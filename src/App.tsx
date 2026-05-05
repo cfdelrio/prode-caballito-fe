@@ -91,7 +91,7 @@ export default function App() {
           <RequireAuth><RequireAdmin><AppLayout><Messages /></AppLayout></RequireAdmin></RequireAuth>
         } />
         <Route path="/reglamento" element={
-          <RequireAuth><AppLayout><Reglamento /></AppLayout></RequireAuth>
+          <AppLayout><Reglamento /></AppLayout>
         } />
         <Route path="/planilla/:planillaId" element={
           <RequireAuth><AppLayout><Planilla /></AppLayout></RequireAuth>
