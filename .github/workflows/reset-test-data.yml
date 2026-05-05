@@ -62,11 +62,11 @@ jobs:
 
       - name: Preview state (before)
         run: |
-          /tmp/run-sql.sh "SELECT (SELECT COUNT(*) FROM matches WHERE estado <> 'pendiente' OR resultado_local IS NOT NULL OR resultado_visitante IS NOT NULL OR finished = true) AS matches_to_reset, (SELECT COUNT(*) FROM scores) AS scores_rows, (SELECT COUNT(*) FROM ranking) AS ranking_rows"
+          /tmp/run-sql.sh "SELECT (SELECT COUNT(*) FROM matches WHERE estado <> 'scheduled' OR resultado_local IS NOT NULL OR resultado_visitante IS NOT NULL OR finished = true) AS matches_to_reset, (SELECT COUNT(*) FROM scores) AS scores_rows, (SELECT COUNT(*) FROM ranking) AS ranking_rows"
 
       - name: Reset matches (results + state)
         run: |
-          /tmp/run-sql.sh "UPDATE matches SET resultado_local = NULL, resultado_visitante = NULL, estado = 'pendiente', finished = false WHERE resultado_local IS NOT NULL OR resultado_visitante IS NOT NULL OR estado <> 'pendiente' OR finished = true"
+          /tmp/run-sql.sh "UPDATE matches SET resultado_local = NULL, resultado_visitante = NULL, estado = 'scheduled', finished = false WHERE resultado_local IS NOT NULL OR resultado_visitante IS NOT NULL OR estado <> 'scheduled' OR finished = true"
 
       - name: Wipe scores (puntos + bonus)
         run: /tmp/run-sql.sh "DELETE FROM scores"
@@ -80,9 +80,9 @@ jobs:
 
       - name: Verify state (after)
         run: |
-          /tmp/run-sql.sh "SELECT (SELECT COUNT(*) FROM matches WHERE estado <> 'pendiente' OR resultado_local IS NOT NULL OR resultado_visitante IS NOT NULL OR finished = true) AS matches_remaining, (SELECT COUNT(*) FROM scores) AS scores_remaining, (SELECT COUNT(*) FROM ranking) AS ranking_remaining"
+          /tmp/run-sql.sh "SELECT (SELECT COUNT(*) FROM matches WHERE estado <> 'scheduled' OR resultado_local IS NOT NULL OR resultado_visitante IS NOT NULL OR finished = true) AS matches_remaining, (SELECT COUNT(*) FROM scores) AS scores_remaining, (SELECT COUNT(*) FROM ranking) AS ranking_remaining"
 
       - name: Summary
         run: |
-          echo "✅ Reset completo. Matches → 'pendiente' sin resultados, scores y rankings vaciados."
+          echo "✅ Reset completo. Matches → 'scheduled' sin resultados, scores y rankings vaciados."
           echo "ℹ️  Los pronósticos (bets) NO se tocaron."
