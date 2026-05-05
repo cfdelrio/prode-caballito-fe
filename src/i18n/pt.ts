@@ -68,6 +68,11 @@ export const pt: T = {
     reminderSet: (m: number) => `Lembrete: ${m} min antes ✓`,
   },
   bets: {
+    helpTitle: '💡 Como carregar teus prognósticos',
+    helpStep1: 'Escolhe uma planilha no seletor ou cria uma nova com o botão ➕.',
+    helpStep2: 'Em cada jogo, toca em 🎯 Completar resultado e escreve o placar (ex: 2-1).',
+    helpStep3: 'Quando terminares de carregar todos os jogos, confirma a planilha para fechá-la.',
+    helpClose: 'Fechar ajuda',
     title: 'Prognósticos', completed: 'completados',
     all: 'Todos', pending: 'Pendentes', finished: 'Finalizados',
     searchTeam: 'Buscar time...',
