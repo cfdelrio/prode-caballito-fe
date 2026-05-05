@@ -54,7 +54,7 @@ export const pt: T = {
   },
   match: {
     vs: 'VS', fin: 'FIM', live: 'AO VIVO', finished: 'Encerrado', closed: 'Fechado', locked: 'Planilha fechada', bonus: 'BÔNUS +1', closesIn: 'Fecha em',
-    noBet: 'Sem prognóstico', bet: '🎯 Apostar', edit: 'Editar', cancel: 'Cancelar',
+    noBet: 'Sem prognóstico', bet: '🎯 Completar resultado', edit: 'Editar', cancel: 'Cancelar',
     invalidFormat: 'Formato inválido. Use: 2-1',
     saved: 'Prognóstico salvo ✓', deleted: 'Prognóstico removido',
     errorSave: 'Erro ao salvar', errorDelete: 'Erro ao remover',

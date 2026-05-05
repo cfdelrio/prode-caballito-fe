@@ -52,7 +52,7 @@ export const es = {
   },
   match: {
     vs: 'VS', fin: 'FIN', live: 'EN VIVO', finished: 'Terminado', closed: 'Cerrado', locked: 'Planilla cerrada', bonus: 'BONUS +1', closesIn: 'Cierra en',
-    noBet: 'Sin pronóstico', bet: '🎯 Apostar', edit: 'Editar', cancel: 'Cancelar',
+    noBet: 'Sin pronóstico', bet: '🎯 Completar resultado', edit: 'Editar', cancel: 'Cancelar',
     invalidFormat: 'Formato inválido. Usá: 2-1',
     saved: 'Pronóstico guardado ✓', deleted: 'Pronóstico eliminado',
     errorSave: 'Error al guardar', errorDelete: 'Error al eliminar',
