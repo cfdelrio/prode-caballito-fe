@@ -66,6 +66,11 @@ export const es = {
     reminderSet: (m: number) => `Recordatorio: ${m} min antes ✓`,
   },
   bets: {
+    helpTitle: '💡 Cómo cargar tus pronósticos',
+    helpStep1: 'Elegí una planilla en el selector o creá una nueva con el botón ➕.',
+    helpStep2: 'En cada partido, tocá 🎯 Completar resultado y escribí el marcador (ej: 2-1).',
+    helpStep3: 'Cuando termines de cargar todos los partidos, confirmá la planilla para cerrarla.',
+    helpClose: 'Cerrar ayuda',
     title: 'Pronósticos', completed: 'completados',
     all: 'Todos', pending: 'Pendientes', finished: 'Finalizados',
     searchTeam: 'Buscar equipo...',

@@ -50,6 +50,7 @@ export function Apuestas() {
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [lockingPlanilla, setLockingPlanilla] = useState(false)
   const [now, setNow] = useState(Date.now())
+  const [showHelp, setShowHelp] = useState(true)
   const hasLive = matches.some(m => m.estado === 'live')
 
   useEffect(() => {
@@ -186,6 +187,26 @@ export function Apuestas() {
         <h1 className="text-xl font-bold text-[#001A4B]">{t.bets.title}</h1>
         <span className="text-sm text-gray-400">{progress.done}/{progress.total} {t.bets.completed}</span>
       </div>
+
+      {/* Caja de ayuda — se cierra con la X y vuelve a aparecer al recargar */}
+      {showHelp && (
+        <div className="relative bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 pr-9 text-sm text-blue-900">
+          <button
+            onClick={() => setShowHelp(false)}
+            aria-label={t.bets.helpClose}
+            title={t.bets.helpClose}
+            className="absolute top-2 right-2 w-7 h-7 rounded-full text-blue-700 hover:bg-blue-100 flex items-center justify-center text-base leading-none transition-colors"
+          >
+            ×
+          </button>
+          <p className="font-semibold mb-1.5">{t.bets.helpTitle}</p>
+          <ol className="list-decimal list-inside space-y-1 text-blue-800">
+            <li>{t.bets.helpStep1}</li>
+            <li>{t.bets.helpStep2}</li>
+            <li>{t.bets.helpStep3}</li>
+          </ol>
+        </div>
+      )}
 
       {/* Selector de planilla + crear nueva */}
       <div className="flex gap-2 items-center">
