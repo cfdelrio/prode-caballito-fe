@@ -4,9 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       confirm:
-        description: "Escribí RESET para confirmar (BORRA resultados, scores y rankings de PRODUCCIÓN)"
+        description: "Tildá la casilla para confirmar el reset destructivo"
+        type: boolean
         required: true
-        default: ""
+        default: false
 
 jobs:
   reset:
@@ -16,8 +17,8 @@ jobs:
     steps:
       - name: Validate confirmation
         run: |
-          if [ "${{ inputs.confirm }}" != "RESET" ]; then
-            echo "::error::Debés escribir exactamente 'RESET' para confirmar."
+          if [ "${{ inputs.confirm }}" != "true" ]; then
+            echo "::error::Tenés que tildar la casilla 'confirm' para ejecutar."
             exit 1
           fi
 
