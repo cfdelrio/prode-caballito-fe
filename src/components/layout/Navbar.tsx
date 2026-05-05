@@ -21,7 +21,6 @@ export function Navbar() {
     { to: '/ranking',                   label: t.nav.ranking, icon: '🏆' },
     { to: '/fixture',                   label: t.nav.fixture, icon: '🗓️' },
     { to: '/reglamento',                label: t.nav.rules,   icon: '📖' },
-    { to: '/premios.html',      label: t.nav.prizes,  icon: '🎁', external: true },
   ]
 
   const adminLinks = [
