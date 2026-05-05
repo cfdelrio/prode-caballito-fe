@@ -14,7 +14,7 @@ export function Navbar() {
   const [switchingLang, setSwitchingLang] = useState(false)
   const [showGanadores, setShowGanadores] = useState(false)
 
-  const navLinks = [
+  const navLinks: { to: string; label: string; icon: string; external?: boolean }[] = [
     { to: '/',                          label: t.nav.home,    icon: '🏠' },
     { to: '/apuestas',                  label: t.nav.bets,    icon: '⚽' },
     { to: '/matriz',                    label: t.nav.matrix,  icon: '📊' },
