@@ -6,6 +6,7 @@ import { MatchCard } from '@/components/match/MatchCard'
 import { Sk, SkMatchCard } from '@/components/ui/Skeleton'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { AdCard } from '@/components/ui/AdCard'
+import { OnboardingTour, hasSeenOnboarding } from '@/components/onboarding/Tour'
 import { useToastStore } from '@/store/toastStore'
 import { teamFlag } from '@/utils/teamFlags'
 
@@ -51,11 +52,21 @@ export function Apuestas() {
   const [lockingPlanilla, setLockingPlanilla] = useState(false)
   const [now, setNow] = useState(Date.now())
   const [showHelp, setShowHelp] = useState(true)
+  const [runTour, setRunTour] = useState(false)
   const hasLive = matches.some(m => m.estado === 'live')
 
   useEffect(() => {
     loadInitial()
   }, [])
+
+  // Arrancar el tour de bienvenida la primera vez que entran a Pronósticos.
+  // Esperamos a que el contenido haya cargado (loading=false) para que los targets existan.
+  useEffect(() => {
+    if (!loading && !hasSeenOnboarding()) {
+      const id = setTimeout(() => setRunTour(true), 400)
+      return () => clearTimeout(id)
+    }
+  }, [loading])
 
   useEffect(() => {
     if (selectedPlanilla) loadBets(selectedPlanilla)
@@ -209,7 +220,7 @@ export function Apuestas() {
       )}
 
       {/* Selector de planilla + crear nueva */}
-      <div className="flex gap-2 items-center">
+      <div className="flex gap-2 items-center" data-tour="planilla-selector">
         {planillas.length > 0 ? (
           <div className="relative flex-1">
             <select
@@ -230,6 +241,7 @@ export function Apuestas() {
         )}
         <button
           onClick={() => setShowNewPlanilla(true)}
+          data-tour="new-planilla"
           className="shrink-0 w-10 h-10 rounded-xl t-bg-primary t-text-on-primary font-bold text-lg flex items-center justify-center hover:opacity-90 transition-opacity"
           title={t.bets.newPlanilla}
         >
@@ -328,7 +340,7 @@ export function Apuestas() {
       )}
 
       {/* Filtros + búsqueda */}
-      <div className="flex gap-2 items-center flex-wrap">
+      <div className="flex gap-2 items-center flex-wrap" data-tour="filters">
         <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
           {([
             { key: 'todos',       label: t.bets.all },
@@ -380,7 +392,7 @@ export function Apuestas() {
       )}
 
       {/* Lista de partidos */}
-      <div className="space-y-3">
+      <div className="space-y-3" data-tour="match-list">
         {filtered.length === 0 && (
           <EmptyState icon="⚽" message={t.bets.noMatches} />
         )}
@@ -399,6 +411,8 @@ export function Apuestas() {
           </Fragment>
         ))}
       </div>
+
+      <OnboardingTour run={runTour} onFinish={() => setRunTour(false)} />
     </div>
   )
 }
