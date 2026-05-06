@@ -1,10 +1,12 @@
 import { useRef, useState, useEffect, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
 import { useT } from '@/hooks/useT'
 import { TEAM_THEMES } from '@/types'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
+import { resetOnboarding } from '@/components/onboarding/Tour'
 
 const COUNTRY_CODES = [
   { code: '+54', flag: '🇦🇷', name: 'Argentina' },
@@ -54,6 +56,7 @@ export function Profile() {
   const { user, updateUser } = useAuthStore()
   const { show } = useToastStore()
   const t = useT()
+  const navigate = useNavigate()
   const fileRef = useRef<HTMLInputElement>(null)
   const [editName, setEditName] = useState(false)
   const [nombre, setNombre] = useState(user?.nombre || '')
@@ -225,6 +228,20 @@ export function Profile() {
             )
           })}
         </div>
+      </div>
+
+      {/* Tour de bienvenida */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+        <button
+          onClick={() => {
+            resetOnboarding()
+            show(t.onboarding.restarted, 'info')
+            navigate('/apuestas')
+          }}
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-blue-200 bg-blue-50 text-blue-800 font-semibold text-sm hover:bg-blue-100 transition-colors"
+        >
+          🎓 {t.onboarding.showAgain}
+        </button>
       </div>
 
       {/* WhatsApp */}
