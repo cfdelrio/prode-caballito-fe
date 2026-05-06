@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { MatchCard } from '@/components/match/MatchCard'
-import { AdCard } from '@/components/ui/AdCard'
 import type { Match, Bet, Planilla, RankingEntry } from '@/types'
 
 // Keyframes inyectados una vez
@@ -673,9 +672,8 @@ export function LeaderHome({
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {upcomingAll.map((m, i) => (
+              {upcomingAll.map((m) => (
                 <div key={m.id}>
-                  {i === 2 && <div style={{ marginBottom: 12 }}><AdCard /></div>}
                   <MatchCard
                     match={m}
                     bet={bets[m.id]}

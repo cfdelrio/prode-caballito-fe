@@ -24,7 +24,6 @@ vi.mock('@/utils/teamFlags', () => ({
   teamAbbr: (name: string) => name.slice(0, 3).toUpperCase(),
 }))
 
-vi.mock('@/components/ui/AdCard', () => ({ AdCard: () => null }))
 
 // MatchCard mockeado para no duplicar su lógica
 vi.mock('@/components/match/MatchCard', () => ({

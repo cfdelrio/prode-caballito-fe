@@ -5,7 +5,6 @@ import { useTeamBadgesStore } from '@/store/teamBadgesStore'
 import { applyTheme } from '@/utils/theme'
 import { Navbar } from '@/components/layout/Navbar'
 import { ToastContainer } from '@/components/ui/Toast'
-import { AdBanner } from '@/components/ui/AdBanner'
 import { GoogleAdUnit } from '@/components/ui/GoogleAdUnit'
 
 const Login      = lazy(() => import('@/pages/Login').then(m => ({ default: m.Login })))
@@ -44,7 +43,6 @@ function AppLayout({ children, adSlot = '4113004001' }: { children: React.ReactN
   return (
     <div className="min-h-screen t-text-page transition-colors duration-300" style={{ background: 'var(--theme-page-bg)' }}>
       <Navbar />
-      <AdBanner />
       {adSlot && <GoogleAdUnit slot={adSlot} />}
       <main className="pb-14 md:pb-0">{children}</main>
     </div>

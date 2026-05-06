@@ -1,7 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { EmptyState } from '@/components/ui/EmptyState'
-import { AdCard } from '@/components/ui/AdCard'
 import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { useT } from '@/hooks/useT'
@@ -228,7 +227,6 @@ export function Ranking() {
                 </button>
               )}
             </div>
-            <AdCard />
             </>
           )}
 

@@ -5,7 +5,6 @@ import { useT } from '@/hooks/useT'
 import { MatchCard } from '@/components/match/MatchCard'
 import { Sk, SkMatchCard } from '@/components/ui/Skeleton'
 import { EmptyState } from '@/components/ui/EmptyState'
-import { AdCard } from '@/components/ui/AdCard'
 import { OnboardingTour, hasSeenOnboarding } from '@/components/onboarding/Tour'
 import { useToastStore } from '@/store/toastStore'
 import { teamFlag } from '@/utils/teamFlags'
@@ -404,9 +403,8 @@ export function Apuestas() {
         {filtered.length === 0 && (
           <EmptyState icon="⚽" message={t.bets.noMatches} />
         )}
-        {filtered.map((m, i) => (
+        {filtered.map((m) => (
           <Fragment key={m.id}>
-            {i === 2 && <AdCard />}
             <MatchCard
               match={m}
               bet={bets[m.id]}

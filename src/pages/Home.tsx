@@ -13,7 +13,6 @@ import { Sk, SkMatchCard } from '@/components/ui/Skeleton'
 import { usePWAInstall } from '@/hooks/usePWAInstall'
 import { teamFlag, teamAbbr } from '@/utils/teamFlags'
 import { LeaderHome } from '@/pages/LeaderHome'
-import { AdCard } from '@/components/ui/AdCard'
 import type { Match, Bet, Planilla, RankingEntry } from '@/types'
 
 /* ── Flip clock display ──────────────────────────────────────────── */
@@ -938,9 +937,8 @@ export function Home() {
         {upcoming.length === 0 ? (
           <EmptyState icon="📅" message={t.home.noUpcoming} />
         ) : (
-          upcoming.map((m, i) => (
+          upcoming.map((m) => (
             <Fragment key={m.id}>
-              {i === 2 && <AdCard />}
               <MatchCard
                 match={m}
                 bet={bets[m.id]}
