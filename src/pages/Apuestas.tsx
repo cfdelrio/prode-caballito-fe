@@ -54,6 +54,7 @@ export function Apuestas() {
   const [showHelp, setShowHelp] = useState(true)
   const [runTour, setRunTour] = useState(false)
   const hasLive = matches.some(m => m.estado === 'live')
+  const isTournamentClosed = matches.length > 0 && now > Math.min(...matches.map(m => new Date(m.time_cutoff).getTime()))
 
   useEffect(() => {
     loadInitial()
@@ -118,6 +119,11 @@ export function Apuestas() {
   }
 
   const handleCreatePlanilla = async () => {
+    if (isTournamentClosed) {
+      show(t.bets.tournamentClosed, 'error')
+      setShowNewPlanilla(false)
+      return
+    }
     setCreatingPlanilla(true)
     try {
       const { data } = await api.post('/planillas')
@@ -239,14 +245,16 @@ export function Apuestas() {
             {t.bets.noPlanillas}
           </div>
         )}
-        <button
-          onClick={() => setShowNewPlanilla(true)}
-          data-tour="new-planilla"
-          className="shrink-0 w-10 h-10 rounded-xl t-bg-primary t-text-on-primary font-bold text-lg flex items-center justify-center hover:opacity-90 transition-opacity"
-          title={t.bets.newPlanilla}
-        >
-          +
-        </button>
+        {!isTournamentClosed && (
+          <button
+            onClick={() => setShowNewPlanilla(true)}
+            data-tour="new-planilla"
+            className="shrink-0 w-10 h-10 rounded-xl t-bg-primary t-text-on-primary font-bold text-lg flex items-center justify-center hover:opacity-90 transition-opacity"
+            title={t.bets.newPlanilla}
+          >
+            +
+          </button>
+        )}
       </div>
 
       {/* Modal nueva planilla */}

@@ -134,8 +134,9 @@ export function Reglamento() {
           <li className="flex items-start gap-2"><span className="shrink-0">🎫</span><span>Cada planilla tiene un valor de <strong>$20.000</strong>.</span></li>
           <li className="flex items-start gap-2"><span className="shrink-0">📋</span><span>Podés participar con <strong>la cantidad de planillas que quieras</strong>, cada una compite por separado.</span></li>
           <li className="flex items-start gap-2"><span className="shrink-0">💰</span><span>El total acumulado va para <strong>un único ganador</strong> (el que sume más puntos).</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">🔒</span><span>El cierre de pronósticos es <strong>5 minutos antes del inicio del primer partido</strong>. A partir de ese momento no se pueden agregar planillas nuevas ni modificar pronósticos.</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">👁️</span><span>Al cierre, la <strong>planilla general</strong> queda visible para todos — podés ver los pronósticos de todos los participantes.</span></li>
           <li className="flex items-start gap-2"><span className="shrink-0">⏰</span><span>El pago debe realizarse antes del inicio del primer partido.</span></li>
-          <li className="flex items-start gap-2"><span className="shrink-0">👁️</span><span>Minutos antes del inicio del primer partido, todos tendrán acceso a la planilla general con todos los pronósticos de todos los participantes.</span></li>
         </ul>
       </div>
 
@@ -167,7 +168,7 @@ export function Reglamento() {
         <h2 className="font-bold text-[#001A4B] text-base">Reglas Generales</h2>
         <ul className="space-y-2 text-sm text-gray-600">
           <li className="flex items-start gap-2"><span className="shrink-0">✅</span> Los resultados cuentan en los <strong>90 minutos</strong>. No cuentan alargues ni penales.</li>
-          <li className="flex items-start gap-2"><span className="shrink-0">✅</span> Podés editar tus pronósticos hasta el cierre (minutos antes del partido).</li>
+          <li className="flex items-start gap-2"><span className="shrink-0">✅</span> Podés editar tus pronósticos hasta el cierre: <strong>5 minutos antes del inicio del primer partido</strong>.</li>
           <li className="flex items-start gap-2"><span className="shrink-0">✅</span> Solo participan en el ranking oficial las planillas con <strong>precio pagado</strong>.</li>
           <li className="flex items-start gap-2"><span className="shrink-0">✅</span> El ranking se actualiza automáticamente al publicar cada resultado.</li>
           <li className="flex items-start gap-2"><span className="shrink-0">📊</span> La app tiene estadísticas, podios, campeonatos de amigos por estrellas y más.</li>
