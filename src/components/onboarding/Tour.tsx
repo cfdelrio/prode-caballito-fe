@@ -83,6 +83,7 @@ export function OnboardingTour({ run, onFinish }: Props) {
         showProgress: true,
         skipBeacon: true,
         buttons: ['back', 'skip', 'primary'],
+        scrollOffset: 80,
       }}
       locale={{
         back: t.onboarding.back,
