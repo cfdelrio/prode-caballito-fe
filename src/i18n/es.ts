@@ -97,6 +97,7 @@ export const es = {
     confirmLock: 'Confirmar planilla',
     planillaLocked: 'Planilla cerrada ✓',
     errorLock: 'Error al cerrar planilla',
+    tournamentClosed: 'El torneo ya cerró. No es posible crear nuevas planillas.',
   },
   ranking: {
     title: '🏆 Ranking', global: 'Global', player: 'Jugador',

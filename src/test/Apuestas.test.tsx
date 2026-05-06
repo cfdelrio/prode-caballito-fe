@@ -164,6 +164,30 @@ describe('Apuestas — filtros', () => {
   })
 })
 
+describe('Apuestas — cutoff de torneo', () => {
+  afterEach(() => vi.clearAllMocks())
+
+  it('muestra botón + nueva planilla cuando el torneo está abierto', async () => {
+    const future = new Date(Date.now() + 3600_000).toISOString()
+    const openMatch = { ...makeMatch('m1'), time_cutoff: future }
+    await setupApi({ matches: [openMatch] })
+    renderApuestas()
+    await waitFor(() => {
+      expect(screen.getByTitle(/Nueva planilla/i)).toBeInTheDocument()
+    }, { timeout: 3000 })
+  })
+
+  it('oculta botón + nueva planilla cuando el torneo cerró', async () => {
+    const past = new Date(Date.now() - 3600_000).toISOString()
+    const closedMatch = { ...makeMatch('m1'), time_cutoff: past, estado: 'scheduled' as const, finished: false }
+    await setupApi({ matches: [closedMatch] })
+    renderApuestas()
+    await waitFor(() => {
+      expect(screen.queryByTitle(/Nueva planilla/i)).toBeNull()
+    }, { timeout: 3000 })
+  })
+})
+
 describe('Apuestas — nueva planilla', () => {
   afterEach(() => vi.clearAllMocks())
 
