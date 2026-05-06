@@ -28,6 +28,12 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }
 
+function HomeRoute() {
+  const { token } = useAuthStore()
+  if (!token) return <AppLayout adSlot={null}><Reglamento /></AppLayout>
+  return <AppLayout adSlot={null}><Home /></AppLayout>
+}
+
 function RequireAdmin({ children }: { children: React.ReactNode }) {
   const { user } = useAuthStore()
   if (!user || user.rol !== 'admin') return <Navigate to="/" replace />
@@ -68,10 +74,8 @@ export default function App() {
         <Route path="/login"    element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* Privadas */}
-        <Route path="/" element={
-          <RequireAuth><AppLayout adSlot={null}><Home /></AppLayout></RequireAuth>
-        } />
+        {/* Home: Reglamento para no logueados, Dashboard para logueados */}
+        <Route path="/" element={<HomeRoute />} />
         <Route path="/apuestas" element={
           <RequireAuth><AppLayout adSlot="4004171291"><Apuestas /></AppLayout></RequireAuth>
         } />
