@@ -6,6 +6,7 @@ import { MatchCard } from '@/components/match/MatchCard'
 import { Sk, SkMatchCard } from '@/components/ui/Skeleton'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { AdCard } from '@/components/ui/AdCard'
+import { OnboardingTour, hasSeenOnboarding } from '@/components/onboarding/Tour'
 import { useToastStore } from '@/store/toastStore'
 import { teamFlag } from '@/utils/teamFlags'
 
@@ -50,11 +51,22 @@ export function Apuestas() {
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [lockingPlanilla, setLockingPlanilla] = useState(false)
   const [now, setNow] = useState(Date.now())
+  const [showHelp, setShowHelp] = useState(true)
+  const [runTour, setRunTour] = useState(false)
   const hasLive = matches.some(m => m.estado === 'live')
 
   useEffect(() => {
     loadInitial()
   }, [])
+
+  // Arrancar el tour de bienvenida la primera vez que entran a Pronósticos.
+  // Esperamos a que el contenido haya cargado (loading=false) para que los targets existan.
+  useEffect(() => {
+    if (!loading && !hasSeenOnboarding()) {
+      const id = setTimeout(() => setRunTour(true), 400)
+      return () => clearTimeout(id)
+    }
+  }, [loading])
 
   useEffect(() => {
     if (selectedPlanilla) loadBets(selectedPlanilla)
@@ -187,8 +199,28 @@ export function Apuestas() {
         <span className="text-sm text-gray-400">{progress.done}/{progress.total} {t.bets.completed}</span>
       </div>
 
+      {/* Caja de ayuda — se cierra con la X y vuelve a aparecer al recargar */}
+      {showHelp && (
+        <div className="relative bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 pr-9 text-sm text-blue-900">
+          <button
+            onClick={() => setShowHelp(false)}
+            aria-label={t.bets.helpClose}
+            title={t.bets.helpClose}
+            className="absolute top-2 right-2 w-7 h-7 rounded-full text-blue-700 hover:bg-blue-100 flex items-center justify-center text-base leading-none transition-colors"
+          >
+            ×
+          </button>
+          <p className="font-semibold mb-1.5">{t.bets.helpTitle}</p>
+          <ol className="list-decimal list-inside space-y-1 text-blue-800">
+            <li>{t.bets.helpStep1}</li>
+            <li>{t.bets.helpStep2}</li>
+            <li>{t.bets.helpStep3}</li>
+          </ol>
+        </div>
+      )}
+
       {/* Selector de planilla + crear nueva */}
-      <div className="flex gap-2 items-center">
+      <div className="flex gap-2 items-center" data-tour="planilla-selector">
         {planillas.length > 0 ? (
           <div className="relative flex-1">
             <select
@@ -209,6 +241,7 @@ export function Apuestas() {
         )}
         <button
           onClick={() => setShowNewPlanilla(true)}
+          data-tour="new-planilla"
           className="shrink-0 w-10 h-10 rounded-xl t-bg-primary t-text-on-primary font-bold text-lg flex items-center justify-center hover:opacity-90 transition-opacity"
           title={t.bets.newPlanilla}
         >
@@ -307,7 +340,7 @@ export function Apuestas() {
       )}
 
       {/* Filtros + búsqueda */}
-      <div className="flex gap-2 items-center flex-wrap">
+      <div className="flex gap-2 items-center flex-wrap" data-tour="filters">
         <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
           {([
             { key: 'todos',       label: t.bets.all },
@@ -359,7 +392,7 @@ export function Apuestas() {
       )}
 
       {/* Lista de partidos */}
-      <div className="space-y-3">
+      <div className="space-y-3" data-tour="match-list">
         {filtered.length === 0 && (
           <EmptyState icon="⚽" message={t.bets.noMatches} />
         )}
@@ -378,6 +411,8 @@ export function Apuestas() {
           </Fragment>
         ))}
       </div>
+
+      <OnboardingTour run={runTour} onFinish={() => setRunTour(false)} />
     </div>
   )
 }
