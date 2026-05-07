@@ -832,6 +832,23 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
     }
   }, [expandedUserId, allPlanillas, show])
 
+  const handleDeleteUser = async (userId: string, userName: string) => {
+    const confirmed = confirm(`⚠️ ¿Eliminar a "${userName}" y TODOS sus datos (planillas, apuestas, scores)?`)
+    if (!confirmed) return
+
+    const confirmation = prompt(`Escribí "CONFIRMAR" para eliminar a ${userName} (es irreversible):`)
+    if (confirmation !== 'CONFIRMAR') return
+
+    try {
+      await api.delete(`/users/${userId}`)
+      setData(data.filter(u => String(u.id) !== userId))
+      show(`Usuario ${userName} eliminado completamente ✓`, 'success')
+    } catch (e: unknown) {
+      const msg = (e as { response?: { data?: { error?: string } } }).response?.data?.error || 'Error al eliminar usuario'
+      show(msg, 'error')
+    }
+  }
+
   const handlePaid = async (id: string, current: boolean) => {
     try {
       await api.put(`/planillas/admin/${id}`, { precio_pagado: !current })
@@ -894,6 +911,7 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
             <th className="text-center px-4 py-2 font-semibold">Rol</th>
             <th className="text-center px-4 py-2 font-semibold">Verificado</th>
             <th className="text-center px-4 py-2 font-semibold">Solicitudes</th>
+            <th className="text-right px-4 py-2 font-semibold">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -925,6 +943,18 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
                       </span>
                     : <span className="text-gray-300 text-xs">—</span>
                   }
+                </td>
+                <td className="px-4 py-2 text-right">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDeleteUser(uid, String(u.nombre || ''))
+                    }}
+                    className="text-xs text-red-500 hover:text-red-700 font-semibold px-2 py-1 transition-colors"
+                    title={`Eliminar a ${u.nombre} y todos sus datos`}
+                  >
+                    🗑️ Eliminar
+                  </button>
                 </td>
               </tr>
               {/* Panel expandible de planillas */}
