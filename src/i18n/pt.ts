@@ -248,7 +248,7 @@ export const pt: T = {
     nameUpdated: 'Nome atualizado', photoUpdated: 'Foto atualizada ✓',
     themeActivated: (n: string) => `Tema ${n} ativado ✓`,
     whatsappTitle: '💬 WhatsApp visível para outros jogadores',
-    whatsappPlaceholder: 'Ex: 5511999999999 (com código do país)',
+    whatsappPlaceholder: 'Ex: 11999999999 (só número sem código do país)',
     whatsappConsent: 'Aceito que meu número seja visível para outros jogadores na Planilha geral',
     whatsappSaved: 'WhatsApp salvo ✓',
     whatsappRemoved: 'WhatsApp removido',

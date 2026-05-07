@@ -281,7 +281,7 @@ export function Ranking() {
                           </p>
                           {r.whatsapp_number && !isMe && (
                             <a
-                              href={`https://wa.me/${r.whatsapp_number.replace(/\D/g, '')}`}
+                              href={`https://wa.me/${r.whatsapp_number}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={e => e.stopPropagation()}
