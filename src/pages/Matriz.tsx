@@ -380,7 +380,7 @@ export function Matriz() {
                         </div>
                         {r.whatsapp_number && !isMe && (
                           <a
-                            href={`https://wa.me/${r.whatsapp_number}`}
+                            href={`https://wa.me/${r.whatsapp_number.replace(/\D/g, '')}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={e => e.stopPropagation()}
