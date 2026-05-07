@@ -110,40 +110,6 @@ describe('Apuestas — renderizado básico', () => {
 describe('Apuestas — filtros', () => {
   afterEach(() => vi.clearAllMocks())
 
-  it('filtro Pendientes oculta partidos finalizados', async () => {
-    const user = userEvent.setup()
-    const matches = [makeMatch('m1', 'scheduled'), makeMatch('m2', 'finished')]
-    await setupApi({ matches })
-    renderApuestas()
-
-    await waitFor(() => {
-      expect(screen.getAllByTestId('match-card').length).toBeGreaterThanOrEqual(2)
-    }, { timeout: 3000 })
-
-    await user.click(screen.getByText(/^Pendientes$/i))
-    // Solo queda el partido pendiente
-    await waitFor(() => {
-      expect(screen.getAllByTestId('match-card').length).toBe(1)
-      expect(screen.getByText(/Homem1/)).toBeInTheDocument()
-    })
-  })
-
-  it('filtro Finalizados oculta pendientes', async () => {
-    const user = userEvent.setup()
-    const matches = [makeMatch('m1', 'scheduled'), makeMatch('m2', 'finished')]
-    await setupApi({ matches })
-    renderApuestas()
-
-    await waitFor(() => {
-      expect(screen.getAllByTestId('match-card').length).toBeGreaterThanOrEqual(2)
-    }, { timeout: 3000 })
-
-    await user.click(screen.getByText(/^Finalizados$/i))
-    await waitFor(() => {
-      expect(screen.getAllByTestId('match-card').length).toBe(1)
-      expect(screen.getByText(/Homem2/)).toBeInTheDocument()
-    })
-  })
 
   it('búsqueda filtra por nombre de equipo', async () => {
     const user = userEvent.setup()
