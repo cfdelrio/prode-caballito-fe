@@ -563,7 +563,7 @@ export function Home() {
   if (loading) return <HomeSkeleton />
 
   // ── Home exclusiva para el líder (#1) ──────────────────────────────────────
-  if (myEntry && myEntry.position === 1) {
+  if (myEntry && myEntry.position === 1 && myEntry.puntos_totales > 0) {
     return (
       <LeaderHome
         matches={matches}
@@ -643,7 +643,7 @@ export function Home() {
           <p className="text-white/45 text-xs mt-2 mb-3">
             {getGreeting(now)}, {user?.nombre?.split(' ')[0] || 'jugador'}
             {myEntry && <> · #{myEntry.position} · <span style={{ color: 'var(--theme-secondary)' }}>{myEntry.puntos_totales}pts</span></>}
-            {myEntry && ptsDiff === 0 && <> · <span className="text-yellow-400 font-bold">¡Líder! 🏆</span></>}
+            {myEntry && ptsDiff === 0 && myEntry.puntos_totales > 0 && <> · <span className="text-yellow-400 font-bold">¡Líder! 🏆</span></>}
           </p>
 
           {/* CTA button */}
@@ -842,7 +842,7 @@ export function Home() {
           <div className="text-3xl">📊</div>
           <div className="text-xs font-bold t-text-nav">{t.home.matrix}</div>
           <div className="text-[10px] t-text-muted leading-tight hidden sm:block">Analizá y dominá</div>
-          {ptsDiff !== null ? (
+          {ptsDiff !== null && myEntry && myEntry.puntos_totales > 0 ? (
             ptsDiff === 0 ? (
               <span className="text-[10px] font-bold bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full">
                 {t.home.leader}
