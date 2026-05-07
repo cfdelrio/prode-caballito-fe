@@ -1,4 +1,6 @@
 import { POINT_COLORS } from '@/utils/scoring'
+import { Link } from 'react-router-dom'
+import { useAuthStore } from '@/store/authStore'
 
 const examples = [
   {
@@ -52,6 +54,8 @@ const examples = [
 ]
 
 export function Reglamento({ showHomePromo = false }: { showHomePromo?: boolean } = {}) {
+  const { token } = useAuthStore()
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-5 pb-20">
 
@@ -192,6 +196,27 @@ export function Reglamento({ showHomePromo = false }: { showHomePromo?: boolean 
       </div>
 
       <p className="text-center text-sm text-gray-400 pb-2">¡Buena suerte a todos! 🏆</p>
+
+      {!token && (
+        <div className="bg-gradient-to-r from-[#001A4B] to-[#0042A5] rounded-2xl p-6 text-center space-y-4 mt-6">
+          <h2 className="text-white font-bold text-lg">¿Listo para jugar?</h2>
+          <p className="text-white/80 text-sm">Creá tu cuenta o inicia sesión para empezar a hacer pronósticos.</p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              to="/login"
+              className="bg-[#FFDF00] text-[#001A4B] font-bold py-3 px-8 rounded-xl hover:bg-yellow-300 transition-colors"
+            >
+              Iniciar Sesión
+            </Link>
+            <Link
+              to="/register"
+              className="bg-white text-[#001A4B] font-bold py-3 px-8 rounded-xl hover:bg-gray-100 transition-colors"
+            >
+              Crear Cuenta
+            </Link>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
