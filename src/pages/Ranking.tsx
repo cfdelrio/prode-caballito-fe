@@ -279,13 +279,13 @@ export function Ranking() {
                           <p className={`text-sm font-semibold truncate ${isMe ? 't-text-primary' : 't-text-nav'}`}>
                             {r.user_name} {isMe && <span className="text-xs font-normal">{t.ranking.you}</span>}
                           </p>
-                          {r.whatsapp_number && !isMe && (
+                          {r.whatsapp_number && (
                             <a
                               href={`https://wa.me/${r.whatsapp_number}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={e => e.stopPropagation()}
-                              title={`WhatsApp a ${r.user_name}`}
+                              title={`WhatsApp${!isMe ? ` a ${r.user_name}` : ''}`}
                               className="shrink-0 transition-opacity opacity-70 hover:opacity-100 leading-none flex-none"
                               data-testid="whatsapp-link"
                             >
