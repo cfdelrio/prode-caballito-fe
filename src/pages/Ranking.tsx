@@ -275,9 +275,26 @@ export function Ranking() {
                           </div>
                       }
                       <div className="min-w-0">
-                        <p className={`text-sm font-semibold truncate ${isMe ? 't-text-primary' : 't-text-nav'}`}>
-                          {r.user_name} {isMe && <span className="text-xs font-normal">{t.ranking.you}</span>}
-                        </p>
+                        <div className="flex items-center gap-1.5">
+                          <p className={`text-sm font-semibold truncate ${isMe ? 't-text-primary' : 't-text-nav'}`}>
+                            {r.user_name} {isMe && <span className="text-xs font-normal">{t.ranking.you}</span>}
+                          </p>
+                          {r.whatsapp_number && !isMe && (
+                            <a
+                              href={`https://wa.me/${r.whatsapp_number}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={e => e.stopPropagation()}
+                              title={`WhatsApp a ${r.user_name}`}
+                              className="shrink-0 transition-opacity opacity-70 hover:opacity-100 leading-none flex-none"
+                              data-testid="whatsapp-link"
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ color: '#25D366' }}>
+                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-5.031 1.378c-1.557.821-2.989 2.065-4.11 3.652a9.995 9.995 0 001.378 15.323c1.557.821 3.291 1.243 5.031 1.243 5.516 0 9.996-4.482 9.996-9.998 0-2.670-.997-5.165-2.806-7.151-1.81-1.988-4.307-3.192-7.010-3.457z" />
+                              </svg>
+                            </a>
+                          )}
+                        </div>
                         <p className="text-xs text-gray-400 truncate">{r.nombre_planilla}
                           {!r.precio_pagado && <span className="ml-1 text-orange-400 font-medium">· {t.ranking.noOfficial}</span>}
                         </p>
