@@ -20,6 +20,7 @@ const Reglamento = lazy(() => import('@/pages/Reglamento').then(m => ({ default:
 const Planilla   = lazy(() => import('@/pages/Planilla').then(m => ({ default: m.Planilla })))
 const Tournaments = lazy(() => import('@/pages/Tournaments').then(m => ({ default: m.Tournaments })))
 const Fixture    = lazy(() => import('@/pages/Fixture').then(m => ({ default: m.Fixture })))
+const RecuperarContrasena = lazy(() => import('@/pages/RecuperarContrasena').then(m => ({ default: m.RecuperarContrasena })))
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { token } = useAuthStore()
@@ -71,6 +72,7 @@ export default function App() {
         {/* Públicas */}
         <Route path="/login"    element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/recuperar-contrasena" element={<RecuperarContrasena />} />
 
         {/* Home: Reglamento para no logueados, Dashboard para logueados */}
         <Route path="/" element={<HomeRoute />} />
