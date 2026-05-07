@@ -43,7 +43,6 @@ export function Apuestas() {
   const [planillas, setPlanillas] = useState<Planilla[]>([])
   const [selectedPlanilla, setSelectedPlanilla] = useState<string>('')
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState<'todos' | 'pendientes' | 'finalizados'>('todos')
   const [search, setSearch] = useState('')
   const [showNewPlanilla, setShowNewPlanilla] = useState(false)
   const [creatingPlanilla, setCreatingPlanilla] = useState(false)
@@ -164,8 +163,6 @@ export function Apuestas() {
 
   const filtered = matches
     .filter((m) => {
-      if (filter === 'pendientes' && m.estado === 'finished') return false
-      if (filter === 'finalizados' && m.estado !== 'finished') return false
       if (search) {
         const q = search.toLowerCase()
         return m.home_team.toLowerCase().includes(q) || m.away_team.toLowerCase().includes(q)
@@ -346,25 +343,8 @@ export function Apuestas() {
         </>
       )}
 
-      {/* Filtros + búsqueda */}
+      {/* Búsqueda */}
       <div className="flex gap-2 items-center flex-wrap" data-tour="filters">
-        <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
-          {([
-            { key: 'todos',       label: t.bets.all },
-            { key: 'pendientes',  label: t.bets.pending },
-            { key: 'finalizados', label: t.bets.finished },
-          ] as const).map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => setFilter(key)}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                filter === key ? 'bg-white shadow text-[#0042A5]' : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
         <input
           type="text"
           value={search}
