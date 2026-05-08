@@ -1,26 +1,27 @@
 import { useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { api } from '@/api/client'
 import { useToastStore } from '@/store/toastStore'
 
 export function RecuperarContrasena() {
   const { show } = useToastStore()
-  const [searchParams] = useSearchParams()
-  const token = searchParams.get('token')
+  const navigate = useNavigate()
 
-  const [step, setStep] = useState<'email' | 'reset'>(token ? 'reset' : 'email')
+  const [step, setStep] = useState<'email' | 'code'>('email')
   const [email, setEmail] = useState('')
+  const [code, setCode] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const [form, setForm] = useState({ password: '', confirmPassword: '' })
 
-  const handleRequestReset = async (e: React.FormEvent) => {
+  const handleRequestCode = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email) return
     setLoading(true)
     try {
       await api.post('/auth/forgot-password', { email })
-      show('Se envió un email con instrucciones para recuperar tu contraseña', 'success')
-      setEmail('')
+      show('Te enviamos un código al email', 'success')
+      setStep('code')
     } catch (e: unknown) {
       const msg = (e as { response?: { data?: { error?: string } } }).response?.data?.error || 'Error al enviar email'
       show(msg, 'error')
@@ -31,28 +32,21 @@ export function RecuperarContrasena() {
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!form.password || !form.confirmPassword) return
-    if (form.password !== form.confirmPassword) {
+    if (password !== confirmPassword) {
       show('Las contraseñas no coinciden', 'error')
       return
     }
-    if (form.password.length < 6) {
+    if (password.length < 6) {
       show('La contraseña debe tener al menos 6 caracteres', 'error')
       return
     }
-    if (!token) {
-      show('Token inválido o expirado', 'error')
-      return
-    }
-
     setLoading(true)
     try {
-      await api.post('/auth/reset-password', { token, password: form.password })
+      await api.post('/auth/reset-password', { email, code, newPassword: password })
       show('Contraseña restablecida correctamente', 'success')
-      setForm({ password: '', confirmPassword: '' })
-      setStep('email')
+      navigate('/login')
     } catch (e: unknown) {
-      const msg = (e as { response?: { data?: { error?: string } } }).response?.data?.error || 'Error al restablecer contraseña'
+      const msg = (e as { response?: { data?: { error?: string } } }).response?.data?.error || 'Código inválido o expirado'
       show(msg, 'error')
     } finally {
       setLoading(false)
@@ -70,9 +64,9 @@ export function RecuperarContrasena() {
 
         <div className="p-8 space-y-4">
           {step === 'email' ? (
-            <form onSubmit={handleRequestReset} className="space-y-4">
+            <form onSubmit={handleRequestCode} className="space-y-4">
               <p className="text-gray-600 text-sm">
-                Ingresa tu email y te enviaremos instrucciones para recuperar tu contraseña.
+                Ingresá tu email y te enviamos un código de 6 dígitos.
               </p>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
@@ -90,20 +84,32 @@ export function RecuperarContrasena() {
                 disabled={loading}
                 className="w-full bg-[#0042A5] text-white font-bold py-3 rounded-xl hover:bg-[#003080] disabled:opacity-50 transition-colors"
               >
-                {loading ? 'Enviando...' : 'Enviar Instrucciones'}
+                {loading ? 'Enviando...' : 'Enviar Código'}
               </button>
             </form>
           ) : (
             <form onSubmit={handleResetPassword} className="space-y-4">
               <p className="text-gray-600 text-sm">
-                Ingresa tu nueva contraseña.
+                Revisá tu email <strong>{email}</strong> e ingresá el código de 6 dígitos.
               </p>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Código</label>
+                <input
+                  type="text"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0042A5] text-sm text-center tracking-[0.5em] font-bold text-lg"
+                  placeholder="000000"
+                  maxLength={6}
+                  required
+                />
+              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Nueva Contraseña</label>
                 <input
                   type="password"
-                  value={form.password}
-                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0042A5] text-sm"
                   placeholder="••••••"
                   required
@@ -113,8 +119,8 @@ export function RecuperarContrasena() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Confirmar Contraseña</label>
                 <input
                   type="password"
-                  value={form.confirmPassword}
-                  onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                   className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0042A5] text-sm"
                   placeholder="••••••"
                   required
@@ -126,6 +132,13 @@ export function RecuperarContrasena() {
                 className="w-full bg-[#0042A5] text-white font-bold py-3 rounded-xl hover:bg-[#003080] disabled:opacity-50 transition-colors"
               >
                 {loading ? 'Restableciendo...' : 'Restablecer Contraseña'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setStep('email')}
+                className="w-full text-sm text-gray-500 hover:text-gray-700"
+              >
+                Volver a ingresar email
               </button>
             </form>
           )}
