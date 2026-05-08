@@ -75,11 +75,6 @@ export function Login() {
               Registrate
             </Link>
           </p>
-          <p className="text-center text-sm text-gray-400 mt-3">
-            <Link to="/recuperar-contrasena" className="text-[#0042A5] font-semibold hover:underline">
-              ¿Olvidaste tu contraseña?
-            </Link>
-          </p>
         </form>
       </div>
     </div>
