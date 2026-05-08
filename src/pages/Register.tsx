@@ -122,9 +122,22 @@ export function Register() {
 
   const handleComplete = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // Validar que el teléfono sea obligatorio
+    if (!localPhone || !localPhone.trim()) {
+      show('El número de WhatsApp es obligatorio', 'error')
+      return
+    }
+
+    // Validar que acepte compartir el número
+    if (!waConsent) {
+      show('Debes aceptar compartir tu número para registrarte', 'error')
+      return
+    }
+
     setLoading(true)
     try {
-      const whatsapp_number = localPhone ? `${countryCode}${localPhone.replace(/\D/g, '')}` : undefined
+      const whatsapp_number = `${countryCode}${localPhone.replace(/\D/g, '')}`
       const { data } = await api.post('/auth/complete-registration', {
         userId,
         tema_equipo: tema,
@@ -319,7 +332,7 @@ export function Register() {
 
               {/* Teléfono con código de país */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">📱 Número de WhatsApp</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">📱 Número de WhatsApp <span className="text-red-500">*</span></label>
                 <div className="flex gap-2">
                   <select
                     value={countryCode}
@@ -336,6 +349,7 @@ export function Register() {
                     onChange={e => setLocalPhone(e.target.value.replace(/\D/g, ''))}
                     placeholder="11 1234 5678"
                     maxLength={12}
+                    required
                     className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0042A5] text-sm"
                   />
                 </div>

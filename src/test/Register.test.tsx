@@ -167,6 +167,14 @@ async function goToCompleteStep() {
   await user.click(screen.getByRole('button', { name: /Verificar/i }))
   await waitFor(() => expect(screen.getByText(/Email verificado/i)).toBeInTheDocument())
 
+  // Ingresar teléfono y aceptar consentimiento (ahora obligatorio)
+  await user.type(screen.getByPlaceholderText('11 1234 5678'), '1155996222')
+  const checkboxLabel = screen.getByText(/Acepto que mi número sea visible/)
+  const checkbox = checkboxLabel.closest('label')?.querySelector('input[type="checkbox"]')
+  if (checkbox && !checkbox.checked) {
+    await user.click(checkbox)
+  }
+
   return { user, api }
 }
 
