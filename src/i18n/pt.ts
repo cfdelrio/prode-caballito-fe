@@ -250,6 +250,7 @@ export const pt: T = {
     whatsappTitle: '💬 WhatsApp visível para outros jogadores',
     whatsappPlaceholder: 'Ex: 11999999999 (só número sem código do país)',
     whatsappConsent: 'Aceito que meu número seja visível para outros jogadores na Planilha geral',
+    whatsappNotice: '🔔 Em breve: notificações automáticas por WhatsApp (ranking, resultados, lembretes). Estamos finalizando a habilitação com WhatsApp Business.',
     whatsappSaved: 'WhatsApp salvo ✓',
     whatsappRemoved: 'WhatsApp removido',
     planillaCreated: 'Planilha criada ✓', planillaDeleted: 'Planilha removida',
