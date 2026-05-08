@@ -10,7 +10,7 @@ import { GoogleAdUnit } from '@/components/ui/GoogleAdUnit'
 
 const Login          = lazy(() => import('@/pages/Login').then(m => ({ default: m.Login })))
 const Register       = lazy(() => import('@/pages/Register').then(m => ({ default: m.Register })))
-const ForgotPassword = lazy(() => import('@/pages/ForgotPassword').then(m => ({ default: m.ForgotPassword })))
+const RecuperarContrasena = lazy(() => import('@/pages/RecuperarContrasena').then(m => ({ default: m.RecuperarContrasena })))
 const Home       = lazy(() => import('@/pages/Home').then(m => ({ default: m.Home })))
 const Apuestas   = lazy(() => import('@/pages/Apuestas').then(m => ({ default: m.Apuestas })))
 const Matriz     = lazy(() => import('@/pages/Matriz').then(m => ({ default: m.Matriz })))
@@ -68,7 +68,7 @@ export default function App() {
         {/* Públicas */}
         <Route path="/login"            element={<Login />} />
         <Route path="/register"         element={<Register />} />
-        <Route path="/forgot-password"  element={<ForgotPassword />} />
+        <Route path="/recuperar-contrasena" element={<RecuperarContrasena />} />
 
         {/* Privadas */}
         <Route path="/" element={
