@@ -8,8 +8,9 @@ import { ToastContainer } from '@/components/ui/Toast'
 import { AdBanner } from '@/components/ui/AdBanner'
 import { GoogleAdUnit } from '@/components/ui/GoogleAdUnit'
 
-const Login      = lazy(() => import('@/pages/Login').then(m => ({ default: m.Login })))
-const Register   = lazy(() => import('@/pages/Register').then(m => ({ default: m.Register })))
+const Login          = lazy(() => import('@/pages/Login').then(m => ({ default: m.Login })))
+const Register       = lazy(() => import('@/pages/Register').then(m => ({ default: m.Register })))
+const ForgotPassword = lazy(() => import('@/pages/ForgotPassword').then(m => ({ default: m.ForgotPassword })))
 const Home       = lazy(() => import('@/pages/Home').then(m => ({ default: m.Home })))
 const Apuestas   = lazy(() => import('@/pages/Apuestas').then(m => ({ default: m.Apuestas })))
 const Matriz     = lazy(() => import('@/pages/Matriz').then(m => ({ default: m.Matriz })))
@@ -65,8 +66,9 @@ export default function App() {
       }>
       <Routes>
         {/* Públicas */}
-        <Route path="/login"    element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/login"            element={<Login />} />
+        <Route path="/register"         element={<Register />} />
+        <Route path="/forgot-password"  element={<ForgotPassword />} />
 
         {/* Privadas */}
         <Route path="/" element={
