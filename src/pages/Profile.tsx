@@ -49,7 +49,11 @@ function parsePhone(full: string): { code: string; local: string } {
   if (!full) return { code: '+54', local: '' }
   const match = COUNTRY_CODES.find(c => full.startsWith(c.code))
   if (match) return { code: match.code, local: full.slice(match.code.length) }
-  return { code: '+54', local: full.replace(/^\+/, '') }
+  // Handle numbers without + (e.g., "541155996222" becomes code: "+54", local: "1155996222")
+  const withoutPlus = full.replace(/^\+/, '')
+  const numMatch = COUNTRY_CODES.find(c => withoutPlus.startsWith(c.code.slice(1)))
+  if (numMatch) return { code: numMatch.code, local: withoutPlus.slice(numMatch.code.length - 1) }
+  return { code: '+54', local: withoutPlus }
 }
 
 export function Profile() {
