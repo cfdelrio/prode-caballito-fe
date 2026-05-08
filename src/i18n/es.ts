@@ -188,6 +188,7 @@ export const es = {
     step6Title: '🏆 ¡Listo, a jugar!',
     step6: 'Vas a ver tu posición en el Ranking automáticamente. Podés volver a ver este tour desde tu Perfil cuando quieras.',
     back: 'Atrás', next: 'Siguiente', last: 'Listo', skip: 'Saltar', close: 'Cerrar',
+    nextLabelWithProgress: 'Siguiente ({step} de {steps})',
     showAgain: 'Ver tour de bienvenida',
     restarted: 'Tour reiniciado — andá a Pronósticos',
   },
@@ -270,6 +271,10 @@ export const es = {
     copied: '✓ Copiado',
     modalHistoryTitle: '🇦🇷 Historial de Argentina',
     modalClose: 'Cerrar',
+  },
+  register: {
+    phoneRequired: 'El número de WhatsApp es obligatorio',
+    consentRequired: 'Debés aceptar compartir tu número para registrarte',
   },
 }
 
