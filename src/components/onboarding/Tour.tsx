@@ -90,7 +90,7 @@ export function OnboardingTour({ run, onFinish }: Props) {
         close: t.onboarding.close,
         last: t.onboarding.last,
         next: t.onboarding.next,
-        nextLabelWithProgress: t.onboarding.nextLabelWithProgress,
+        nextWithProgress: t.onboarding.nextWithProgress,
         skip: t.onboarding.skip,
       }}
     />

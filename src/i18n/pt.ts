@@ -270,7 +270,7 @@ export const pt: T = {
     step6Title: '🏆 Pronto, a jogar!',
     step6: 'Vais ver tua posição no Ranking automaticamente. Podes voltar a ver este tour desde teu Perfil quando quiseres.',
     back: 'Voltar', next: 'Próximo', last: 'Pronto', skip: 'Pular', close: 'Fechar',
-    nextLabelWithProgress: 'Próximo ({step} de {steps})',
+    nextWithProgress: 'Próximo ({step} de {steps})',
     showAgain: 'Ver tour de boas-vindas',
     restarted: 'Tour reiniciado — vai para Prognósticos',
   },

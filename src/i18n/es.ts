@@ -188,7 +188,7 @@ export const es = {
     step6Title: '🏆 ¡Listo, a jugar!',
     step6: 'Vas a ver tu posición en el Ranking automáticamente. Podés volver a ver este tour desde tu Perfil cuando quieras.',
     back: 'Atrás', next: 'Siguiente', last: 'Listo', skip: 'Saltar', close: 'Cerrar',
-    nextLabelWithProgress: 'Siguiente ({step} de {steps})',
+    nextWithProgress: 'Siguiente ({step} de {steps})',
     showAgain: 'Ver tour de bienvenida',
     restarted: 'Tour reiniciado — andá a Pronósticos',
   },
