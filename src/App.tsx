@@ -7,8 +7,9 @@ import { Navbar } from '@/components/layout/Navbar'
 import { ToastContainer } from '@/components/ui/Toast'
 import { GoogleAdUnit } from '@/components/ui/GoogleAdUnit'
 
-const Login      = lazy(() => import('@/pages/Login').then(m => ({ default: m.Login })))
-const Register   = lazy(() => import('@/pages/Register').then(m => ({ default: m.Register })))
+const Login               = lazy(() => import('@/pages/Login').then(m => ({ default: m.Login })))
+const Register            = lazy(() => import('@/pages/Register').then(m => ({ default: m.Register })))
+const RecuperarContrasena = lazy(() => import('@/pages/RecuperarContrasena').then(m => ({ default: m.RecuperarContrasena })))
 const Home       = lazy(() => import('@/pages/Home').then(m => ({ default: m.Home })))
 const Apuestas   = lazy(() => import('@/pages/Apuestas').then(m => ({ default: m.Apuestas })))
 const Matriz     = lazy(() => import('@/pages/Matriz').then(m => ({ default: m.Matriz })))
@@ -20,7 +21,6 @@ const Reglamento = lazy(() => import('@/pages/Reglamento').then(m => ({ default:
 const Planilla   = lazy(() => import('@/pages/Planilla').then(m => ({ default: m.Planilla })))
 const Tournaments = lazy(() => import('@/pages/Tournaments').then(m => ({ default: m.Tournaments })))
 const Fixture    = lazy(() => import('@/pages/Fixture').then(m => ({ default: m.Fixture })))
-const RecuperarContrasena = lazy(() => import('@/pages/RecuperarContrasena').then(m => ({ default: m.RecuperarContrasena })))
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { token } = useAuthStore()
@@ -69,12 +69,10 @@ export default function App() {
         </div>
       }>
       <Routes>
-        {/* Públicas */}
         <Route path="/login"    element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/recuperar-contrasena" element={<RecuperarContrasena />} />
 
-        {/* Home: Reglamento para no logueados, Dashboard para logueados */}
         <Route path="/" element={<HomeRoute />} />
         <Route path="/apuestas" element={
           <RequireAuth><AppLayout adSlot="4004171291"><Apuestas /></AppLayout></RequireAuth>
@@ -106,16 +104,12 @@ export default function App() {
         <Route path="/fixture" element={
           <RequireAuth><AppLayout><Fixture /></AppLayout></RequireAuth>
         } />
-
-        {/* Admin */}
         <Route path="/admin" element={
           <RequireAuth><RequireAdmin><AppLayout><Admin /></AppLayout></RequireAdmin></RequireAuth>
         } />
         <Route path="/admin/planillas" element={
           <RequireAuth><RequireAdmin><AppLayout><Admin /></AppLayout></RequireAdmin></RequireAuth>
         } />
-
-        {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       </Suspense>

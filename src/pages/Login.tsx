@@ -65,6 +65,11 @@ export function Login() {
             {loading ? 'Ingresando...' : 'Iniciar Sesión'}
           </button>
           <p className="text-center text-sm text-gray-500">
+            <Link to="/recuperar-contrasena" className="text-[#0042A5] hover:underline">
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </p>
+          <p className="text-center text-sm text-gray-500">
             ¿No tenés cuenta?{' '}
             <Link to="/register" className="text-[#0042A5] font-semibold hover:underline">
               Registrate
