@@ -362,8 +362,9 @@ export function Register() {
                     onChange={e => setWaConsent(e.target.checked)}
                     className="mt-0.5 w-4 h-4 accent-[#0042A5] shrink-0"
                   />
-                  <span className="text-xs text-gray-500 leading-relaxed">Acepto que mi número sea visible para otros jugadores en la Planilla general</span>
+                  <span className="text-xs text-gray-500 leading-relaxed">{t.profile.whatsappConsent}</span>
                 </label>
+                <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 leading-relaxed mt-2">{t.profile.whatsappNotice}</p>
               </div>
 
               {/* Equipo favorito */}

@@ -279,6 +279,7 @@ export function Profile() {
           />
           <span className="text-xs text-gray-500 leading-relaxed">{t.profile.whatsappConsent}</span>
         </label>
+        <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 leading-relaxed">{t.profile.whatsappNotice}</p>
         <button
           onClick={handleSaveWhatsapp}
           disabled={savingWa || (waConsent && !waNumber)}
