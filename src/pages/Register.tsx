@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { api } from '@/api/client'
 import { useToastStore } from '@/store/toastStore'
 import { useAuthStore } from '@/store/authStore'
+import { useT } from '@/hooks/useT'
 
 type Step = 'form' | 'verify' | 'complete' | 'notify'
 
@@ -53,6 +54,7 @@ const TEAMS = [
 
 export function Register() {
   const navigate = useNavigate()
+  const t = useT()
   const { show } = useToastStore()
   const { setAuth, updateUser } = useAuthStore()
   const fileRef = useRef<HTMLInputElement>(null)
@@ -122,9 +124,20 @@ export function Register() {
 
   const handleComplete = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!localPhone || !localPhone.trim()) {
+      show(t.register.phoneRequired, 'error')
+      return
+    }
+
+    if (!waConsent) {
+      show(t.register.consentRequired, 'error')
+      return
+    }
+
     setLoading(true)
     try {
-      const whatsapp_number = localPhone ? `${countryCode}${localPhone.replace(/\D/g, '')}` : undefined
+      const whatsapp_number = `${countryCode}${localPhone.replace(/\D/g, '')}`
       const { data } = await api.post('/auth/complete-registration', {
         userId,
         tema_equipo: tema,
@@ -319,7 +332,7 @@ export function Register() {
 
               {/* Teléfono con código de país */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">📱 Número de WhatsApp</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">📱 Número de WhatsApp <span className="text-red-500">*</span></label>
                 <div className="flex gap-2">
                   <select
                     value={countryCode}
@@ -334,8 +347,11 @@ export function Register() {
                     type="tel"
                     value={localPhone}
                     onChange={e => setLocalPhone(e.target.value.replace(/\D/g, ''))}
+                    onInvalid={e => e.currentTarget.setCustomValidity(t.register.phoneRequired)}
+                    onInput={e => e.currentTarget.setCustomValidity('')}
                     placeholder="11 1234 5678"
                     maxLength={12}
+                    required
                     className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0042A5] text-sm"
                   />
                 </div>
@@ -346,8 +362,9 @@ export function Register() {
                     onChange={e => setWaConsent(e.target.checked)}
                     className="mt-0.5 w-4 h-4 accent-[#0042A5] shrink-0"
                   />
-                  <span className="text-xs text-gray-500 leading-relaxed">Acepto que mi número sea visible para otros jugadores en la Matriz</span>
+                  <span className="text-xs text-gray-500 leading-relaxed">{t.profile.whatsappConsent}</span>
                 </label>
+                <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 leading-relaxed mt-2">{t.profile.whatsappNotice}</p>
               </div>
 
               {/* Equipo favorito */}

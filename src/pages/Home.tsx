@@ -13,7 +13,6 @@ import { Sk, SkMatchCard } from '@/components/ui/Skeleton'
 import { usePWAInstall } from '@/hooks/usePWAInstall'
 import { teamFlag, teamAbbr } from '@/utils/teamFlags'
 import { LeaderHome } from '@/pages/LeaderHome'
-import { AdCard } from '@/components/ui/AdCard'
 import type { Match, Bet, Planilla, RankingEntry } from '@/types'
 
 /* ── Flip clock display ──────────────────────────────────────────── */
@@ -564,7 +563,7 @@ export function Home() {
   if (loading) return <HomeSkeleton />
 
   // ── Home exclusiva para el líder (#1) ──────────────────────────────────────
-  if (myEntry && myEntry.position === 1) {
+  if (myEntry && myEntry.position === 1 && myEntry.puntos_totales > 0) {
     return (
       <LeaderHome
         matches={matches}
@@ -644,7 +643,7 @@ export function Home() {
           <p className="text-white/45 text-xs mt-2 mb-3">
             {getGreeting(now)}, {user?.nombre?.split(' ')[0] || 'jugador'}
             {myEntry && <> · #{myEntry.position} · <span style={{ color: 'var(--theme-secondary)' }}>{myEntry.puntos_totales}pts</span></>}
-            {myEntry && ptsDiff === 0 && <> · <span className="text-yellow-400 font-bold">¡Líder! 🏆</span></>}
+            {myEntry && ptsDiff === 0 && myEntry.puntos_totales > 0 && <> · <span className="text-yellow-400 font-bold">¡Líder! 🏆</span></>}
           </p>
 
           {/* CTA button */}
@@ -843,7 +842,7 @@ export function Home() {
           <div className="text-3xl">📊</div>
           <div className="text-xs font-bold t-text-nav">{t.home.matrix}</div>
           <div className="text-[10px] t-text-muted leading-tight hidden sm:block">Analizá y dominá</div>
-          {ptsDiff !== null ? (
+          {ptsDiff !== null && myEntry && myEntry.puntos_totales > 0 ? (
             ptsDiff === 0 ? (
               <span className="text-[10px] font-bold bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full">
                 {t.home.leader}
@@ -862,36 +861,6 @@ export function Home() {
       {/* ── CAROUSEL GANADORES ────────────────────────────────── */}
       {winners.length > 0 && <WinnersCarousel winners={winners} />}
 
-      {/* ── Banner Premios Nueva Chicago ──────────────────────── */}
-      <a
-        href="/premios.html"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block rounded-2xl overflow-hidden"
-        style={{
-          background: 'linear-gradient(110deg, #002A10 0%, #005C28 55%, #001A08 100%)',
-          border: '1px solid rgba(0,166,80,0.35)',
-        }}
-      >
-        <div className="flex items-center gap-4 px-4 py-4">
-          <img
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Escudo_del_Club_Atl%C3%A9tico_Nueva_Chicago.svg/500px-Escudo_del_Club_Atl%C3%A9tico_Nueva_Chicago.svg.png"
-            alt="Nueva Chicago"
-            className="w-12 h-12 object-contain shrink-0"
-          />
-          <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-bold tracking-widest uppercase text-green-400/80 mb-0.5">🏆 Premios reales</p>
-            <p className="text-white font-black text-sm leading-tight">Ganá el Prode y llevate<br/>más de $600.000 en premios</p>
-            <p className="text-white/50 text-[11px] mt-0.5">Pileta · Entradas · Ropa · Camiseta firmada</p>
-          </div>
-          <div
-            className="shrink-0 text-xs font-black px-3 py-2 rounded-xl whitespace-nowrap"
-            style={{ background: '#00A650', color: '#fff' }}
-          >
-            Ver premios →
-          </div>
-        </div>
-      </a>
 
       {/* ── 3. RANKING ACTUAL ─────────────────────────────────── */}
       {top3.length > 0 && (
@@ -968,9 +937,8 @@ export function Home() {
         {upcoming.length === 0 ? (
           <EmptyState icon="📅" message={t.home.noUpcoming} />
         ) : (
-          upcoming.map((m, i) => (
+          upcoming.map((m) => (
             <Fragment key={m.id}>
-              {i === 2 && <AdCard />}
               <MatchCard
                 match={m}
                 bet={bets[m.id]}

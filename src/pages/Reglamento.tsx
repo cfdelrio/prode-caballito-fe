@@ -1,4 +1,6 @@
 import { POINT_COLORS } from '@/utils/scoring'
+import { Link } from 'react-router-dom'
+import { useAuthStore } from '@/store/authStore'
 
 const examples = [
   {
@@ -51,9 +53,26 @@ const examples = [
   },
 ]
 
-export function Reglamento() {
+export function Reglamento({ showHomePromo = false }: { showHomePromo?: boolean } = {}) {
+  const { token } = useAuthStore()
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-5 pb-20">
+
+      {showHomePromo && (
+        <a
+          href="/login"
+          className="block rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-shadow"
+          aria-label="Jugar ahora"
+        >
+          <img
+            src="/promo-jugar.png"
+            alt="¿Te la bancás? Jugá desde $25 — Jugar ahora"
+            className="w-full h-auto block"
+            loading="eager"
+          />
+        </a>
+      )}
 
       {/* Header */}
       <div className="bg-[#001A4B] text-white rounded-2xl p-5 text-center space-y-1">
@@ -134,8 +153,9 @@ export function Reglamento() {
           <li className="flex items-start gap-2"><span className="shrink-0">🎫</span><span>Cada planilla tiene un valor de <strong>$20.000</strong>.</span></li>
           <li className="flex items-start gap-2"><span className="shrink-0">📋</span><span>Podés participar con <strong>la cantidad de planillas que quieras</strong>, cada una compite por separado.</span></li>
           <li className="flex items-start gap-2"><span className="shrink-0">💰</span><span>El total acumulado va para <strong>un único ganador</strong> (el que sume más puntos).</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">🔒</span><span>El cierre de pronósticos es <strong>5 minutos antes del inicio del primer partido</strong>. A partir de ese momento no se pueden agregar planillas nuevas ni modificar pronósticos.</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">👁️</span><span>Al cierre, la <strong>planilla general</strong> queda visible para todos — podés ver los pronósticos de todos los participantes.</span></li>
           <li className="flex items-start gap-2"><span className="shrink-0">⏰</span><span>El pago debe realizarse antes del inicio del primer partido.</span></li>
-          <li className="flex items-start gap-2"><span className="shrink-0">👁️</span><span>Minutos antes del inicio del primer partido, todos tendrán acceso a la planilla general con todos los pronósticos de todos los participantes.</span></li>
         </ul>
       </div>
 
@@ -167,7 +187,7 @@ export function Reglamento() {
         <h2 className="font-bold text-[#001A4B] text-base">Reglas Generales</h2>
         <ul className="space-y-2 text-sm text-gray-600">
           <li className="flex items-start gap-2"><span className="shrink-0">✅</span> Los resultados cuentan en los <strong>90 minutos</strong>. No cuentan alargues ni penales.</li>
-          <li className="flex items-start gap-2"><span className="shrink-0">✅</span> Podés editar tus pronósticos hasta el cierre (minutos antes del partido).</li>
+          <li className="flex items-start gap-2"><span className="shrink-0">✅</span> Podés editar tus pronósticos hasta el cierre: <strong>5 minutos antes del inicio del primer partido</strong>.</li>
           <li className="flex items-start gap-2"><span className="shrink-0">✅</span> Solo participan en el ranking oficial las planillas con <strong>precio pagado</strong>.</li>
           <li className="flex items-start gap-2"><span className="shrink-0">✅</span> El ranking se actualiza automáticamente al publicar cada resultado.</li>
           <li className="flex items-start gap-2"><span className="shrink-0">📊</span> La app tiene estadísticas, podios, campeonatos de amigos por estrellas y más.</li>
@@ -176,6 +196,27 @@ export function Reglamento() {
       </div>
 
       <p className="text-center text-sm text-gray-400 pb-2">¡Buena suerte a todos! 🏆</p>
+
+      {!token && (
+        <div className="bg-gradient-to-r from-[#001A4B] to-[#0042A5] rounded-2xl p-6 text-center space-y-4 mt-6">
+          <h2 className="text-white font-bold text-lg">¿Listo para jugar?</h2>
+          <p className="text-white/80 text-sm">Creá tu cuenta o inicia sesión para empezar a hacer pronósticos.</p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              to="/login"
+              className="bg-[#FFDF00] text-[#001A4B] font-bold py-3 px-8 rounded-xl hover:bg-yellow-300 transition-colors"
+            >
+              Iniciar Sesión
+            </Link>
+            <Link
+              to="/register"
+              className="bg-white text-[#001A4B] font-bold py-3 px-8 rounded-xl hover:bg-gray-100 transition-colors"
+            >
+              Crear Cuenta
+            </Link>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

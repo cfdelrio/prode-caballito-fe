@@ -378,13 +378,13 @@ export function Matriz() {
                             </span>
                           )}
                         </div>
-                        {r.whatsapp_number && !isMe && (
+                        {r.whatsapp_number && (
                           <a
                             href={`https://wa.me/${r.whatsapp_number}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={e => e.stopPropagation()}
-                            title={`WhatsApp a ${r.user_name}`}
+                            title={`WhatsApp${!isMe ? ` a ${r.user_name}` : ''}`}
                             className="shrink-0 transition-opacity opacity-80 hover:opacity-100 leading-none"
                             style={{ color: '#25D366' }}
                           >

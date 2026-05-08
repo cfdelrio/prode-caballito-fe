@@ -15,7 +15,6 @@ vi.mock('@/store/toastStore', () => ({
   useToastStore: () => ({ show: vi.fn() }),
 }))
 
-vi.mock('@/components/ui/AdCard', () => ({ AdCard: () => null }))
 
 vi.mock('@/api/client', () => ({
   api: { get: vi.fn(), post: vi.fn() },

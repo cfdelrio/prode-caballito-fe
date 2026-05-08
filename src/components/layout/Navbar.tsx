@@ -14,14 +14,13 @@ export function Navbar() {
   const [switchingLang, setSwitchingLang] = useState(false)
   const [showGanadores, setShowGanadores] = useState(false)
 
-  const navLinks = [
+  const navLinks: { to: string; label: string; icon: string; external?: boolean }[] = [
     { to: '/',                          label: t.nav.home,    icon: '🏠' },
     { to: '/apuestas',                  label: t.nav.bets,    icon: '⚽' },
     { to: '/matriz',                    label: t.nav.matrix,  icon: '📊' },
     { to: '/ranking',                   label: t.nav.ranking, icon: '🏆' },
     { to: '/fixture',                   label: t.nav.fixture, icon: '🗓️' },
     { to: '/reglamento',                label: t.nav.rules,   icon: '📖' },
-    { to: '/premios.html',      label: t.nav.prizes,  icon: '🎁', external: true },
   ]
 
   const adminLinks = [
