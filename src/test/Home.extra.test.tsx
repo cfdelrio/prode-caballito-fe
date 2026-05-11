@@ -130,7 +130,6 @@ describe('Home — reglamento inline', () => {
     await waitFor(() => {
       expect(screen.getByText(/Sistema de Puntuación/i)).toBeInTheDocument()
     }, { timeout: 3000 })
-    // Cada nivel de puntos aparece al menos 2 veces (en Sistema + en Ejemplos)
     expect(screen.getAllByText(/4 pts/i).length).toBeGreaterThanOrEqual(1)
     expect(screen.getAllByText(/3 pts/i).length).toBeGreaterThanOrEqual(1)
     expect(screen.getAllByText(/0 pts/i).length).toBeGreaterThanOrEqual(1)
@@ -142,7 +141,6 @@ describe('Home — reglamento inline', () => {
     await waitFor(() => {
       expect(screen.getByText(/Ejemplos Prácticos/i)).toBeInTheDocument()
     }, { timeout: 3000 })
-    // Hay 5 ejemplos, cada uno con "Resultado real"
     expect(screen.getAllByText(/Resultado real/i).length).toBe(5)
     expect(screen.getAllByText(/Tu pronóstico/i).length).toBe(5)
   })
@@ -152,6 +150,16 @@ describe('Home — reglamento inline', () => {
     renderHome()
     await waitFor(() => {
       expect(screen.getByText(/Condiciones Importantes/i)).toBeInTheDocument()
+    }, { timeout: 3000 })
+  })
+
+  it('muestra sección de precios con oferta combo', async () => {
+    await setupApi({})
+    renderHome()
+    await waitFor(() => {
+      expect(screen.getByText(/\$25\.000/)).toBeInTheDocument()
+      expect(screen.getByText(/\$40\.000/)).toBeInTheDocument()
+      expect(screen.getByText(/2 boletas combo/i)).toBeInTheDocument()
     }, { timeout: 3000 })
   })
 })
@@ -167,7 +175,6 @@ describe('Home — ranking y hero', () => {
     await setupApi({ ranking })
     renderHome()
     await waitFor(() => {
-      // El hero muestra "30pts" (sin espacio) — distinto del "4 pts" (con espacio) de la sección de puntuación
       expect(screen.getByText(/30\s*pts/)).toBeInTheDocument()
     }, { timeout: 3000 })
   })
@@ -196,31 +203,35 @@ describe('Home — partidos y apuestas', () => {
   })
 })
 
-describe('Home — botón compartir', () => {
+describe('Home — invitar a un amigo', () => {
   afterEach(() => vi.clearAllMocks())
 
-  it('muestra botón "Enviar a un amigo" siempre visible en el hero', async () => {
+  it('muestra botón "Invitar a un amigo" en el hero', async () => {
     await setupApi({ ranking: [] })
     renderHome()
     await waitFor(() => {
-      expect(screen.getByText(/Enviar a un amigo/i)).toBeInTheDocument()
+      expect(screen.getByText(/Invitar a un amigo/i)).toBeInTheDocument()
     }, { timeout: 3000 })
   })
 
-  it('muestra card de compartir por WhatsApp al final de la página', async () => {
+  it('muestra card de invitación con botones WhatsApp y Personalizar', async () => {
     await setupApi({ ranking: [] })
     renderHome()
     await waitFor(() => {
-      expect(screen.getByText(/Enviar por WhatsApp/i)).toBeInTheDocument()
+      expect(screen.getByText(/Mientras más jueguen/i)).toBeInTheDocument()
     }, { timeout: 3000 })
+    // Botón WhatsApp directo de la card
+    expect(screen.getAllByText(/WhatsApp/i).length).toBeGreaterThanOrEqual(1)
+    // Botón Personalizar abre el modal
+    expect(screen.getByText(/Personalizar/i)).toBeInTheDocument()
   })
 
-  it('sticky bar mobile tiene botón de WhatsApp', async () => {
+  it('sticky bar mobile tiene botón "Invitar amigo"', async () => {
     await setupApi({ ranking: [] })
     renderHome()
     await waitFor(() => {
-      const waButtons = screen.getAllByText(/Enviar a amigo/i)
-      expect(waButtons.length).toBeGreaterThanOrEqual(1)
+      const inviteBtns = screen.getAllByText(/Invitar amigo/i)
+      expect(inviteBtns.length).toBeGreaterThanOrEqual(1)
     }, { timeout: 3000 })
   })
 })
