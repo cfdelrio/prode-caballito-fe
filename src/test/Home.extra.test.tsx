@@ -220,7 +220,9 @@ describe('Home — invitar a un amigo', () => {
     await waitFor(() => {
       expect(screen.getByText(/Mientras más jueguen/i)).toBeInTheDocument()
     }, { timeout: 3000 })
+    // "WhatsApp" aparece en la descripción de la card y en el botón
     expect(screen.getAllByText(/WhatsApp/i).length).toBeGreaterThanOrEqual(1)
+    // "Personalizar" aparece en el link del hero y en el botón de la card
     expect(screen.getAllByText(/Personalizar/i).length).toBeGreaterThanOrEqual(1)
   })
 
