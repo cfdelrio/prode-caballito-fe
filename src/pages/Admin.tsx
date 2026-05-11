@@ -8,8 +8,9 @@ import { Spinner } from '@/components/ui/Spinner'
 import { useToastStore } from '@/store/toastStore'
 import { useAuthStore } from '@/store/authStore'
 import type { Match, Tournament } from '@/types'
+import { BackupsTab } from '@/pages/admin/BackupsTab'
 
-type Tab = 'partidos' | 'planillas' | 'usuarios' | 'torneos' | 'broadcast' | 'jobs'
+type Tab = 'partidos' | 'planillas' | 'usuarios' | 'torneos' | 'broadcast' | 'jobs' | 'backups'
 
 const SUPER_ADMIN_EMAIL = 'cfdelrio@gmail.com'
 
@@ -136,7 +137,10 @@ export function Admin() {
     { id: 'usuarios', label: '👥 Usuarios' },
     { id: 'torneos', label: '🏆 Torneos' },
     { id: 'broadcast',   label: '📣 WhatsApp' },
-    ...(isSuperAdmin ? [{ id: 'jobs' as Tab, label: '⚙️ Procesos' }] : []),
+    ...(isSuperAdmin ? [
+      { id: 'backups' as Tab, label: '💾 Backups' },
+      { id: 'jobs' as Tab, label: '⚙️ Procesos' },
+    ] : []),
   ]
 
   return (
@@ -177,6 +181,9 @@ export function Admin() {
 
       {/* Tab: Procesos manuales */}
       {tab === 'jobs' && <JobsTab />}
+
+      {/* Tab: Backups */}
+      {tab === 'backups' && <BackupsTab />}
 
       {/* Modal partido */}
       <Modal open={showMatchModal} onClose={() => setShowMatchModal(false)} title={editMatch ? 'Editar Partido' : 'Nuevo Partido'}>
