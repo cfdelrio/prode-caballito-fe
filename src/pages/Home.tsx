@@ -324,8 +324,6 @@ function HomeSkeleton() {
 
 /* ── Contenido estático ──────────────────────────────────────── */
 
-const SHARE_TEXT = `⚽ Vuelve el Prode del Mundial\n\nArmá tus resultados, competí en el ranking y jugá contra todos.\n\nEntrá acá:\nhttps://prodecaballito.com`
-
 function buildInviteMessage(inviterName?: string): string {
   if (inviterName) {
     return `⚽ ¡Te invito al PRODE del Mundial 2026!\n\nSoy ${inviterName} y te quiero desafiar. Armá tus resultados, sumá puntos y jugá contra todos en el ranking.\n\n🎫 1 boleta $25.000\n⚡ Combo 2 boletas (1ra + 2da ronda) $40.000\n\nEntrá acá:\nhttps://prodecaballito.com`
@@ -448,15 +446,6 @@ export function Home() {
 
   const myEntry = ranking.find(r => r.user_id === user?.id)
 
-  /* ── Compartir simple (botón directo de WhatsApp) ───────── */
-  const handleQuickShare = () => {
-    if (navigator.share) {
-      navigator.share({ text: SHARE_TEXT }).catch(() => {})
-    } else {
-      window.open(`https://wa.me/?text=${encodeURIComponent(SHARE_TEXT)}`, '_blank')
-    }
-  }
-
   /* ── Modal de invitación multi-canal ────────────────────── */
   const openInviteModal = () => {
     const inviterName = user?.nombre?.split(' ')[0]
@@ -465,7 +454,7 @@ export function Home() {
   }
 
   const inviteVia = (channel: 'whatsapp' | 'sms' | 'email' | 'copy' | 'native') => {
-    const text = inviteMessage
+    const text = inviteMessage || buildInviteMessage(user?.nombre?.split(' ')[0])
     const encoded = encodeURIComponent(text)
     switch (channel) {
       case 'whatsapp':
@@ -808,8 +797,6 @@ export function Home() {
           <div className="px-4 pb-5 pt-1 grid grid-cols-2 gap-2.5">
             <button
               onClick={() => inviteVia('whatsapp')}
-              onMouseEnter={() => { if (!inviteMessage) setInviteMessage(buildInviteMessage(user?.nombre?.split(' ')[0])) }}
-              onTouchStart={() => { if (!inviteMessage) setInviteMessage(buildInviteMessage(user?.nombre?.split(' ')[0])) }}
               className="font-black text-sm py-3 rounded-xl flex items-center justify-center gap-2 transition-all hover:brightness-105 active:scale-[0.98]"
               style={{ background: '#25D366', color: '#fff', boxShadow: '0 4px 16px rgba(37,211,102,0.35)' }}
             >
@@ -1005,9 +992,6 @@ export function Home() {
           </div>
         </>
       )}
-
-      {/* Reservar handleQuickShare como utilitario alternativo */}
-      <span className="hidden" data-quick-share onClick={handleQuickShare} aria-hidden="true" />
 
     </div>
   )
