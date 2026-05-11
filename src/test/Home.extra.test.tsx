@@ -129,10 +129,11 @@ describe('Home — reglamento inline', () => {
     renderHome()
     await waitFor(() => {
       expect(screen.getByText(/Sistema de Puntuación/i)).toBeInTheDocument()
-      expect(screen.getByText(/4 pts/i)).toBeInTheDocument()
-      expect(screen.getByText(/3 pts/i)).toBeInTheDocument()
-      expect(screen.getByText(/0 pts/i)).toBeInTheDocument()
     }, { timeout: 3000 })
+    // Cada nivel de puntos aparece al menos 2 veces (en Sistema + en Ejemplos)
+    expect(screen.getAllByText(/4 pts/i).length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText(/3 pts/i).length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText(/0 pts/i).length).toBeGreaterThanOrEqual(1)
   })
 
   it('muestra ejemplos prácticos', async () => {
@@ -140,8 +141,10 @@ describe('Home — reglamento inline', () => {
     renderHome()
     await waitFor(() => {
       expect(screen.getByText(/Ejemplos Prácticos/i)).toBeInTheDocument()
-      expect(screen.getByText(/Resultado real/i)).toBeInTheDocument()
     }, { timeout: 3000 })
+    // Hay 5 ejemplos, cada uno con "Resultado real"
+    expect(screen.getAllByText(/Resultado real/i).length).toBe(5)
+    expect(screen.getAllByText(/Tu pronóstico/i).length).toBe(5)
   })
 
   it('muestra condiciones importantes', async () => {
@@ -164,7 +167,7 @@ describe('Home — ranking y hero', () => {
     await setupApi({ ranking })
     renderHome()
     await waitFor(() => {
-      // El hero muestra "30pts" (sin espacio) junto a la posición — distinto del "4 pts" (con espacio) de la sección de puntuación
+      // El hero muestra "30pts" (sin espacio) — distinto del "4 pts" (con espacio) de la sección de puntuación
       expect(screen.getByText(/30\s*pts/)).toBeInTheDocument()
     }, { timeout: 3000 })
   })
