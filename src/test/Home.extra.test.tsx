@@ -223,7 +223,8 @@ describe('Home — invitar a un amigo', () => {
     }, { timeout: 3000 })
     // "WhatsApp" aparece en la descripción de la card y en el botón
     expect(screen.getAllByText(/WhatsApp/i).length).toBeGreaterThanOrEqual(1)
-    expect(screen.getByText(/Personalizar/i)).toBeInTheDocument()
+    // "Personalizar" aparece en el link del hero y en el botón de la card
+    expect(screen.getAllByText(/Personalizar/i).length).toBeGreaterThanOrEqual(1)
   })
 
   it('sticky bar mobile tiene botón "Invitar amigo"', async () => {
