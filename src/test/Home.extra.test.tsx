@@ -157,10 +157,11 @@ describe('Home — reglamento inline', () => {
     await setupApi({})
     renderHome()
     await waitFor(() => {
-      expect(screen.getByText(/\$25\.000/)).toBeInTheDocument()
-      expect(screen.getByText(/\$40\.000/)).toBeInTheDocument()
       expect(screen.getByText(/2 boletas combo/i)).toBeInTheDocument()
     }, { timeout: 3000 })
+    // $25.000 y $40.000 aparecen en card de Precios + en Condiciones Importantes
+    expect(screen.getAllByText(/\$25\.000/).length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText(/\$40\.000/).length).toBeGreaterThanOrEqual(1)
   })
 })
 
@@ -220,9 +221,8 @@ describe('Home — invitar a un amigo', () => {
     await waitFor(() => {
       expect(screen.getByText(/Mientras más jueguen/i)).toBeInTheDocument()
     }, { timeout: 3000 })
-    // Botón WhatsApp directo de la card
+    // "WhatsApp" aparece en la descripción de la card y en el botón
     expect(screen.getAllByText(/WhatsApp/i).length).toBeGreaterThanOrEqual(1)
-    // Botón Personalizar abre el modal
     expect(screen.getByText(/Personalizar/i)).toBeInTheDocument()
   })
 
