@@ -1,10 +1,9 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { Home } from '@/pages/Home'
 
-// ─── Mocks (mismo set que Home.cta.test.tsx) ─────────────────────────────────
+// ─── Mocks ───────────────────────────────────────────────────────────────────
 
 vi.mock('@/store/authStore', () => ({
   useAuthStore: vi.fn((selector?: (s: any) => any) => {
@@ -22,7 +21,6 @@ vi.mock('@/utils/theme', () => ({ applyTheme: vi.fn() }))
 vi.mock('@/hooks/usePWAInstall', () => ({
   usePWAInstall: () => ({ state: { type: 'unavailable' }, install: vi.fn() }),
 }))
-
 
 vi.mock('@/pages/LeaderHome', () => ({
   LeaderHome: () => <div data-testid="leader-home" />,
@@ -72,8 +70,6 @@ function setupApi(overrides: {
 } = {}) {
   return import('@/api/client').then(({ api }) => {
     if (overrides.rejectAll) {
-      // Solo rechazar /matches para forzar el catch de loadData; los demás resuelven
-      // para evitar rechazos no manejados en Promise.all (Node 20 los trata como fatal)
       ;(api.get as ReturnType<typeof vi.fn>).mockImplementation((url: string) => {
         if (url.startsWith('/matches')) return Promise.reject(new Error('network'))
         return Promise.resolve({ data: { data: [] } })
@@ -81,11 +77,10 @@ function setupApi(overrides: {
       return
     }
     ;(api.get as ReturnType<typeof vi.fn>).mockImplementation((url: string) => {
-      if (url.startsWith('/matches')) return Promise.resolve({ data: { data: { matches: overrides.matches ?? [] } } })
+      if (url.startsWith('/matches'))   return Promise.resolve({ data: { data: { matches: overrides.matches ?? [] } } })
       if (url.startsWith('/planillas')) return Promise.resolve({ data: { data: [PLANILLA] } })
-      if (url.startsWith('/ranking')) return Promise.resolve({ data: { data: { ranking: overrides.ranking ?? [] } } })
-      if (url.startsWith('/tournaments')) return Promise.resolve({ data: { data: [] } })
-      if (url.includes('/bets')) return Promise.resolve({ data: { data: overrides.bets ?? [] } })
+      if (url.startsWith('/ranking'))   return Promise.resolve({ data: { data: { ranking: overrides.ranking ?? [] } } })
+      if (url.includes('/bets'))        return Promise.resolve({ data: { data: overrides.bets ?? [] } })
       return Promise.resolve({ data: { data: [] } })
     })
   })
@@ -101,11 +96,9 @@ describe('Home — estado de carga y errores', () => {
   afterEach(() => vi.clearAllMocks())
 
   it('muestra skeleton mientras carga', async () => {
-    // API que nunca resuelve → loading permanente
     const { api } = await import('@/api/client')
     ;(api.get as ReturnType<typeof vi.fn>).mockImplementation(() => new Promise(() => {}))
     renderHome()
-    // Skeleton está en el DOM (no hay contenido real)
     expect(screen.queryByText(/pronóstico/i)).toBeNull()
   })
 
@@ -118,25 +111,52 @@ describe('Home — estado de carga y errores', () => {
   })
 })
 
-describe('Home — ranking y podio', () => {
+describe('Home — reglamento inline', () => {
   afterEach(() => vi.clearAllMocks())
 
-  it('muestra top 3 cuando hay ranking', async () => {
-    const ranking = [
-      { planilla_id: 'p2', user_id: 'u2', user_name: 'Ana García', puntos_totales: 50, position: 1 },
-      { planilla_id: 'p3', user_id: 'u3', user_name: 'Bob López', puntos_totales: 40, position: 2 },
-      { planilla_id: 'p4', user_id: 'u4', user_name: 'Caro Ruiz', puntos_totales: 30, position: 3 },
-    ]
-    await setupApi({ ranking })
+  it('muestra sección "Cómo funciona" con los 3 pasos', async () => {
+    await setupApi({})
     renderHome()
     await waitFor(() => {
-      expect(screen.getByText('Ana')).toBeInTheDocument()
-      expect(screen.getByText('Bob')).toBeInTheDocument()
-      expect(screen.getByText('Caro')).toBeInTheDocument()
+      expect(screen.getByText(/Cómo funciona/i)).toBeInTheDocument()
+      expect(screen.getByText(/Pronosticá/i)).toBeInTheDocument()
+      expect(screen.getByText(/Ganá/i)).toBeInTheDocument()
     }, { timeout: 3000 })
   })
 
-  it('mi posición aparece resaltada con "(vos)"', async () => {
+  it('muestra sistema de puntuación con 5 niveles', async () => {
+    await setupApi({})
+    renderHome()
+    await waitFor(() => {
+      expect(screen.getByText(/Sistema de Puntuación/i)).toBeInTheDocument()
+      expect(screen.getByText(/4 pts/i)).toBeInTheDocument()
+      expect(screen.getByText(/3 pts/i)).toBeInTheDocument()
+      expect(screen.getByText(/0 pts/i)).toBeInTheDocument()
+    }, { timeout: 3000 })
+  })
+
+  it('muestra ejemplos prácticos', async () => {
+    await setupApi({})
+    renderHome()
+    await waitFor(() => {
+      expect(screen.getByText(/Ejemplos Prácticos/i)).toBeInTheDocument()
+      expect(screen.getByText(/Resultado real/i)).toBeInTheDocument()
+    }, { timeout: 3000 })
+  })
+
+  it('muestra condiciones importantes', async () => {
+    await setupApi({})
+    renderHome()
+    await waitFor(() => {
+      expect(screen.getByText(/Condiciones Importantes/i)).toBeInTheDocument()
+    }, { timeout: 3000 })
+  })
+})
+
+describe('Home — ranking y hero', () => {
+  afterEach(() => vi.clearAllMocks())
+
+  it('muestra posición y puntos del usuario en el hero cuando tiene ranking', async () => {
     const ranking = [
       { planilla_id: 'p2', user_id: 'u2', user_name: 'Ana García', puntos_totales: 50, position: 1 },
       { planilla_id: 'p1', user_id: 'u1', user_name: 'Carlos Foo', puntos_totales: 30, position: 2 },
@@ -144,8 +164,7 @@ describe('Home — ranking y podio', () => {
     await setupApi({ ranking })
     renderHome()
     await waitFor(() => {
-      // "(vos)" aparece junto al nombre del usuario logueado
-      expect(screen.getByText(/\(vos\)/i)).toBeInTheDocument()
+      expect(screen.getByText(/30\s*pts/)).toBeInTheDocument()
     }, { timeout: 3000 })
   })
 
@@ -159,25 +178,33 @@ describe('Home — ranking y podio', () => {
       expect(screen.getByTestId('leader-home')).toBeInTheDocument()
     }, { timeout: 3000 })
   })
-})
 
-describe('Home — partidos próximos', () => {
-  afterEach(() => vi.clearAllMocks())
-
-  it('renderiza tarjetas de partidos próximos', async () => {
-    const matches = [futureMatch('m1'), futureMatch('m2')]
-    await setupApi({ matches })
+  it('sin ranking no muestra puntos en el hero', async () => {
+    await setupApi({ ranking: [] })
     renderHome()
     await waitFor(() => {
-      expect(screen.getAllByTestId('match-card').length).toBeGreaterThanOrEqual(1)
+      expect(screen.queryByText(/pts$/)).toBeNull()
     }, { timeout: 3000 })
   })
+})
 
-  it('sin partidos ni ranking → no muestra tarjetas', async () => {
+describe('Home — partidos y apuestas', () => {
+  afterEach(() => vi.clearAllMocks())
+
+  it('sin partidos → no muestra tarjetas de partido', async () => {
     await setupApi({ matches: [], ranking: [] })
     renderHome()
     await waitFor(() => {
       expect(screen.queryByTestId('match-card')).toBeNull()
+    }, { timeout: 3000 })
+  })
+
+  it('con apuestas pendientes muestra CTA para completar pronósticos', async () => {
+    const matches = [futureMatch('m1'), futureMatch('m2')]
+    await setupApi({ matches, bets: [] })
+    renderHome()
+    await waitFor(() => {
+      expect(screen.getByText(/pronóstico/i)).toBeInTheDocument()
     }, { timeout: 3000 })
   })
 })
@@ -185,27 +212,28 @@ describe('Home — partidos próximos', () => {
 describe('Home — botón compartir', () => {
   afterEach(() => vi.clearAllMocks())
 
-  it('muestra botón compartir cuando el usuario tiene puntos', async () => {
-    const ranking = [
-      { planilla_id: 'p1', user_id: 'u1', user_name: 'Carlos Foo', puntos_totales: 20, position: 2 },
-      { planilla_id: 'p2', user_id: 'u2', user_name: 'Ana', puntos_totales: 30, position: 1 },
-    ]
-    await setupApi({ ranking })
+  it('muestra botón "Enviar a un amigo" siempre visible en el hero', async () => {
+    await setupApi({ ranking: [] })
     renderHome()
     await waitFor(() => {
-      expect(screen.getByText(/Compartir/i)).toBeInTheDocument()
+      expect(screen.getByText(/Enviar a un amigo/i)).toBeInTheDocument()
     }, { timeout: 3000 })
   })
 
-  it('no muestra botón compartir con 0 puntos', async () => {
-    const ranking = [
-      { planilla_id: 'p1', user_id: 'u1', user_name: 'Carlos Foo', puntos_totales: 0, position: 1 },
-    ]
-    await setupApi({ ranking })
+  it('muestra card de compartir por WhatsApp al final de la página', async () => {
+    await setupApi({ ranking: [] })
     renderHome()
     await waitFor(() => {
-      // Esperar que Home cargue (title visible)
-      expect(screen.queryByText(/Compartir/i)).toBeNull()
+      expect(screen.getByText(/Enviar por WhatsApp/i)).toBeInTheDocument()
+    }, { timeout: 3000 })
+  })
+
+  it('sticky bar mobile tiene botón de WhatsApp', async () => {
+    await setupApi({ ranking: [] })
+    renderHome()
+    await waitFor(() => {
+      const waButtons = screen.getAllByText(/Enviar a amigo/i)
+      expect(waButtons.length).toBeGreaterThanOrEqual(1)
     }, { timeout: 3000 })
   })
 })
