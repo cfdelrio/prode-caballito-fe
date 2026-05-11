@@ -1,6 +1,7 @@
 import { POINT_COLORS } from '@/utils/scoring'
 import { Link } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
+import { InviteFriendCTA } from '@/components/InviteFriendCTA'
 
 const examples = [
   {
@@ -80,6 +81,9 @@ export function Reglamento({ showHomePromo = false }: { showHomePromo?: boolean 
         <h1 className="text-xl font-black">⚽ Vuelve el PRODE del MUNDIAL ⚽</h1>
         <p className="text-sm text-white/70">Instructivo oficial — leelo antes de arrancar</p>
       </div>
+
+      {/* Invitar amigo — CTA principal */}
+      <InviteFriendCTA />
 
       {/* Intro */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-3 text-sm text-gray-700 leading-relaxed">

@@ -6,6 +6,7 @@ import { MatchCard } from '@/components/match/MatchCard'
 import { Sk, SkMatchCard } from '@/components/ui/Skeleton'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { OnboardingTour, hasSeenOnboarding } from '@/components/onboarding/Tour'
+import { InviteFriendCTA } from '@/components/InviteFriendCTA'
 import { useToastStore } from '@/store/toastStore'
 import { teamFlag } from '@/utils/teamFlags'
 
@@ -200,6 +201,9 @@ export function Apuestas() {
         <h1 className="text-xl font-bold text-[#001A4B]">{t.bets.title}</h1>
         <span className="text-sm text-gray-400">{progress.done}/{progress.total} {t.bets.completed}</span>
       </div>
+
+      {/* Invitar amigo — CTA compacto */}
+      <InviteFriendCTA variant="compact" />
 
       {/* Caja de ayuda — se cierra con la X y vuelve a aparecer al recargar */}
       {showHelp && (
