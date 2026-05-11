@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
 
-/* ── Animaciones (inyectadas una sola vez) ───────────── */
+/* ── Animaciones (inyectadas una sola vez) ─────────────────── */
 if (typeof document !== 'undefined' && !document.getElementById('invite-cta-anim')) {
   const s = document.createElement('style')
   s.id = 'invite-cta-anim'
@@ -15,7 +15,7 @@ if (typeof document !== 'undefined' && !document.getElementById('invite-cta-anim
   document.head.appendChild(s)
 }
 
-/* ── Mensaje de invitación ────────────────────── */
+/* ── Mensaje de invitación ─────────────────────────────────── */
 export function buildInviteMessage(inviterName?: string): string {
   if (inviterName) {
     return `⚽ ¡Te invito al PRODE del Mundial 2026!\n\nSoy ${inviterName} y te quiero desafiar. Armá tus resultados, sumá puntos y jugá contra todos en el ranking.\n\n🎫 1 boleta $25.000\n⚡ Combo 2 boletas (1ra + 2da ronda) $40.000\n\nEntrá acá:\nhttps://prodecaballito.com`
@@ -25,7 +25,7 @@ export function buildInviteMessage(inviterName?: string): string {
 
 type Channel = 'whatsapp' | 'sms' | 'email' | 'copy' | 'native'
 
-/* ── Hook con la lógica de compartir ───────────────── */
+/* ── Hook con la lógica de compartir ───────────────────────── */
 export function useInviteFriend() {
   const { user } = useAuthStore()
   const { show: showToast } = useToastStore()
@@ -71,7 +71,7 @@ export function useInviteFriend() {
   return { showModal, setShowModal, message, setMessage, openModal, inviteVia }
 }
 
-/* ── Modal multi-canal ──────────────────────── */
+/* ── Modal multi-canal ─────────────────────────────────────── */
 export function InviteFriendModal({
   show, onClose, message, onMessageChange, onInvite,
 }: {
@@ -155,7 +155,7 @@ export function InviteFriendModal({
   )
 }
 
-/* ── Card visual completa (CTA principal) ────────────── */
+/* ── Card visual completa (CTA principal) ──────────────────── */
 export function InviteFriendCTA({ variant = 'full' }: { variant?: 'full' | 'compact' }) {
   const { showModal, setShowModal, message, setMessage, openModal, inviteVia } = useInviteFriend()
 

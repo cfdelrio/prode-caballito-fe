@@ -159,7 +159,6 @@ describe('Home — reglamento inline', () => {
     await waitFor(() => {
       expect(screen.getByText(/2 boletas combo/i)).toBeInTheDocument()
     }, { timeout: 3000 })
-    // $25.000 y $40.000 aparecen en card de Precios + en Condiciones Importantes
     expect(screen.getAllByText(/\$25\.000/).length).toBeGreaterThanOrEqual(1)
     expect(screen.getAllByText(/\$40\.000/).length).toBeGreaterThanOrEqual(1)
   })
