@@ -33,6 +33,8 @@ interface Props {
   onBetDeleted?: (matchId: string) => void
   readonly?: boolean
   planillaLocked?: boolean
+  /** True cuando el torneo ya arrancó (5min antes del primer partido). Bloquea TODAS las apuestas, incluso las de partidos que aún no empezaron. */
+  tournamentClosed?: boolean
   now?: number
 }
 
@@ -55,7 +57,7 @@ function TeamDisplay({ team }: { team: string }) {
   )
 }
 
-export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, readonly, planillaLocked, now: nowProp }: Props) {
+export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, readonly, planillaLocked, tournamentClosed, now: nowProp }: Props) {
   const { show } = useToastStore()
   const t = useT()
   const lang = useAuthStore(s => s.user?.idioma_pref || 'es')
@@ -90,7 +92,8 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
 
   const nowMs = nowProp ?? Date.now()
   const cutoffMs = new Date(match.time_cutoff).getTime()
-  const isClosed = nowMs > cutoffMs
+  // El torneo se cierra 5 min antes del primer partido — cuando eso pasa, todos los partidos quedan cerrados aunque su cutoff individual no haya llegado
+  const isClosed = nowMs > cutoffMs || !!tournamentClosed
   const isFinished = match.estado === 'finished'
   const isLive = match.estado === 'live'
   const dateLocale = lang === 'pt' ? ptBR : esLocale
