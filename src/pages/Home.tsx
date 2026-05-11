@@ -27,6 +27,10 @@ if (typeof document !== 'undefined' && !document.getElementById('flip-anim')) {
       from { opacity: 0; }
       to   { opacity: 1; }
     }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to   { transform: translateY(0); }
+    }
   `
   document.head.appendChild(s)
 }
@@ -322,6 +326,13 @@ function HomeSkeleton() {
 
 const SHARE_TEXT = `⚽ Vuelve el Prode del Mundial\n\nArmá tus resultados, competí en el ranking y jugá contra todos.\n\nEntrá acá:\nhttps://prodecaballito.com`
 
+function buildInviteMessage(inviterName?: string): string {
+  if (inviterName) {
+    return `⚽ ¡Te invito al PRODE del Mundial 2026!\n\nSoy ${inviterName} y te quiero desafiar. Armá tus resultados, sumá puntos y jugá contra todos en el ranking.\n\n🎫 1 boleta $25.000\n⚡ Combo 2 boletas (1ra + 2da ronda) $40.000\n\nEntrá acá:\nhttps://prodecaballito.com`
+  }
+  return `⚽ ¡Sumate al PRODE del Mundial 2026!\n\nArmá tus resultados, competí en el ranking y jugá contra todos.\n\n🎫 1 boleta $25.000\n⚡ Combo 2 boletas (1ra + 2da ronda) $40.000\n\nEntrá acá:\nhttps://prodecaballito.com`
+}
+
 const SCORING_ROWS = [
   { color: 'celeste'  as const, pts: '4 pts', desc: 'Resultado exacto + ambos goles + 4 o más goles en el partido (BONUS)' },
   { color: 'rojo'     as const, pts: '3 pts', desc: 'Resultado exacto: ganador/empate y ambos tanteadores exactos' },
@@ -359,6 +370,8 @@ export function Home() {
   const [loadError, setLoadError] = useState(false)
   const [now, setNow] = useState(new Date())
   const [showIOSGuide, setShowIOSGuide] = useState(false)
+  const [showInviteModal, setShowInviteModal] = useState(false)
+  const [inviteMessage, setInviteMessage] = useState('')
   const { state: pwaState, install: pwaInstall } = usePWAInstall()
   const { show: showToast } = useToastStore()
 
@@ -435,11 +448,49 @@ export function Home() {
 
   const myEntry = ranking.find(r => r.user_id === user?.id)
 
-  const handleShare = () => {
+  /* ── Compartir simple (botón directo de WhatsApp) ───────── */
+  const handleQuickShare = () => {
     if (navigator.share) {
       navigator.share({ text: SHARE_TEXT }).catch(() => {})
     } else {
       window.open(`https://wa.me/?text=${encodeURIComponent(SHARE_TEXT)}`, '_blank')
+    }
+  }
+
+  /* ── Modal de invitación multi-canal ────────────────────── */
+  const openInviteModal = () => {
+    const inviterName = user?.nombre?.split(' ')[0]
+    setInviteMessage(buildInviteMessage(inviterName))
+    setShowInviteModal(true)
+  }
+
+  const inviteVia = (channel: 'whatsapp' | 'sms' | 'email' | 'copy' | 'native') => {
+    const text = inviteMessage
+    const encoded = encodeURIComponent(text)
+    switch (channel) {
+      case 'whatsapp':
+        window.open(`https://wa.me/?text=${encoded}`, '_blank')
+        break
+      case 'sms':
+        window.location.href = `sms:?body=${encoded}`
+        break
+      case 'email':
+        window.location.href = `mailto:?subject=${encodeURIComponent('Te invito al PRODE del Mundial 2026')}&body=${encoded}`
+        break
+      case 'copy':
+        if (navigator.clipboard?.writeText) {
+          navigator.clipboard.writeText(text)
+            .then(() => showToast('Mensaje copiado ✓', 'success'))
+            .catch(() => showToast('No se pudo copiar', 'error'))
+        } else {
+          showToast('No se pudo copiar', 'error')
+        }
+        break
+      case 'native':
+        if (navigator.share) {
+          navigator.share({ text }).catch(() => {})
+        }
+        break
     }
   }
 
@@ -545,11 +596,11 @@ export function Home() {
               )}
 
               <button
-                onClick={handleShare}
+                onClick={openInviteModal}
                 className="inline-flex items-center gap-2 font-bold text-sm px-5 py-2.5 rounded-xl w-fit transition-colors hover:bg-white/10"
                 style={{ border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.8)' }}
               >
-                💬 Enviar a un amigo
+                💌 Invitar a un amigo
               </button>
             </div>
 
@@ -737,40 +788,39 @@ export function Home() {
           </ul>
         </div>
 
-        {/* ── SHARE CTA ───────────────────────────────────────── */}
+        {/* ── INVITAR A UN AMIGO (CTA principal) ──────────────── */}
         <div
           className="rounded-2xl overflow-hidden shadow-lg"
           style={{ background: 'linear-gradient(135deg, #001A4B 0%, #003087 50%, #0042A5 100%)' }}
         >
           <div className="px-5 pt-5 pb-3">
             <p className="text-[10px] font-black text-[#FFDF00] uppercase tracking-widest mb-2">
-              💬 ¿Conocés a alguien que se la banca?
+              💌 Invitá a tus amigos
             </p>
             <h2 className="text-white font-black text-xl leading-tight">
-              Mandalo a jugar<br />con vos 🤙
+              Mientras más jueguen,<br />más grande el premio 🏆
             </h2>
-          </div>
-
-          <div
-            className="mx-4 mb-4 rounded-xl p-3.5"
-            style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)' }}
-          >
-            <p className="text-white/75 text-xs leading-relaxed" style={{ whiteSpace: 'pre-line', fontFamily: 'monospace' }}>
-              {`⚽ Vuelve el Prode del Mundial\n\nArmá tus resultados, competí en el ranking y jugá contra todos.\n\nEntrá acá:\nhttps://prodecaballito.com`}
+            <p className="text-white/60 text-xs mt-2 leading-relaxed">
+              Mandales el link a tus amigos por WhatsApp, SMS, email o cualquier app. Cuantos más entren, más se acumula el pozo.
             </p>
           </div>
 
-          <div className="px-4 pb-5">
+          <div className="px-4 pb-5 pt-1 grid grid-cols-2 gap-2.5">
             <button
-              onClick={handleShare}
-              className="w-full font-black text-sm py-3.5 rounded-xl flex items-center justify-center gap-2.5 transition-all hover:brightness-105 active:scale-[0.98]"
+              onClick={() => inviteVia('whatsapp')}
+              onMouseEnter={() => { if (!inviteMessage) setInviteMessage(buildInviteMessage(user?.nombre?.split(' ')[0])) }}
+              onTouchStart={() => { if (!inviteMessage) setInviteMessage(buildInviteMessage(user?.nombre?.split(' ')[0])) }}
+              className="font-black text-sm py-3 rounded-xl flex items-center justify-center gap-2 transition-all hover:brightness-105 active:scale-[0.98]"
               style={{ background: '#25D366', color: '#fff', boxShadow: '0 4px 16px rgba(37,211,102,0.35)' }}
             >
-              <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white" xmlns="http://www.w3.org/2000/svg">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
-                <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.534 5.855L0 24l6.335-1.512A11.956 11.956 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.817 9.817 0 01-5.001-1.368l-.361-.214-3.762.898.938-3.663-.235-.377A9.818 9.818 0 012.182 12C2.182 6.574 6.574 2.182 12 2.182S21.818 6.574 21.818 12 17.426 21.818 12 21.818z" />
-              </svg>
-              Enviar por WhatsApp
+              💬 WhatsApp
+            </button>
+            <button
+              onClick={openInviteModal}
+              className="font-black text-sm py-3 rounded-xl flex items-center justify-center gap-2 transition-all hover:brightness-110 active:scale-[0.98]"
+              style={{ background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1px solid rgba(255,255,255,0.25)' }}
+            >
+              ✏️ Personalizar
             </button>
           </div>
         </div>
@@ -801,14 +851,117 @@ export function Home() {
             ⚽ {urgentUnbet > 0 ? `${urgentUnbet} urgentes` : 'Completar prode'}
           </Link>
           <button
-            onClick={handleShare}
+            onClick={openInviteModal}
             className="flex-1 font-black text-sm py-3 rounded-xl"
             style={{ background: '#25D366', color: '#fff' }}
           >
-            💬 Enviar a amigo
+            💌 Invitar amigo
           </button>
         </div>
       </div>
+
+      {/* ── MODAL INVITAR A UN AMIGO ─────────────────────────── */}
+      {showInviteModal && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/60 z-50 backdrop-blur-sm"
+            onClick={() => setShowInviteModal(false)}
+            aria-hidden="true"
+          />
+          <div
+            className="fixed inset-x-0 bottom-0 z-50 bg-white rounded-t-3xl shadow-2xl max-w-lg mx-auto overflow-hidden"
+            style={{ animation: 'slideUp 0.25s ease-out' }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="invite-title"
+          >
+            <div className="flex justify-center pt-3 pb-1">
+              <div className="w-10 h-1 rounded-full bg-gray-200" />
+            </div>
+
+            <div className="px-5 pt-3 pb-4 text-center">
+              <h3 id="invite-title" className="text-xl font-black text-[#001A4B]">
+                💌 Invitá a un amigo
+              </h3>
+              <p className="text-xs text-gray-500 mt-1">
+                Editá el mensaje y elegí cómo enviarlo
+              </p>
+            </div>
+
+            <div className="px-5 pb-3">
+              <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1.5">
+                Mensaje a enviar
+              </label>
+              <textarea
+                value={inviteMessage}
+                onChange={(e) => setInviteMessage(e.target.value)}
+                className="w-full text-xs text-gray-700 leading-relaxed border border-gray-200 rounded-xl p-3 focus:outline-none focus:border-[#0042A5] focus:ring-2 focus:ring-[#0042A5]/20 resize-none"
+                rows={7}
+                style={{ fontFamily: 'inherit' }}
+              />
+              <p className="text-[10px] text-gray-400 mt-1.5">
+                Tip: editá el mensaje para hacerlo más personal
+              </p>
+            </div>
+
+            <div className="px-5 pb-3">
+              <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">
+                Compartir por
+              </p>
+              <div className="grid grid-cols-4 gap-2">
+                <button
+                  onClick={() => inviteVia('whatsapp')}
+                  className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border border-gray-100 hover:bg-green-50 hover:border-green-200 active:scale-95 transition-all"
+                >
+                  <span className="text-2xl leading-none">💬</span>
+                  <span className="text-[11px] font-bold text-gray-700">WhatsApp</span>
+                </button>
+                <button
+                  onClick={() => inviteVia('sms')}
+                  className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border border-gray-100 hover:bg-blue-50 hover:border-blue-200 active:scale-95 transition-all"
+                >
+                  <span className="text-2xl leading-none">📱</span>
+                  <span className="text-[11px] font-bold text-gray-700">SMS</span>
+                </button>
+                <button
+                  onClick={() => inviteVia('email')}
+                  className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border border-gray-100 hover:bg-amber-50 hover:border-amber-200 active:scale-95 transition-all"
+                >
+                  <span className="text-2xl leading-none">📧</span>
+                  <span className="text-[11px] font-bold text-gray-700">Email</span>
+                </button>
+                <button
+                  onClick={() => inviteVia('copy')}
+                  className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border border-gray-100 hover:bg-purple-50 hover:border-purple-200 active:scale-95 transition-all"
+                >
+                  <span className="text-2xl leading-none">📋</span>
+                  <span className="text-[11px] font-bold text-gray-700">Copiar</span>
+                </button>
+              </div>
+            </div>
+
+            {typeof navigator !== 'undefined' && 'share' in navigator && (
+              <div className="px-5 pb-3">
+                <button
+                  onClick={() => inviteVia('native')}
+                  className="w-full text-xs font-semibold text-[#0042A5] py-2 hover:underline"
+                >
+                  Más opciones de compartir →
+                </button>
+              </div>
+            )}
+
+            <div className="px-5 pb-6 pt-2 border-t border-gray-100">
+              <button
+                onClick={() => setShowInviteModal(false)}
+                className="w-full bg-gray-100 text-gray-700 font-bold py-3 rounded-xl text-sm hover:bg-gray-200 transition-colors"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* ── MODAL iOS INSTALL ───────────────────────────────────── */}
       {showIOSGuide && (
@@ -852,6 +1005,9 @@ export function Home() {
           </div>
         </>
       )}
+
+      {/* Reservar handleQuickShare como utilitario alternativo */}
+      <span className="hidden" data-quick-share onClick={handleQuickShare} aria-hidden="true" />
 
     </div>
   )
