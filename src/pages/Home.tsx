@@ -584,12 +584,19 @@ export function Home() {
                 </Link>
               )}
 
+              {/* CTA secundario: invitar amigo por WhatsApp (directo) */}
+              <button
+                onClick={() => inviteVia('whatsapp')}
+                className="inline-flex items-center gap-2 font-black text-sm px-5 py-3 rounded-xl w-fit transition-all hover:brightness-105 active:scale-95"
+                style={{ background: '#25D366', color: '#fff', boxShadow: '0 4px 16px rgba(37,211,102,0.35)' }}
+              >
+                💬 Invitar a un amigo
+              </button>
               <button
                 onClick={openInviteModal}
-                className="inline-flex items-center gap-2 font-bold text-sm px-5 py-2.5 rounded-xl w-fit transition-colors hover:bg-white/10"
-                style={{ border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.8)' }}
+                className="self-start text-[11px] font-semibold text-white/55 hover:text-white/85 transition-colors -mt-0.5"
               >
-                💌 Invitar a un amigo
+                ✏️ Personalizar mensaje u otro canal →
               </button>
             </div>
 
@@ -838,11 +845,11 @@ export function Home() {
             ⚽ {urgentUnbet > 0 ? `${urgentUnbet} urgentes` : 'Completar prode'}
           </Link>
           <button
-            onClick={openInviteModal}
+            onClick={() => inviteVia('whatsapp')}
             className="flex-1 font-black text-sm py-3 rounded-xl"
             style={{ background: '#25D366', color: '#fff' }}
           >
-            💌 Invitar amigo
+            💬 Invitar amigo
           </button>
         </div>
       </div>
