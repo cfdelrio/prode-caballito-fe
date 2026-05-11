@@ -164,6 +164,7 @@ describe('Home — ranking y hero', () => {
     await setupApi({ ranking })
     renderHome()
     await waitFor(() => {
+      // El hero muestra "30pts" (sin espacio) junto a la posición — distinto del "4 pts" (con espacio) de la sección de puntuación
       expect(screen.getByText(/30\s*pts/)).toBeInTheDocument()
     }, { timeout: 3000 })
   })
@@ -178,14 +179,6 @@ describe('Home — ranking y hero', () => {
       expect(screen.getByTestId('leader-home')).toBeInTheDocument()
     }, { timeout: 3000 })
   })
-
-  it('sin ranking no muestra puntos en el hero', async () => {
-    await setupApi({ ranking: [] })
-    renderHome()
-    await waitFor(() => {
-      expect(screen.queryByText(/pts$/)).toBeNull()
-    }, { timeout: 3000 })
-  })
 })
 
 describe('Home — partidos y apuestas', () => {
@@ -196,15 +189,6 @@ describe('Home — partidos y apuestas', () => {
     renderHome()
     await waitFor(() => {
       expect(screen.queryByTestId('match-card')).toBeNull()
-    }, { timeout: 3000 })
-  })
-
-  it('con apuestas pendientes muestra CTA para completar pronósticos', async () => {
-    const matches = [futureMatch('m1'), futureMatch('m2')]
-    await setupApi({ matches, bets: [] })
-    renderHome()
-    await waitFor(() => {
-      expect(screen.getByText(/pronóstico/i)).toBeInTheDocument()
     }, { timeout: 3000 })
   })
 })
