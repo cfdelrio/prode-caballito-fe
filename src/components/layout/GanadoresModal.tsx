@@ -4,6 +4,8 @@ import { api } from '@/api/client'
 interface WinnerData {
   image_url: string
   matchday_label?: string
+  user_name?: string
+  points?: number
   updated_at?: string
 }
 
@@ -25,6 +27,7 @@ export function GanadoresModal({ onClose }: { onClose: () => void }) {
   const [idx, setIdx] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+  const [imgError, setImgError] = useState(false)
 
   useEffect(() => {
     // 1) Intentar el historial completo (array)
@@ -55,6 +58,9 @@ export function GanadoresModal({ onClose }: { onClose: () => void }) {
       .catch(() => setError(true))
       .finally(() => setLoading(false))
   }, [])
+
+  // Reset imgError al cambiar de ganador
+  useEffect(() => { setImgError(false) }, [idx])
 
   // Auto-advance cada 5s si hay más de 1
   useEffect(() => {
@@ -131,13 +137,44 @@ export function GanadoresModal({ onClose }: { onClose: () => void }) {
             </div>
           )}
           {!loading && !error && current?.image_url && (
-            <img
-              key={idx}
-              src={current.image_url}
-              alt={current.matchday_label ?? 'Ganador de la fecha'}
-              className="w-full block"
-              style={{ animation: 'ganadoresFadeIn .3s ease' }}
-            />
+            <>
+              {imgError ? (
+                /* Fallback cuando la imagen expiró o no carga */
+                <div className="flex flex-col items-center justify-center py-14 px-8 gap-4"
+                  style={{ background: 'linear-gradient(135deg, #001A4B 0%, #0042A5 100%)' }}>
+                  <span className="text-7xl">🏆</span>
+                  {current.user_name && (
+                    <p className="text-white font-black text-2xl text-center">{current.user_name}</p>
+                  )}
+                  {current.points != null && (
+                    <p className="text-yellow-300 font-bold text-lg">{current.points} puntos</p>
+                  )}
+                  <p className="text-white/60 text-sm text-center">{current.matchday_label}</p>
+                </div>
+              ) : (
+                <img
+                  key={idx}
+                  src={current.image_url}
+                  alt={current.matchday_label ?? 'Ganador de la fecha'}
+                  className="w-full block"
+                  style={{ animation: 'ganadoresFadeIn .3s ease' }}
+                  onError={() => setImgError(true)}
+                />
+              )}
+              {/* Nombre y puntos debajo de la imagen (si están disponibles) */}
+              {!imgError && (current.user_name || current.points != null) && (
+                <div className="flex items-center justify-center gap-3 px-5 py-3 border-t border-gray-100">
+                  {current.user_name && (
+                    <span className="font-bold text-[#001A4B]">{current.user_name}</span>
+                  )}
+                  {current.points != null && (
+                    <span className="text-sm font-semibold text-[#0042A5] bg-blue-50 px-2 py-0.5 rounded-full">
+                      {current.points} pts
+                    </span>
+                  )}
+                </div>
+              )}
+            </>
           )}
         </div>
 
