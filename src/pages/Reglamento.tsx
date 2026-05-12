@@ -60,21 +60,6 @@ export function Reglamento({ showHomePromo = false }: { showHomePromo?: boolean 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-5 pb-20">
 
-      {showHomePromo && (
-        <a
-          href="/login"
-          className="block rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-shadow"
-          aria-label="Jugar ahora"
-        >
-          <img
-            src="/promo-jugar.png"
-            alt="¿Te la bancás? Jugá desde $25 — Jugar ahora"
-            className="w-full h-auto block"
-            loading="eager"
-          />
-        </a>
-      )}
-
       {/* Header */}
       <div className="bg-[#001A4B] text-white rounded-2xl p-5 text-center space-y-1">
         <p className="text-xs font-semibold tracking-widest text-[#FFDF00] uppercase">Después de 4 años</p>
@@ -250,6 +235,21 @@ export function Reglamento({ showHomePromo = false }: { showHomePromo?: boolean 
             </Link>
           </div>
         </div>
+      )}
+
+      {showHomePromo && (
+        <a
+          href="/login"
+          className="block rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-shadow"
+          aria-label="Jugar ahora"
+        >
+          <img
+            src="/promo-jugar.png"
+            alt="¿Te la bancás? Jugá desde $25 — Jugar ahora"
+            className="w-full h-auto block"
+            loading="lazy"
+          />
+        </a>
       )}
     </div>
   )
