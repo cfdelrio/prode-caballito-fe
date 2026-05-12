@@ -6,6 +6,7 @@ import { MatchCard } from '@/components/match/MatchCard'
 import { Sk, SkMatchCard } from '@/components/ui/Skeleton'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { OnboardingTour, hasSeenOnboarding } from '@/components/onboarding/Tour'
+import { InviteFriendCTA } from '@/components/InviteFriendCTA'
 import { useToastStore } from '@/store/toastStore'
 import { teamFlag } from '@/utils/teamFlags'
 
@@ -201,6 +202,9 @@ export function Apuestas() {
         <span className="text-sm text-gray-400">{progress.done}/{progress.total} {t.bets.completed}</span>
       </div>
 
+      {/* Invitar amigo — CTA compacto */}
+      <InviteFriendCTA variant="compact" />
+
       {/* Caja de ayuda — se cierra con la X y vuelve a aparecer al recargar */}
       {showHelp && (
         <div className="relative bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 pr-9 text-sm text-blue-900">
@@ -369,6 +373,7 @@ export function Apuestas() {
               bet={bets[m.id]}
               planillaId={selectedPlanilla || undefined}
               planillaLocked={selectedPlanillaObj?.precio_pagado}
+              tournamentClosed={isTournamentClosed}
               onBetSaved={() => loadBets(selectedPlanilla)}
               onBetDeleted={(mid) => { const nb = { ...bets }; delete nb[mid]; setBets(nb) }}
               now={now}
@@ -390,6 +395,7 @@ export function Apuestas() {
               bet={bets[m.id]}
               planillaId={selectedPlanilla || undefined}
               planillaLocked={selectedPlanillaObj?.precio_pagado}
+              tournamentClosed={isTournamentClosed}
               onBetSaved={() => loadBets(selectedPlanilla)}
               onBetDeleted={(mid) => { const nb = { ...bets }; delete nb[mid]; setBets(nb) }}
               now={now}

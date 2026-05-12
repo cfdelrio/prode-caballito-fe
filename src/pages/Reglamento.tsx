@@ -1,6 +1,7 @@
 import { POINT_COLORS } from '@/utils/scoring'
 import { Link } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
+import { InviteFriendCTA } from '@/components/InviteFriendCTA'
 
 const examples = [
   {
@@ -59,27 +60,15 @@ export function Reglamento({ showHomePromo = false }: { showHomePromo?: boolean 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-5 pb-20">
 
-      {showHomePromo && (
-        <a
-          href="/login"
-          className="block rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-shadow"
-          aria-label="Jugar ahora"
-        >
-          <img
-            src="/promo-jugar.png"
-            alt="¿Te la bancás? Jugá desde $25 — Jugar ahora"
-            className="w-full h-auto block"
-            loading="eager"
-          />
-        </a>
-      )}
-
       {/* Header */}
       <div className="bg-[#001A4B] text-white rounded-2xl p-5 text-center space-y-1">
         <p className="text-xs font-semibold tracking-widest text-[#FFDF00] uppercase">Después de 4 años</p>
         <h1 className="text-xl font-black">⚽ Vuelve el PRODE del MUNDIAL ⚽</h1>
         <p className="text-sm text-white/70">Instructivo oficial — leelo antes de arrancar</p>
       </div>
+
+      {/* Invitar amigo — CTA principal */}
+      <InviteFriendCTA />
 
       {/* Intro */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-3 text-sm text-gray-700 leading-relaxed">
@@ -92,6 +81,35 @@ export function Reglamento({ showHomePromo = false }: { showHomePromo?: boolean 
         <p className="text-xs text-gray-500 bg-gray-50 rounded-lg px-3 py-2">
           💡 Para completar resultados usá el formato <strong>2-0</strong> (sin espacios).
         </p>
+      </div>
+
+      {/* Precios y oferta */}
+      <div
+        className="rounded-2xl overflow-hidden shadow-md border"
+        style={{ background: 'linear-gradient(135deg, #FFF8DC 0%, #FFFBEB 100%)', borderColor: '#FFDF00' }}
+      >
+        <div className="px-4 py-3 flex items-center gap-2" style={{ background: '#001A4B' }}>
+          <h2 className="text-xs font-black text-white uppercase tracking-widest">🎫 Precios</h2>
+          <span
+            className="text-[9px] font-black px-2 py-0.5 rounded-full ml-auto"
+            style={{ background: '#FFDF00', color: '#001A4B', letterSpacing: '0.05em' }}
+          >
+            ⚡ OFERTA COMBO
+          </span>
+        </div>
+        <div className="grid grid-cols-2 divide-x divide-amber-200">
+          <div className="p-4 text-center">
+            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">1 boleta</p>
+            <p className="text-2xl font-black text-[#001A4B] leading-none">$25.000</p>
+            <p className="text-[10px] text-gray-500 mt-1.5">Una planilla del Mundial</p>
+          </div>
+          <div className="p-4 text-center" style={{ background: 'rgba(255,223,0,0.18)' }}>
+            <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wider mb-1">2 boletas combo</p>
+            <p className="text-2xl font-black text-[#001A4B] leading-none">$40.000</p>
+            <p className="text-[10px] text-gray-700 mt-1.5 font-semibold">1ra + 2da ronda</p>
+            <p className="text-[9px] text-emerald-700 font-bold mt-0.5">Ahorrás $10.000</p>
+          </div>
+        </div>
       </div>
 
       {/* Sistema de puntaje */}
@@ -150,7 +168,8 @@ export function Reglamento({ showHomePromo = false }: { showHomePromo?: boolean 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-3">
         <h2 className="font-bold text-[#001A4B] text-base">Participación</h2>
         <ul className="space-y-2 text-sm text-gray-600">
-          <li className="flex items-start gap-2"><span className="shrink-0">🎫</span><span>Cada planilla tiene un valor de <strong>$20.000</strong>.</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">🎫</span><span>Cada planilla tiene un valor de <strong>$25.000</strong>.</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">⚡</span><span><strong>Oferta combo:</strong> 2 boletas (1ra + 2da ronda) por <strong>$40.000</strong> — ahorrás $10.000.</span></li>
           <li className="flex items-start gap-2"><span className="shrink-0">📋</span><span>Podés participar con <strong>la cantidad de planillas que quieras</strong>, cada una compite por separado.</span></li>
           <li className="flex items-start gap-2"><span className="shrink-0">💰</span><span>El total acumulado va para <strong>un único ganador</strong> (el que sume más puntos).</span></li>
           <li className="flex items-start gap-2"><span className="shrink-0">🔒</span><span>El cierre de pronósticos es <strong>5 minutos antes del inicio del primer partido</strong>. A partir de ese momento no se pueden agregar planillas nuevas ni modificar pronósticos.</span></li>
@@ -186,12 +205,12 @@ export function Reglamento({ showHomePromo = false }: { showHomePromo?: boolean 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-2">
         <h2 className="font-bold text-[#001A4B] text-base">Reglas Generales</h2>
         <ul className="space-y-2 text-sm text-gray-600">
-          <li className="flex items-start gap-2"><span className="shrink-0">✅</span> Los resultados cuentan en los <strong>90 minutos</strong>. No cuentan alargues ni penales.</li>
-          <li className="flex items-start gap-2"><span className="shrink-0">✅</span> Podés editar tus pronósticos hasta el cierre: <strong>5 minutos antes del inicio del primer partido</strong>.</li>
-          <li className="flex items-start gap-2"><span className="shrink-0">✅</span> Solo participan en el ranking oficial las planillas con <strong>precio pagado</strong>.</li>
-          <li className="flex items-start gap-2"><span className="shrink-0">✅</span> El ranking se actualiza automáticamente al publicar cada resultado.</li>
-          <li className="flex items-start gap-2"><span className="shrink-0">📊</span> La app tiene estadísticas, podios, campeonatos de amigos por estrellas y más.</li>
-          <li className="flex items-start gap-2"><span className="shrink-0">💬</span> Ante cualquier duda, comunicate por WhatsApp.</li>
+          <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span>Los resultados cuentan en los <strong>90 minutos</strong>. No cuentan alargues ni penales.</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span>Podés editar tus pronósticos hasta el cierre: <strong>5 minutos antes del inicio del primer partido</strong>.</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span>Solo participan en el ranking oficial las planillas con <strong>precio pagado</strong>.</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span>El ranking se actualiza automáticamente al publicar cada resultado.</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">📊</span><span>La app tiene estadísticas, podios, campeonatos de amigos por estrellas y más.</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">💬</span><span>Ante cualquier duda, comunicate por WhatsApp.</span></li>
         </ul>
       </div>
 
@@ -216,6 +235,21 @@ export function Reglamento({ showHomePromo = false }: { showHomePromo?: boolean 
             </Link>
           </div>
         </div>
+      )}
+
+      {showHomePromo && (
+        <a
+          href="/login"
+          className="block rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-shadow"
+          aria-label="Jugar ahora"
+        >
+          <img
+            src="/promo-jugar.png"
+            alt="¿Te la bancás? Jugá desde $25 — Jugar ahora"
+            className="w-full h-auto block"
+            loading="lazy"
+          />
+        </a>
       )}
     </div>
   )

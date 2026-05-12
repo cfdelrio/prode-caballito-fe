@@ -111,6 +111,7 @@ export function LeaderHome({
   const upcomingAll = matches
     .filter(m => m.estado !== 'finished')
     .slice(0, 4)
+  const tournamentClosed = matches.length > 0 && Date.now() > Math.min(...matches.map(m => new Date(m.time_cutoff).getTime()))
 
   const handleShare = async () => {
     const text =
@@ -678,6 +679,7 @@ export function LeaderHome({
                     match={m}
                     bet={bets[m.id]}
                     planillaId={planilla?.id}
+                    tournamentClosed={tournamentClosed}
                     onBetSaved={onBetSaved}
                     onBetDeleted={onBetDeleted}
                   />
