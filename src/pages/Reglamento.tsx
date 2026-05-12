@@ -205,12 +205,12 @@ export function Reglamento({ showHomePromo = false }: { showHomePromo?: boolean 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-2">
         <h2 className="font-bold text-[#001A4B] text-base">Reglas Generales</h2>
         <ul className="space-y-2 text-sm text-gray-600">
-          <li className="flex items-start gap-2"><span className="shrink-0">✅</span> Los resultados cuentan en los <strong>90 minutos</strong>. No cuentan alargues ni penales.</li>
-          <li className="flex items-start gap-2"><span className="shrink-0">✅</span> Podés editar tus pronósticos hasta el cierre: <strong>5 minutos antes del inicio del primer partido</strong>.</li>
-          <li className="flex items-start gap-2"><span className="shrink-0">✅</span> Solo participan en el ranking oficial las planillas con <strong>precio pagado</strong>.</li>
-          <li className="flex items-start gap-2"><span className="shrink-0">✅</span> El ranking se actualiza automáticamente al publicar cada resultado.</li>
-          <li className="flex items-start gap-2"><span className="shrink-0">📊</span> La app tiene estadísticas, podios, campeonatos de amigos por estrellas y más.</li>
-          <li className="flex items-start gap-2"><span className="shrink-0">💬</span> Ante cualquier duda, comunicate por WhatsApp.</li>
+          <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span>Los resultados cuentan en los <strong>90 minutos</strong>. No cuentan alargues ni penales.</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span>Podés editar tus pronósticos hasta el cierre: <strong>5 minutos antes del inicio del primer partido</strong>.</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span>Solo participan en el ranking oficial las planillas con <strong>precio pagado</strong>.</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span>El ranking se actualiza automáticamente al publicar cada resultado.</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">📊</span><span>La app tiene estadísticas, podios, campeonatos de amigos por estrellas y más.</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">💬</span><span>Ante cualquier duda, comunicate por WhatsApp.</span></li>
         </ul>
       </div>
 
