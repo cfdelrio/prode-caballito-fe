@@ -891,7 +891,7 @@ export function Home() {
                     {r.user_name.split(' ')[0]}
                     {isMe && <span className="text-xs t-text-muted font-normal"> {t.home.you}</span>}
                   </p>
-                  <p className="font-black t-text-primary text-sm shrink-0">
+                  <p className="font-black t-text-page-accent text-sm shrink-0">
                     {r.puntos_totales}
                     <span className="font-normal text-[10px] t-text-muted ml-0.5">{t.ranking.pts}</span>
                   </p>
@@ -904,7 +904,7 @@ export function Home() {
                 className="flex items-center gap-3 px-4 py-3"
                 style={{ background: 'color-mix(in srgb, var(--theme-primary) 8%, white)' }}
               >
-                <span className="text-sm font-black t-text-primary w-7 text-center">#{myEntry.position}</span>
+                <span className="text-sm font-black t-text-page-accent w-7 text-center">#{myEntry.position}</span>
                 {myEntry.user_avatar
                   ? <img src={myEntry.user_avatar} alt="" className="w-9 h-9 rounded-full object-cover border border-gray-100 shrink-0" />
                   : <div className="w-9 h-9 rounded-full flex items-center justify-center font-black text-sm shrink-0 t-bg-primary text-white">
@@ -916,7 +916,7 @@ export function Home() {
                   <span className="text-xs t-text-muted font-normal"> {t.home.you}</span>
                 </p>
                 <div className="text-right shrink-0">
-                  <p className="font-black t-text-primary text-sm">
+                  <p className="font-black t-text-page-accent text-sm">
                     {myEntry.puntos_totales}
                     <span className="font-normal text-[10px] t-text-muted ml-0.5">{t.ranking.pts}</span>
                   </p>
