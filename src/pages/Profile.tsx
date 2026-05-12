@@ -141,7 +141,9 @@ export function Profile() {
     show(t.profile.themeActivated(TEAM_THEMES[tema]?.name || tema), 'success')
     try {
       await api.put(`/users/${user!.id}`, { tema_equipo: tema })
-    } catch { /* silent */ }
+    } catch {
+      show(t.profile.errorTheme, 'warning')
+    }
   }
 
   if (!user) return null

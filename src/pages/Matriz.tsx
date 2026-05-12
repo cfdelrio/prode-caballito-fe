@@ -7,6 +7,7 @@ import { Sk, SkMatrizRow } from '@/components/ui/Skeleton'
 import { calcularPuntaje, POINT_COLORS } from '@/utils/scoring'
 import { teamFlag } from '@/utils/teamFlags'
 import { useAuthStore } from '@/store/authStore'
+import { useToastStore } from '@/store/toastStore'
 import type { Match, RankingEntry } from '@/types'
 
 type BetMap = Record<string, Record<string, { home: number; away: number }>>
@@ -132,6 +133,7 @@ function MatrizSkeleton() {
 
 export function Matriz() {
   const { user } = useAuthStore()
+  const { show } = useToastStore()
   const t = useT()
   const [matches, setMatches] = useState<Match[]>([])
   const [ranking, setRanking] = useState<RankingEntry[]>([])
@@ -182,8 +184,10 @@ export function Matriz() {
         else next.delete(planillaId)
         return next
       })
-    } catch { /* silent */ } finally { setTogglingFav(null) }
-  }, [togglingFav])
+    } catch {
+      show(t.ranking.errorFavorite, 'error')
+    } finally { setTogglingFav(null) }
+  }, [togglingFav, show, t])
 
   const handleBadgeClick = useCallback((
     e: React.MouseEvent<HTMLSpanElement>,

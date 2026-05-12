@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
+import { useToastStore } from '@/store/toastStore'
 import { useT } from '@/hooks/useT'
 import { Sk, SkRankRow } from '@/components/ui/Skeleton'
 
@@ -62,6 +63,7 @@ const MEDAL = ['🥇', '🥈', '🥉']
 
 export function Ranking() {
   const { user } = useAuthStore()
+  const { show } = useToastStore()
   const t = useT()
   const [ranking, setRanking] = useState<RankingEntry[]>([])
   const [loading, setLoading] = useState(true)
@@ -131,10 +133,12 @@ export function Ranking() {
         else next.delete(planillaId)
         return next
       })
-    } catch { /* silent */ } finally {
+    } catch {
+      show(t.ranking.errorFavorite, 'error')
+    } finally {
       setTogglingFav(null)
     }
-  }, [togglingFav])
+  }, [togglingFav, show, t])
 
   const myEntry = ranking.find((r) => r.user_id === user?.id)
 
