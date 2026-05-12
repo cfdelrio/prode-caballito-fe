@@ -39,6 +39,40 @@ export function SkMatchCard() {
   )
 }
 
+/** Conversation row skeleton — matches Messages sidebar item */
+export function SkConversation() {
+  return (
+    <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-50">
+      <SkAvatar size="sm" />
+      <div className="flex-1 min-w-0 space-y-1.5">
+        <div className="flex items-center justify-between gap-2">
+          <Sk className="h-3 w-24" />
+          <Sk className="h-2 w-8" />
+        </div>
+        <Sk className="h-2.5 w-32" />
+      </div>
+    </div>
+  )
+}
+
+/** Matriz row skeleton — sticky left cell + N data cells */
+export function SkMatrizRow({ cols = 8 }: { cols?: number }) {
+  return (
+    <div className="flex items-center border-b border-gray-50">
+      <div className="flex items-center gap-2 px-2 py-2 min-w-[140px] sm:min-w-[180px] shrink-0">
+        <SkAvatar size="sm" />
+        <Sk className="h-3 w-20" />
+      </div>
+      <Sk className="h-4 w-6 mx-auto" />
+      {Array.from({ length: cols }).map((_, i) => (
+        <div key={i} className="min-w-[60px] flex justify-center py-2">
+          <Sk className="h-5 w-7 rounded" />
+        </div>
+      ))}
+    </div>
+  )
+}
+
 /** Ranking table row skeleton — matches grid-cols-[2rem_1fr_auto_auto_2rem] */
 export function SkRankRow() {
   return (

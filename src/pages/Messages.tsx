@@ -4,9 +4,25 @@ import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
 import { useT } from '@/hooks/useT'
-import { Spinner } from '@/components/ui/Spinner'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { Sk, SkConversation } from '@/components/ui/Skeleton'
 import type { Message } from '@/types'
+
+function MessagesSkeleton() {
+  return (
+    <div className="max-w-4xl mx-auto h-[calc(100vh-3.5rem)] flex">
+      <div className="flex flex-col w-full md:w-72 border-r border-gray-100 bg-white">
+        <div className="p-4 border-b">
+          <Sk className="h-4 w-24" />
+        </div>
+        <div className="flex-1 overflow-y-auto">
+          {[0, 1, 2, 3, 4, 5].map(i => <SkConversation key={i} />)}
+        </div>
+      </div>
+      <div className="hidden md:flex flex-1 items-center justify-center bg-gray-50" />
+    </div>
+  )
+}
 
 interface Conversation {
   id: string
@@ -102,7 +118,7 @@ export function Messages() {
     }
   }
 
-  if (loading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
+  if (loading) return <MessagesSkeleton />
 
   return (
     <div className="max-w-4xl mx-auto h-[calc(100vh-3.5rem)] flex">

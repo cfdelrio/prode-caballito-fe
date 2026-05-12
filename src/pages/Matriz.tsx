@@ -2,8 +2,8 @@ import { useEffect, useState, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { api } from '@/api/client'
 import { useT } from '@/hooks/useT'
-import { Spinner } from '@/components/ui/Spinner'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { Sk, SkMatrizRow } from '@/components/ui/Skeleton'
 import { calcularPuntaje, POINT_COLORS } from '@/utils/scoring'
 import { teamFlag } from '@/utils/teamFlags'
 import { useAuthStore } from '@/store/authStore'
@@ -112,6 +112,24 @@ function BetPopover({ cell, onClose }: { cell: ActiveCell; onClose: () => void }
   )
 }
 
+function MatrizSkeleton() {
+  return (
+    <div className="px-2 py-4 space-y-3">
+      <div className="max-w-7xl mx-auto px-2 space-y-1.5">
+        <Sk className="h-6 w-32" />
+        <Sk className="h-3 w-48" />
+      </div>
+      <div className="max-w-7xl mx-auto px-2 flex gap-2 flex-wrap">
+        {[0, 1, 2, 3, 4].map(i => <Sk key={i} className="h-5 w-12 rounded" />)}
+      </div>
+      <div className="bg-white rounded-lg overflow-hidden border border-gray-100">
+        <div className="bg-[#001A4B]/90 h-12" />
+        {[0, 1, 2, 3, 4, 5, 6, 7].map(i => <SkMatrizRow key={i} />)}
+      </div>
+    </div>
+  )
+}
+
 export function Matriz() {
   const { user } = useAuthStore()
   const t = useT()
@@ -190,7 +208,7 @@ export function Matriz() {
   const pendingMatches  = filteredMatches.filter(m => m.estado !== 'finished')
   const allMatches = [...finishedMatches, ...pendingMatches]
 
-  if (loading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
+  if (loading) return <MatrizSkeleton />
 
   const baseRows: RankingEntry[] = ranking
 
