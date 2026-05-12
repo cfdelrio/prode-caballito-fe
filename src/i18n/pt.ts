@@ -130,6 +130,7 @@ export const pt: T = {
     favStep1: 'Toca em ☆ em qualquer jogador do Ranking ou da Planilha geral para adicioná-lo ao teu grupo.',
     favStep2: 'Filtra com "⭐ Favoritos" para ver só o ranking do teu grupo.',
     favStep3: 'Compara-te com os teus amigos e compete no teu próprio campeonato.',
+    errorFavorite: 'Não foi possível atualizar o favorito',
   },
   matrix: {
     title: '📊 Planilha geral',
@@ -168,6 +169,9 @@ export const pt: T = {
     exacts: 'exatos', hits: 'acertos', pts: 'pontos',
     you: '(você)', live: 'AO VIVO', final: 'Final',
     player: 'Jogador', exactHeader: 'Exatos', hitsHeader: 'Acertos',
+    errorLoad: 'Erro ao carregar torneios',
+    errorLoadMatches: 'Erro ao carregar partidas do torneio',
+    errorLoadRanking: 'Erro ao carregar classificação do torneio',
   },
   viral: {
     title: '⚡ Momentos do torneio',
@@ -256,6 +260,7 @@ export const pt: T = {
     planillaCreated: 'Planilha criada ✓', planillaDeleted: 'Planilha removida',
     errorUpdate: 'Erro ao atualizar', errorPhoto: 'Erro ao enviar foto',
     errorCreate: 'Erro ao criar planilha', errorDelete: 'Erro ao eliminar',
+    errorTheme: 'Não foi possível salvar o tema. Será aplicado no próximo início.',
   },
   onboarding: {
     step1Title: '👋 Bem-vindo ao Prode Caballito!',

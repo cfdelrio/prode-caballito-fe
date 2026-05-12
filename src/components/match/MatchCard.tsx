@@ -228,8 +228,8 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
         {/* Local */}
         <div className="flex flex-col items-center gap-2">
           <span className={`text-[34px] leading-none tabular-nums ${
-            isFinished ? 'font-[500] t-text-nav'
-            : bet ? 'font-black t-text-primary'
+            isFinished ? 'font-[500] t-text-page-accent opacity-70'
+            : bet ? 'font-black t-text-page-accent'
             : 'font-[300] t-text-muted opacity-50'
           }`}>
             {isFinished ? match.resultado_local : bet ? bet.goles_local : '—'}
@@ -262,8 +262,8 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
         {/* Visitante */}
         <div className="flex flex-col items-center gap-2">
           <span className={`text-[34px] leading-none tabular-nums ${
-            isFinished ? 'font-[500] t-text-nav'
-            : bet ? 'font-black t-text-primary'
+            isFinished ? 'font-[500] t-text-page-accent opacity-70'
+            : bet ? 'font-black t-text-page-accent'
             : 'font-[300] t-text-muted opacity-50'
           }`}>
             {isFinished ? match.resultado_visitante : bet ? bet.goles_visitante : '—'}
