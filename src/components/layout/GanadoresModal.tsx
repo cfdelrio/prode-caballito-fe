@@ -22,6 +22,13 @@ if (typeof document !== 'undefined' && !document.getElementById('ganadores-modal
   document.head.appendChild(s)
 }
 
+function parseValue(raw: unknown): unknown {
+  if (typeof raw === 'string') {
+    try { return JSON.parse(raw) } catch { return null }
+  }
+  return raw
+}
+
 export function GanadoresModal({ onClose }: { onClose: () => void }) {
   const [winners, setWinners] = useState<WinnerData[]>([])
   const [idx, setIdx] = useState(0)
@@ -34,25 +41,21 @@ export function GanadoresModal({ onClose }: { onClose: () => void }) {
     api.get('/config/ganadores_fechas')
       .then(r => {
         const row = r.data?.data
-        if (row?.value) {
-          try {
-            const parsed = JSON.parse(row.value)
-            if (Array.isArray(parsed) && parsed.length > 0) {
-              setWinners(parsed)
-              setLoading(false)
-              return
-            }
-          } catch { /* fall through */ }
+        if (row?.value != null) {
+          const parsed = parseValue(row.value)
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setWinners(parsed)
+            setLoading(false)
+            return
+          }
         }
         // 2) Fallback: el último ganador (singular)
         return api.get('/config/ganador_fecha').then(r2 => {
           const single = r2.data?.data
           if (!single?.value) { setError(true); return }
-          try {
-            const parsed = JSON.parse(single.value)
-            if (parsed?.image_url) setWinners([parsed])
-            else setError(true)
-          } catch { setError(true) }
+          const parsed = parseValue(single.value) as WinnerData | null
+          if (parsed?.image_url) setWinners([parsed])
+          else setError(true)
         })
       })
       .catch(() => setError(true))
@@ -139,7 +142,6 @@ export function GanadoresModal({ onClose }: { onClose: () => void }) {
           {!loading && !error && current?.image_url && (
             <>
               {imgError ? (
-                /* Fallback cuando la imagen expiró o no carga */
                 <div className="flex flex-col items-center justify-center py-14 px-8 gap-4"
                   style={{ background: 'linear-gradient(135deg, #001A4B 0%, #0042A5 100%)' }}>
                   <span className="text-7xl">🏆</span>
@@ -161,7 +163,6 @@ export function GanadoresModal({ onClose }: { onClose: () => void }) {
                   onError={() => setImgError(true)}
                 />
               )}
-              {/* Nombre y puntos debajo de la imagen (si están disponibles) */}
               {!imgError && (current.user_name || current.points != null) && (
                 <div className="flex items-center justify-center gap-3 px-5 py-3 border-t border-gray-100">
                   {current.user_name && (
@@ -178,7 +179,6 @@ export function GanadoresModal({ onClose }: { onClose: () => void }) {
           )}
         </div>
 
-        {/* Dots indicator cuando hay múltiples */}
         {!loading && !error && hasMulti && (
           <div className="flex items-center justify-center gap-1.5 py-3 bg-white border-t border-gray-100">
             {winners.map((_, i) => (
