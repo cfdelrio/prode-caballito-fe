@@ -326,9 +326,9 @@ function HomeSkeleton() {
 
 function buildInviteMessage(inviterName?: string): string {
   if (inviterName) {
-    return `⚽ ¡Te invito al PRODE del Mundial 2026!\n\nSoy ${inviterName} y te quiero desafiar. Armá tus resultados, sumá puntos y jugá contra todos en el ranking.\n\n🎫 1 boleta $25.000\n⚡ Combo 2 boletas (1ra + 2da ronda) $40.000\n\nEntrá acá:\nhttps://prodecaballito.com`
+    return `⚽ ¡Te invito al PRODE del Mundial 2026!\n\nSoy ${inviterName} y te quiero desafiar. Armá tus resultados, sumá puntos y jugá contra todos en el ranking.\n\n🎫 1 boleta $20.000\n\nEntrá acá:\nhttps://prodecaballito.com`
   }
-  return `⚽ ¡Sumate al PRODE del Mundial 2026!\n\nArmá tus resultados, competí en el ranking y jugá contra todos.\n\n🎫 1 boleta $25.000\n⚡ Combo 2 boletas (1ra + 2da ronda) $40.000\n\nEntrá acá:\nhttps://prodecaballito.com`
+  return `⚽ ¡Sumate al PRODE del Mundial 2026!\n\nArmá tus resultados, competí en el ranking y jugá contra todos.\n\n🎫 1 boleta $20.000\n\nEntrá acá:\nhttps://prodecaballito.com`
 }
 
 const SCORING_ROWS = [
@@ -349,7 +349,7 @@ const KEY_EXAMPLES = [
 
 const CONDITIONS = [
   { icon: '🔒', text: 'El cierre de pronósticos es 5 minutos antes del primer partido. Después no se puede agregar ni modificar nada.' },
-  { icon: '💰', text: 'Cada planilla cuesta $25.000. Oferta: 2 boletas (1ra + 2da ronda) por $40.000.' },
+  { icon: '💰', text: 'Cada planilla cuesta $20.000.' },
   { icon: '👁️', text: 'Al cierre, la planilla general queda visible para todos — podés ver los pronósticos de cada uno.' },
   { icon: '🏆', text: 'Un único ganador: el que acumule más puntos al final de los 72 partidos.' },
   { icon: '⚖️', text: 'Desempate: mayor cantidad de exactos celeste → rojo → verde → amarillo (en ese orden).' },
@@ -662,32 +662,18 @@ export function Home() {
           </Link>
         )}
 
-        {/* ── PRECIOS Y OFERTA ────────────────────────────────── */}
+        {/* ── PRECIO ──────────────────────────────────────────── */}
         <div
           className="rounded-2xl overflow-hidden shadow-md border"
           style={{ background: 'linear-gradient(135deg, #FFF8DC 0%, #FFFBEB 100%)', borderColor: '#FFDF00' }}
         >
           <div className="px-4 py-3 flex items-center gap-2" style={{ background: '#001A4B' }}>
-            <span className="text-[10px] font-black text-white uppercase tracking-widest">🎫 Precios</span>
-            <span
-              className="text-[9px] font-black px-2 py-0.5 rounded-full ml-auto"
-              style={{ background: '#FFDF00', color: '#001A4B', letterSpacing: '0.05em' }}
-            >
-              ⚡ OFERTA
-            </span>
+            <span className="text-[10px] font-black text-white uppercase tracking-widest">🎫 Precio</span>
           </div>
-          <div className="grid grid-cols-2 divide-x divide-amber-200">
-            <div className="p-4 text-center">
-              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">1 boleta</p>
-              <p className="text-2xl font-black text-[#001A4B] leading-none">$25.000</p>
-              <p className="text-[10px] text-gray-500 mt-1.5">Una planilla del Mundial</p>
-            </div>
-            <div className="p-4 text-center relative" style={{ background: 'rgba(255,223,0,0.18)' }}>
-              <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wider mb-1">2 boletas combo</p>
-              <p className="text-2xl font-black text-[#001A4B] leading-none">$40.000</p>
-              <p className="text-[10px] text-gray-700 mt-1.5 font-semibold">1ra + 2da ronda</p>
-              <p className="text-[9px] text-emerald-700 font-bold mt-0.5">Ahorrás $10.000</p>
-            </div>
+          <div className="p-4 text-center">
+            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">1 boleta</p>
+            <p className="text-2xl font-black text-[#001A4B] leading-none">$20.000</p>
+            <p className="text-[10px] text-gray-500 mt-1.5">Una planilla del Mundial</p>
           </div>
           <p className="px-4 py-2.5 text-[11px] text-gray-600 border-t border-amber-200 bg-white/60">
             Podés tener varias planillas — cada una compite por separado en el ranking.
