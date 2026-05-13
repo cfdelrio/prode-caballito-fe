@@ -805,6 +805,27 @@ export function Home() {
           </div>
         </div>
 
+        {/* ── CANAL DE WHATSAPP ───────────────────────────────── */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="px-4 py-3 flex items-center gap-2" style={{ background: '#25D366' }}>
+            <span className="text-[10px] font-black text-white uppercase tracking-widest">📢 Canal de WhatsApp</span>
+          </div>
+          <div className="p-5 flex flex-col items-center text-center gap-3">
+            <p className="text-sm text-gray-700 font-semibold">
+              Sumate al canal <strong>ProdeCaballito</strong> para enterarte de novedades y resultados.
+            </p>
+            <img
+              src="/whatsapp-qr.png"
+              alt="QR del canal de WhatsApp ProdeCaballito"
+              className="w-48 h-48 rounded-xl border border-gray-100"
+              loading="lazy"
+            />
+            <p className="text-[11px] text-gray-500">
+              Escaneá el código con la cámara de tu teléfono.
+            </p>
+          </div>
+        </div>
+
       </div>
 
       {/* ── STICKY MOBILE BAR ───────────────────────────────────── */}
