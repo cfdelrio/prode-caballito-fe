@@ -3,6 +3,7 @@ import { usePolling } from '@/hooks/usePolling'
 import { Link } from 'react-router-dom'
 import { format } from 'date-fns'
 import { es as esLocale } from 'date-fns/locale'
+import { QRCodeSVG } from 'qrcode.react'
 import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
@@ -814,15 +815,26 @@ export function Home() {
             <p className="text-sm text-gray-700 font-semibold">
               Sumate al canal <strong>ProdeCaballito</strong> para enterarte de novedades y resultados.
             </p>
-            <img
-              src="/whatsapp-qr.png"
-              alt="QR del canal de WhatsApp ProdeCaballito"
-              className="w-48 h-48 rounded-xl border border-gray-100"
-              loading="lazy"
-            />
+            <div className="p-3 bg-white rounded-xl border border-gray-100">
+              <QRCodeSVG
+                value="https://whatsapp.com/channel/0029VbD5n7oDeON9vGA2gS3j"
+                size={192}
+                level="M"
+                marginSize={0}
+              />
+            </div>
             <p className="text-[11px] text-gray-500">
               Escaneá el código con la cámara de tu teléfono.
             </p>
+            <a
+              href="https://whatsapp.com/channel/0029VbD5n7oDeON9vGA2gS3j"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-black text-sm py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all hover:brightness-105 active:scale-[0.98]"
+              style={{ background: '#25D366', color: '#fff', boxShadow: '0 4px 16px rgba(37,211,102,0.35)' }}
+            >
+              💬 Unirme al canal
+            </a>
           </div>
         </div>
 
