@@ -105,7 +105,7 @@ export function Reglamento({ showHomePromo = false }: { showHomePromo?: boolean 
           {([
             { color: 'celeste' as const, pts: '4 pts', desc: 'Resultado exacto + ambos goles exactos + 4 o más goles en total (BONUS)' },
             { color: 'rojo'    as const, pts: '3 pts', desc: 'Resultado exacto: acertó ganador/empate y ambos tanteadores' },
-            { color: 'verde'   as const, pts: '2 pts', desc: 'Acertó ganador/empate y uno de los dos tanteadores exactos' },
+            { color: 'verde'   as const, pts: '2 pts', desc: 'Acertó el ganador y uno de los dos tanteadores exactos (no aplica en empate)' },
             { color: 'amarillo'as const, pts: '1 pt',  desc: 'Acertó solo el ganador o empate (ningún tanteador exacto)' },
             { color: 'gris'    as const, pts: '0 pts', desc: 'No acertó el resultado global (ganador o empate)' },
           ]).map(({ color, pts, desc }) => (

@@ -334,7 +334,7 @@ function buildInviteMessage(inviterName?: string): string {
 const SCORING_ROWS = [
   { color: 'celeste'  as const, pts: '4 pts', desc: 'Resultado exacto + ambos goles + 4 o más goles en el partido (BONUS)' },
   { color: 'rojo'     as const, pts: '3 pts', desc: 'Resultado exacto: ganador/empate y ambos tanteadores exactos' },
-  { color: 'verde'    as const, pts: '2 pts', desc: 'Ganador/empate correcto y uno de los dos tanteadores exactos' },
+  { color: 'verde'    as const, pts: '2 pts', desc: 'Ganador correcto y uno de los dos tanteadores exactos (no aplica en empate)' },
   { color: 'amarillo' as const, pts: '1 pt',  desc: 'Solo acertaste el ganador o el empate (sin goles exactos)' },
   { color: 'gris'     as const, pts: '0 pts', desc: 'No acertaste el resultado global (quién ganó o si fue empate)' },
 ]
