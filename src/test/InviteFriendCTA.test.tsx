@@ -37,10 +37,9 @@ describe('buildInviteMessage', () => {
     expect(msg).toContain('https://prodecaballito.com')
   })
 
-  it('incluye los precios de boleta y combo', () => {
+  it('incluye el precio de la boleta', () => {
     const msg = buildInviteMessage()
-    expect(msg).toContain('$25.000')
-    expect(msg).toContain('$40.000')
+    expect(msg).toContain('$20.000')
   })
 })
 

@@ -153,14 +153,13 @@ describe('Home — reglamento inline', () => {
     }, { timeout: 3000 })
   })
 
-  it('muestra sección de precios con oferta combo', async () => {
+  it('muestra sección de precio', async () => {
     await setupApi({})
     renderHome()
     await waitFor(() => {
-      expect(screen.getByText(/2 boletas combo/i)).toBeInTheDocument()
+      expect(screen.getByText(/1 boleta/i)).toBeInTheDocument()
     }, { timeout: 3000 })
-    expect(screen.getAllByText(/\$25\.000/).length).toBeGreaterThanOrEqual(1)
-    expect(screen.getAllByText(/\$40\.000/).length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText(/\$20\.000/).length).toBeGreaterThanOrEqual(1)
   })
 })
 
