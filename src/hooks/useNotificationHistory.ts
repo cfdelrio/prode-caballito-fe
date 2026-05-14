@@ -26,7 +26,9 @@ export function useNotificationHistory() {
     setError(null)
     try {
       const res = await api.get('/notifications?limit=20&sort=desc')
-      setNotifications(res.data.data || [])
+      const data = res.data?.data
+      const list = Array.isArray(data) ? data : Array.isArray(data?.notifications) ? data.notifications : []
+      setNotifications(list)
     } catch (err: any) {
       setError(err.response?.data?.error || 'Error al cargar notificaciones')
     } finally {
