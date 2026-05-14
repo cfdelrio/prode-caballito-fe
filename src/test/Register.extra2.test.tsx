@@ -225,10 +225,9 @@ describe('Register — handleAllowNotifications/Skip', () => {
     return { user }
   }
 
-  it('handleSkipNotifications → navega a /apuestas', async () => {
+  it('NO hay botón para saltear notificaciones — son obligatorias', async () => {
     const { user } = await goToNotifyStep()
-    await user.click(screen.getByRole('button', { name: /Ahora no/i }))
-    expect(mockNavigate).toHaveBeenCalledWith('/apuestas')
+    expect(screen.queryByRole('button', { name: /Ahora no/i })).not.toBeInTheDocument()
   })
 
   it('handleAllowNotifications con error → navega después de pausa', async () => {

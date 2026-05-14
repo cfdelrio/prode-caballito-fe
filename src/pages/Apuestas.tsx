@@ -7,6 +7,7 @@ import { Sk, SkMatchCard } from '@/components/ui/Skeleton'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { OnboardingTour, hasSeenOnboarding } from '@/components/onboarding/Tour'
 import { InviteFriendCTA } from '@/components/InviteFriendCTA'
+import { PushOptInBanner } from '@/components/PushOptInBanner'
 import { useToastStore } from '@/store/toastStore'
 import { teamFlag } from '@/utils/teamFlags'
 
@@ -204,6 +205,9 @@ export function Apuestas() {
 
       {/* Invitar amigo — CTA compacto */}
       <InviteFriendCTA variant="compact" />
+
+      {/* Push opt-in — solo si ya hay al menos un bet (entiende el valor) */}
+      {Object.keys(bets).length > 0 && <PushOptInBanner />}
 
       {/* Caja de ayuda — se cierra con la X y vuelve a aparecer al recargar */}
       {showHelp && (

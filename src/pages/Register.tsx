@@ -202,8 +202,6 @@ export function Register() {
     }
   }
 
-  const handleSkipNotifications = () => navigate('/apuestas')
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#001A4B] to-[#0042A5] flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
@@ -420,7 +418,7 @@ export function Register() {
                     ))}
                   </ul>
 
-                  <div className="w-full space-y-3 pt-1">
+                  <div className="w-full pt-1">
                     <button
                       onClick={handleAllowNotifications}
                       disabled={notifStatus === 'requesting'}
@@ -428,12 +426,9 @@ export function Register() {
                     >
                       {notifStatus === 'requesting' ? 'Esperando permiso...' : 'Activar notificaciones'}
                     </button>
-                    <button
-                      onClick={handleSkipNotifications}
-                      className="w-full text-sm text-gray-400 hover:text-gray-600 py-1 transition-colors"
-                    >
-                      Ahora no
-                    </button>
+                    <p className="text-xs text-gray-400 mt-3 text-center">
+                      Las notificaciones son obligatorias para usar ProdeCaballito
+                    </p>
                   </div>
                 </>
               ) : notifStatus === 'granted' ? (
