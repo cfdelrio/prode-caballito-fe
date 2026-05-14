@@ -211,7 +211,7 @@ export function Apuestas() {
 
       {/* Caja de ayuda — se cierra con la X y vuelve a aparecer al recargar */}
       {showHelp && (
-        <div className="relative bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 pr-9 text-sm text-blue-900">
+        <div className="relative bg-blue-50 border border-blue-200 rounded-xl section-animate px-4 py-3 pr-9 text-sm text-blue-900">
           <button
             onClick={() => setShowHelp(false)}
             aria-label={t.bets.helpClose}

@@ -15,7 +15,7 @@ import { LeaderHome } from '@/pages/LeaderHome'
 import { POINT_COLORS } from '@/utils/scoring'
 import type { Match, Bet, Planilla, RankingEntry } from '@/types'
 
-/* ── Global animations + DESIGN_RULES.md ESPN vibe ────────────── */
+/* ── Flip clock animation (defined in index.css) ─────────────────────── */
 if (typeof document !== 'undefined' && !document.getElementById('flip-anim')) {
   const s = document.createElement('style')
   s.id = 'flip-anim'
@@ -23,32 +23,6 @@ if (typeof document !== 'undefined' && !document.getElementById('flip-anim')) {
     @keyframes flipDown {
       from { transform: perspective(280px) rotateX(-82deg); }
       to   { transform: perspective(280px) rotateX(0deg); }
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
-    @keyframes slideUp {
-      from { transform: translateY(100%); }
-      to   { transform: translateY(0); }
-    }
-    @keyframes slideInFromLeft {
-      from { transform: translateX(-30px); opacity: 0; }
-      to   { transform: translateX(0); opacity: 1; }
-    }
-    @keyframes glow {
-      0%, 100% { box-shadow: 0 0 10px rgba(16, 185, 129, 0.3), 0 0 20px rgba(255, 223, 0, 0.2); }
-      50% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.5), 0 0 30px rgba(255, 223, 0, 0.3); }
-    }
-    @keyframes scoreboardPulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.95; }
-    }
-    .section-animate {
-      animation: slideUp 0.6s ease-out forwards;
-    }
-    .glow-card {
-      animation: glow 3s ease-in-out infinite;
     }
   `
   document.head.appendChild(s)
