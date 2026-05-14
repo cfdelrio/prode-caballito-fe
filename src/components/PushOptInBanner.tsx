@@ -36,56 +36,43 @@ export function PushOptInBanner() {
   }
 
   const handleActivate = async () => {
-    // Track analytics
-    window.gtag?.('event', 'push_banner_activate_click')
     await push.subscribe()
     if (push.state === 'denied') {
       show('Bloqueaste las notificaciones — habilítalas desde la configuración del navegador', 'error')
-      window.gtag?.('event', 'push_notification_denied')
     } else {
       show('Notificaciones activadas ✓', 'success')
-      window.gtag?.('event', 'push_notification_enabled')
     }
-  }
-
-  const handleDismissWithTracking = () => {
-    window.gtag?.('event', 'push_banner_dismiss')
-    handleDismiss()
   }
 
   return (
     <div
       data-testid="push-optin-banner"
-      className="relative rounded-2xl p-5 mb-4 overflow-hidden glow-card"
-      style={{
-        background: 'linear-gradient(135deg, #0042A5 0%, #003087 50%, #001A4B 100%)',
-        animation: 'slideUp 0.6s ease-out, glow 4s ease-in-out infinite',
-        boxShadow: '0 0 30px rgba(0, 66, 165, 0.3), 0 8px 16px rgba(0, 26, 75, 0.2)',
-      }}
+      className="relative rounded-2xl p-4 mb-4 overflow-hidden"
+      style={{ background: 'linear-gradient(135deg, #0042A5 0%, #001A4B 100%)' }}
     >
       <button
-        onClick={handleDismissWithTracking}
+        onClick={handleDismiss}
         aria-label="Descartar"
-        className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center text-white/60 hover:text-white hover:bg-white/15 transition-colors"
+        className="absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-colors"
       >
         ✕
       </button>
-      <div className="flex items-start gap-3.5 pr-6">
-        <div className="text-3xl shrink-0">⏰</div>
+      <div className="flex items-start gap-3 pr-6">
+        <div className="text-2xl shrink-0">🔔</div>
         <div className="flex-1">
           <h3 className="font-black text-white text-sm leading-tight">
-            Recibí recordatorios antes del cierre
+            No te pierdas los resultados
           </h3>
-          <p className="text-white/75 text-xs leading-relaxed mt-1.5">
-            Activá notificaciones y no te pierdas ningún partido. Te avisamos 30 minutos antes de que cierre cada apuesta.
+          <p className="text-white/70 text-xs leading-relaxed mt-1">
+            Activá las notificaciones del navegador y enterate al toque cuando se publique cada resultado y cuando cambies de posición en el ranking.
           </p>
           <button
             onClick={handleActivate}
             disabled={push.loading}
-            className="mt-3 font-black text-xs px-5 py-2.5 rounded-xl transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50 shadow-lg"
+            className="mt-3 font-black text-xs px-4 py-2 rounded-lg transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50"
             style={{ background: '#FFDF00', color: '#001A4B' }}
           >
-            {push.loading ? 'Activando…' : '✓ Activar notificaciones'}
+            {push.loading ? 'Activando…' : '🔔 Activar notificaciones'}
           </button>
         </div>
       </div>
