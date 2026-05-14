@@ -91,3 +91,49 @@ export function SkRankRow() {
     </div>
   )
 }
+
+/** Tournament page match row skeleton — slim row with home / vs / away */
+export function SkTournamentMatch() {
+  return (
+    <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-3">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+        <div className="flex items-center gap-2 justify-end">
+          <Sk className="h-3 w-20" />
+          <Sk className="h-5 w-5 rounded-full" />
+        </div>
+        <div className="flex flex-col items-center gap-1 px-2 min-w-[64px]">
+          <Sk className="h-4 w-12" />
+          <Sk className="h-2 w-10" />
+        </div>
+        <div className="flex items-center gap-2">
+          <Sk className="h-5 w-5 rounded-full" />
+          <Sk className="h-3 w-20" />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/** Full Tournaments page skeleton — header + selector + info card + tabs + list */
+export function SkTournamentsPage() {
+  return (
+    <div className="max-w-3xl mx-auto px-4 py-6 space-y-5">
+      <Sk className="h-6 w-40" />
+      <div className="flex gap-2 flex-wrap">
+        {[0, 1].map(i => <Sk key={i} className="h-10 w-28 rounded-xl" />)}
+      </div>
+      <div className="bg-gradient-to-r from-[#001A4B] to-[#0042A5] rounded-2xl p-5 space-y-3">
+        <Sk className="h-5 w-44 bg-white/20" />
+        <Sk className="h-3 w-32 bg-white/20" />
+        <Sk className="h-3 w-28 bg-white/20" />
+      </div>
+      <div className="flex gap-1 bg-gray-100 p-1 rounded-xl w-fit">
+        <Sk className="h-7 w-24 rounded-lg" />
+        <Sk className="h-7 w-24 rounded-lg" />
+      </div>
+      <div className="space-y-2">
+        {[0, 1, 2, 3].map(i => <SkTournamentMatch key={i} />)}
+      </div>
+    </div>
+  )
+}
