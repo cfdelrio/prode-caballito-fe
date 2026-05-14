@@ -238,6 +238,19 @@ export function Reglamento({ showHomePromo = false }: { showHomePromo?: boolean 
         </a>
       )}
 
+      {/* Ayuda — 0800 */}
+      <a
+        href="tel:08003451521"
+        className="flex items-center gap-4 bg-[#001A4B] text-white rounded-2xl px-5 py-4 shadow-md hover:brightness-110 active:scale-[0.98] transition-all"
+        aria-label="Llamar al 0800 3 45 1521"
+      >
+        <span className="text-3xl leading-none">📞</span>
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-widest text-[#FFDF00]">¿Tenés dudas? Llamá gratis</p>
+          <p className="text-xl font-black tracking-wide">0800 3 45 1521</p>
+        </div>
+      </a>
+
       {/* Canal de WhatsApp — siempre al final */}
       <div data-testid="whatsapp-canal" className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="px-4 py-3 flex items-center gap-2" style={{ background: '#25D366' }}>
