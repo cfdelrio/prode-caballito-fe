@@ -15,7 +15,7 @@ import { LeaderHome } from '@/pages/LeaderHome'
 import { POINT_COLORS } from '@/utils/scoring'
 import type { Match, Bet, Planilla, RankingEntry } from '@/types'
 
-/* ── Flip clock animation ─────────────────────────────────────── */
+/* ── Flip clock animation (defined in index.css) ─────────────────────── */
 if (typeof document !== 'undefined' && !document.getElementById('flip-anim')) {
   const s = document.createElement('style')
   s.id = 'flip-anim'
@@ -23,14 +23,6 @@ if (typeof document !== 'undefined' && !document.getElementById('flip-anim')) {
     @keyframes flipDown {
       from { transform: perspective(280px) rotateX(-82deg); }
       to   { transform: perspective(280px) rotateX(0deg); }
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
-    @keyframes slideUp {
-      from { transform: translateY(100%); }
-      to   { transform: translateY(0); }
     }
   `
   document.head.appendChild(s)
@@ -504,12 +496,15 @@ export function Home() {
 
   if (loadError) return (
     <div className="max-w-4xl mx-auto px-4 py-20 flex flex-col items-center gap-4 text-center">
-      <span className="text-5xl">📡</span>
-      <p className="font-semibold t-text-nav">{t.home.loadError}</p>
+      <span className="text-6xl animate-bounce">📡</span>
+      <div>
+        <h2 className="text-2xl font-black text-[#001A4B] mb-2">Oops, conexión perdida</h2>
+        <p className="font-semibold text-gray-600 text-sm">{t.home.loadError}</p>
+      </div>
       <button
         onClick={() => loadData()}
-        className="px-6 py-2.5 rounded-xl font-bold text-sm text-white transition-all hover:brightness-110 active:scale-95"
-        style={{ background: 'var(--theme-primary)' }}
+        className="px-6 py-3 rounded-xl font-bold text-sm text-white transition-all hover:brightness-110 active:scale-95 mt-2"
+        style={{ background: 'var(--theme-primary)', boxShadow: '0 4px 20px rgba(var(--theme-primary-rgb, 0, 66, 165), 0.4)' }}
       >
         {t.home.loadErrorRetry}
       </button>
@@ -570,16 +565,16 @@ export function Home() {
               {urgentUnbet > 0 ? (
                 <Link
                   to="/apuestas"
-                  className="inline-flex items-center gap-2 font-black text-sm px-5 py-3 rounded-xl w-fit transition-all hover:brightness-105 active:scale-95"
-                  style={{ background: '#ef4444', color: '#fff', boxShadow: '0 4px 16px rgba(239,68,68,0.4)' }}
+                  className="inline-flex items-center gap-2 font-black text-sm px-5 py-3 rounded-xl w-fit transition-all hover:brightness-110 active:scale-95 hover:scale-105 group"
+                  style={{ background: '#ef4444', color: '#fff', boxShadow: '0 4px 16px rgba(239,68,68,0.4)', animation: 'glow 2s ease-in-out infinite' }}
                 >
                   ⚠️ {urgentUnbet} urgentes — Apostar ahora
                 </Link>
               ) : (
                 <Link
                   to="/apuestas"
-                  className="inline-flex items-center gap-2 font-black text-sm px-5 py-3 rounded-xl w-fit transition-all hover:brightness-105 active:scale-95"
-                  style={{ background: '#FFDF00', color: '#001A4B', boxShadow: '0 4px 20px rgba(255,223,0,0.4)' }}
+                  className="inline-flex items-center gap-2 font-black text-sm px-5 py-3 rounded-xl w-fit transition-all hover:brightness-110 active:scale-95 hover:scale-105"
+                  style={{ background: '#FFDF00', color: '#001A4B', boxShadow: '0 4px 20px rgba(255,223,0,0.5)' }}
                 >
                   ⚽ {totalUnbet > 0 ? `Completar mi prode (${totalUnbet})` : 'Jugar ahora'}
                 </Link>
@@ -588,8 +583,8 @@ export function Home() {
               {/* CTA secundario: invitar amigo por WhatsApp (directo) */}
               <button
                 onClick={() => inviteVia('whatsapp')}
-                className="inline-flex items-center gap-2 font-black text-sm px-5 py-3 rounded-xl w-fit transition-all hover:brightness-105 active:scale-95"
-                style={{ background: '#25D366', color: '#fff', boxShadow: '0 4px 16px rgba(37,211,102,0.35)' }}
+                className="inline-flex items-center gap-2 font-black text-sm px-5 py-3 rounded-xl w-fit transition-all hover:brightness-110 active:scale-95 hover:scale-105"
+                style={{ background: '#25D366', color: '#fff', boxShadow: '0 4px 16px rgba(37,211,102,0.4)' }}
               >
                 💬 Invitar a un amigo
               </button>
@@ -665,8 +660,8 @@ export function Home() {
 
         {/* ── PRECIO ──────────────────────────────────────────── */}
         <div
-          className="rounded-2xl overflow-hidden shadow-md border"
-          style={{ background: 'linear-gradient(135deg, #FFF8DC 0%, #FFFBEB 100%)', borderColor: '#FFDF00' }}
+          className="rounded-2xl overflow-hidden shadow-md border section-animate"
+          style={{ background: 'linear-gradient(135deg, #FFF8DC 0%, #FFFBEB 100%)', borderColor: '#FFDF00', animation: 'slideUp 0.6s ease-out' }}
         >
           <div className="px-4 py-3 flex items-center gap-2" style={{ background: '#001A4B' }}>
             <span className="text-[10px] font-black text-white uppercase tracking-widest">🎫 Precio</span>
@@ -682,7 +677,7 @@ export function Home() {
         </div>
 
         {/* ── CÓMO FUNCIONA ───────────────────────────────────── */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" style={{ animation: 'slideUp 0.6s ease-out 0.1s both' }}>
           <div className="bg-[#001A4B] px-4 py-3">
             <p className="text-[10px] font-black text-white uppercase tracking-widest">⚽ Cómo funciona</p>
           </div>
@@ -708,17 +703,24 @@ export function Home() {
         </div>
 
         {/* ── SISTEMA DE PUNTUACIÓN ───────────────────────────── */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" style={{ animation: 'slideUp 0.6s ease-out 0.2s both' }}>
           <div className="bg-[#001A4B] px-4 py-3">
             <p className="text-[10px] font-black text-white uppercase tracking-widest">🎯 Sistema de Puntuación</p>
           </div>
           <div className="divide-y divide-gray-50">
-            {SCORING_ROWS.map(({ color, pts, desc }) => (
-              <div key={color} className="flex items-center gap-3 px-4 py-3">
-                <span className={`text-xs font-bold px-2.5 py-1.5 rounded-full shrink-0 min-w-[52px] text-center ${POINT_COLORS[color]}`}>
+            {SCORING_ROWS.map(({ color, pts, desc }, i) => (
+              <div
+                key={color}
+                className="flex items-center gap-3 px-4 py-3 hover:bg-gray-25 transition-colors"
+                style={{ animationDelay: `${i * 0.05}s` }}
+              >
+                <span
+                  className={`text-xs font-bold px-2.5 py-1.5 rounded-full shrink-0 min-w-[52px] text-center ${POINT_COLORS[color]} glow-card`}
+                  style={{ borderWidth: '1.5px', borderColor: `rgba(16, 185, 129, 0.3)` }}
+                >
                   {pts}
                 </span>
-                <p className="text-sm text-gray-600 leading-snug">{desc}</p>
+                <p className="text-sm text-gray-600 leading-snug font-medium">{desc}</p>
               </div>
             ))}
           </div>
@@ -728,7 +730,7 @@ export function Home() {
         </div>
 
         {/* ── EJEMPLOS PRÁCTICOS ──────────────────────────────── */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" style={{ animation: 'slideUp 0.6s ease-out 0.3s both' }}>
           <div className="bg-[#001A4B] px-4 py-3">
             <p className="text-[10px] font-black text-white uppercase tracking-widest">📊 Ejemplos Prácticos</p>
           </div>
@@ -757,7 +759,7 @@ export function Home() {
         </div>
 
         {/* ── CONDICIONES IMPORTANTES ─────────────────────────── */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" style={{ animation: 'slideUp 0.6s ease-out 0.4s both' }}>
           <div className="bg-[#001A4B] px-4 py-3">
             <p className="text-[10px] font-black text-white uppercase tracking-widest">📌 Condiciones Importantes</p>
           </div>
@@ -773,8 +775,12 @@ export function Home() {
 
         {/* ── INVITAR A UN AMIGO (CTA principal) ──────────────── */}
         <div
-          className="rounded-2xl overflow-hidden shadow-lg"
-          style={{ background: 'linear-gradient(135deg, #001A4B 0%, #003087 50%, #0042A5 100%)' }}
+          className="rounded-2xl overflow-hidden shadow-lg glow-card"
+          style={{
+            background: 'linear-gradient(135deg, #001A4B 0%, #003087 50%, #0042A5 100%)',
+            animation: 'slideUp 0.6s ease-out 0.5s both, glow 4s ease-in-out 0.5s infinite',
+            boxShadow: '0 0 30px rgba(16, 185, 129, 0.2), 0 20px 40px rgba(0, 26, 75, 0.3)'
+          }}
         >
           <div className="px-5 pt-5 pb-3">
             <p className="text-[10px] font-black text-[#FFDF00] uppercase tracking-widest mb-2">
