@@ -812,7 +812,10 @@ export function Home() {
           </div>
         </div>
 
-        {/* ── CANAL DE WHATSAPP ───────────────────────────────── */}
+      </div>
+
+      {/* ── CANAL DE WHATSAPP (at the very bottom) ──────────────── */}
+      <div className="px-4 mt-5 mb-28 md:mb-8">
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="px-4 py-3 flex items-center gap-2" style={{ background: '#25D366' }}>
             <span className="text-[10px] font-black text-white uppercase tracking-widest">📢 Canal de WhatsApp</span>
@@ -843,7 +846,6 @@ export function Home() {
             </a>
           </div>
         </div>
-
       </div>
 
       {/* ── STICKY MOBILE BAR ───────────────────────────────────── */}
