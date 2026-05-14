@@ -81,10 +81,15 @@ export function Apuestas() {
 
   // Live polling: refresh matches every 30s when live — pausa si el tab está oculto
   usePolling(() => {
-    api.get('/matches?limit=200').then(res => {
-      setMatches(res.data.data.matches)
-      setNow(Date.now())
-    }).catch(() => {})
+    api.get('/matches?limit=200')
+      .then(res => {
+        setMatches(res.data.data.matches)
+        setNow(Date.now())
+      })
+      .catch(err => {
+        const errMsg = err?.response?.data?.error || 'No se pudieron actualizar los partidos'
+        show(errMsg, 'error')
+      })
   }, 30_000, hasLive)
 
   const loadInitial = async () => {

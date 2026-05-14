@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
+import { useToastStore } from '@/store/toastStore'
 import { useT } from '@/hooks/useT'
 import { api } from '@/api/client'
 import { GanadoresModal } from './GanadoresModal'
 
 export function Navbar() {
   const { user, logout, updateUser, isAdmin } = useAuthStore()
+  const { show } = useToastStore()
   const t = useT()
   const navigate = useNavigate()
   const location = useLocation()
@@ -36,13 +38,13 @@ export function Navbar() {
   const handleToggleLang = async () => {
     if (!user || switchingLang) return
     const newLang = user.idioma_pref === 'pt' ? 'es' : 'pt'
-    // Actualización optimista: cambia en el store + localStorage inmediatamente
     updateUser({ idioma_pref: newLang })
     setSwitchingLang(true)
     try {
       await api.put(`/users/${user.id}`, { idioma_pref: newLang })
-    } catch { /* silent — localStorage ya tiene el valor correcto */ }
-    finally {
+    } catch (err: any) {
+      show('No se pudo cambiar el idioma', 'error')
+    } finally {
       setSwitchingLang(false)
     }
   }
