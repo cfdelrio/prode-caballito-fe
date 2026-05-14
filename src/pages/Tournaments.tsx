@@ -5,7 +5,7 @@ import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
 import { useT } from '@/hooks/useT'
-import { Spinner } from '@/components/ui/Spinner'
+import { SkTournamentsPage, SkTournamentMatch, SkRankRow } from '@/components/ui/Skeleton'
 import { teamFlag } from '@/utils/teamFlags'
 import type { Tournament, Match } from '@/types'
 
@@ -79,7 +79,7 @@ export function Tournaments() {
   const finished = matches.filter(m => m.estado === 'finished')
   const pending = matches.filter(m => m.estado !== 'finished')
 
-  if (loadingTournaments) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
+  if (loadingTournaments) return <SkTournamentsPage />
 
   if (tournaments.length === 0) return (
     <div className="max-w-2xl mx-auto px-4 py-10 text-center">
@@ -168,7 +168,9 @@ export function Tournaments() {
       {/* Tab: Partidos */}
       {tab === 'partidos' && (
         loadingMatches ? (
-          <div className="flex justify-center py-10"><Spinner /></div>
+          <div className="space-y-2">
+            {[0, 1, 2, 3].map(i => <SkTournamentMatch key={i} />)}
+          </div>
         ) : matches.length === 0 ? (
           <div className="bg-white rounded-xl border border-gray-100 p-8 text-center">
             <div className="text-3xl mb-2">⚽</div>
@@ -199,7 +201,9 @@ export function Tournaments() {
       {/* Tab: Ranking */}
       {tab === 'ranking' && (
         loadingRanking ? (
-          <div className="flex justify-center py-10"><Spinner /></div>
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+            {[0, 1, 2, 3, 4, 5].map(i => <SkRankRow key={i} />)}
+          </div>
         ) : ranking.length === 0 ? (
           <div className="bg-white rounded-xl border border-gray-100 p-8 text-center">
             <div className="text-3xl mb-2">📊</div>
