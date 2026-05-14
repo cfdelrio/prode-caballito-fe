@@ -13,6 +13,9 @@ interface TournamentRankingEntry {
   user_id: string
   user_name: string
   user_avatar?: string
+  planilla_id: string
+  nombre_planilla: string
+  precio_pagado?: boolean
   puntos: number
   total_aciertos: number
   total_exactos: number
@@ -224,7 +227,7 @@ export function Tournaments() {
               const isMe = r.user_id === user?.id
               return (
                 <div
-                  key={r.user_id}
+                  key={r.planilla_id || `${r.user_id}-${i}`}
                   className={`grid grid-cols-[2rem_1fr_auto_auto_auto] gap-2 items-center px-4 py-3 ${i < ranking.length - 1 ? 'border-b border-gray-50' : ''} ${isMe ? 'bg-blue-50' : ''}`}
                 >
                   <span className="text-sm font-bold text-gray-400">
@@ -237,9 +240,14 @@ export function Tournaments() {
                           {(r.user_name || '?')[0].toUpperCase()}
                         </div>
                     }
-                    <p className={`text-sm font-semibold truncate ${isMe ? 'text-[#0042A5]' : 'text-[#001A4B]'}`}>
-                      {r.user_name} {isMe && <span className="text-xs font-normal">{t.tournaments.you}</span>}
-                    </p>
+                    <div className="min-w-0">
+                      <p className={`text-sm font-semibold truncate ${isMe ? 'text-[#0042A5]' : 'text-[#001A4B]'}`}>
+                        {r.user_name} {isMe && <span className="text-xs font-normal">{t.tournaments.you}</span>}
+                      </p>
+                      {r.nombre_planilla && (
+                        <p className="text-xs text-gray-400 truncate">{r.nombre_planilla}</p>
+                      )}
+                    </div>
                   </div>
                   <span className="text-xs text-center text-gray-500 hidden sm:block">{r.total_exactos}</span>
                   <span className="text-xs text-center text-gray-500 hidden sm:block">{r.total_aciertos}</span>
