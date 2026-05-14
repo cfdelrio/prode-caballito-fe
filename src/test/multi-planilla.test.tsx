@@ -25,7 +25,6 @@ vi.mock('@/utils/teamFlags', () => ({
   teamAbbr: (name: string) => name.slice(0, 3).toUpperCase(),
 }))
 
-vi.mock('@/components/ui/AdCard', () => ({ AdCard: () => null }))
 
 vi.mock('@/components/match/MatchCard', () => ({
   MatchCard: ({ match }: { match: { id: string; home_team: string; away_team: string } }) => (

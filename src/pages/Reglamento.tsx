@@ -1,4 +1,8 @@
 import { POINT_COLORS } from '@/utils/scoring'
+import { Link } from 'react-router-dom'
+import { QRCodeSVG } from 'qrcode.react'
+import { useAuthStore } from '@/store/authStore'
+import { InviteFriendCTA } from '@/components/InviteFriendCTA'
 
 const examples = [
   {
@@ -51,7 +55,9 @@ const examples = [
   },
 ]
 
-export function Reglamento() {
+export function Reglamento({ showHomePromo = false }: { showHomePromo?: boolean } = {}) {
+  const { token } = useAuthStore()
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-5 pb-20">
 
@@ -60,6 +66,41 @@ export function Reglamento() {
         <p className="text-xs font-semibold tracking-widest text-[#FFDF00] uppercase">Después de 4 años</p>
         <h1 className="text-xl font-black">⚽ Vuelve el PRODE del MUNDIAL ⚽</h1>
         <p className="text-sm text-white/70">Instructivo oficial — leelo antes de arrancar</p>
+      </div>
+
+      {/* Invitar amigo — CTA principal */}
+      <InviteFriendCTA />
+
+      {/* Canal de WhatsApp */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="px-4 py-3 flex items-center gap-2" style={{ background: '#25D366' }}>
+          <span className="text-[10px] font-black text-white uppercase tracking-widest">📢 Canal de WhatsApp</span>
+        </div>
+        <div className="p-5 flex flex-col items-center text-center gap-3">
+          <p className="text-sm text-gray-700 font-semibold">
+            Sumate al canal <strong>ProdeCaballito</strong> para enterarte de novedades y resultados.
+          </p>
+          <div className="p-3 bg-white rounded-xl border border-gray-100">
+            <QRCodeSVG
+              value="https://whatsapp.com/channel/0029VbD5n7oDeON9vGA2gS3j"
+              size={192}
+              level="M"
+              marginSize={0}
+            />
+          </div>
+          <p className="text-[11px] text-gray-500">
+            Escaneá el código con la cámara de tu teléfono.
+          </p>
+          <a
+            href="https://whatsapp.com/channel/0029VbD5n7oDeON9vGA2gS3j"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-black text-sm py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all hover:brightness-105 active:scale-[0.98]"
+            style={{ background: '#25D366', color: '#fff', boxShadow: '0 4px 16px rgba(37,211,102,0.35)' }}
+          >
+            💬 Unirme al canal
+          </a>
+        </div>
       </div>
 
       {/* Intro */}
@@ -75,6 +116,21 @@ export function Reglamento() {
         </p>
       </div>
 
+      {/* Precios y oferta */}
+      <div
+        className="rounded-2xl overflow-hidden shadow-md border"
+        style={{ background: 'linear-gradient(135deg, #FFF8DC 0%, #FFFBEB 100%)', borderColor: '#FFDF00' }}
+      >
+        <div className="px-4 py-3 flex items-center gap-2" style={{ background: '#001A4B' }}>
+          <h2 className="text-xs font-black text-white uppercase tracking-widest">🎫 Precio</h2>
+        </div>
+        <div className="p-4 text-center">
+          <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">1 boleta</p>
+          <p className="text-2xl font-black text-[#001A4B] leading-none">$20.000</p>
+          <p className="text-[10px] text-gray-500 mt-1.5">Una planilla del Mundial</p>
+        </div>
+      </div>
+
       {/* Sistema de puntaje */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-3">
         <h2 className="font-bold text-[#001A4B] text-base">Sistema de Puntuación</h2>
@@ -82,7 +138,7 @@ export function Reglamento() {
           {([
             { color: 'celeste' as const, pts: '4 pts', desc: 'Resultado exacto + ambos goles exactos + 4 o más goles en total (BONUS)' },
             { color: 'rojo'    as const, pts: '3 pts', desc: 'Resultado exacto: acertó ganador/empate y ambos tanteadores' },
-            { color: 'verde'   as const, pts: '2 pts', desc: 'Acertó ganador/empate y uno de los dos tanteadores exactos' },
+            { color: 'verde'   as const, pts: '2 pts', desc: 'Acertó el ganador y uno de los dos tanteadores exactos (no aplica en empate)' },
             { color: 'amarillo'as const, pts: '1 pt',  desc: 'Acertó solo el ganador o empate (ningún tanteador exacto)' },
             { color: 'gris'    as const, pts: '0 pts', desc: 'No acertó el resultado global (ganador o empate)' },
           ]).map(({ color, pts, desc }) => (
@@ -134,8 +190,9 @@ export function Reglamento() {
           <li className="flex items-start gap-2"><span className="shrink-0">🎫</span><span>Cada planilla tiene un valor de <strong>$20.000</strong>.</span></li>
           <li className="flex items-start gap-2"><span className="shrink-0">📋</span><span>Podés participar con <strong>la cantidad de planillas que quieras</strong>, cada una compite por separado.</span></li>
           <li className="flex items-start gap-2"><span className="shrink-0">💰</span><span>El total acumulado va para <strong>un único ganador</strong> (el que sume más puntos).</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">🔒</span><span>El cierre de pronósticos es <strong>5 minutos antes del inicio del primer partido</strong>. A partir de ese momento no se pueden agregar planillas nuevas ni modificar pronósticos.</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">👁️</span><span>Al cierre, la <strong>planilla general</strong> queda visible para todos — podés ver los pronósticos de todos los participantes.</span></li>
           <li className="flex items-start gap-2"><span className="shrink-0">⏰</span><span>El pago debe realizarse antes del inicio del primer partido.</span></li>
-          <li className="flex items-start gap-2"><span className="shrink-0">👁️</span><span>Minutos antes del inicio del primer partido, todos tendrán acceso a la planilla general con todos los pronósticos de todos los participantes.</span></li>
         </ul>
       </div>
 
@@ -166,16 +223,52 @@ export function Reglamento() {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-2">
         <h2 className="font-bold text-[#001A4B] text-base">Reglas Generales</h2>
         <ul className="space-y-2 text-sm text-gray-600">
-          <li className="flex items-start gap-2"><span className="shrink-0">✅</span> Los resultados cuentan en los <strong>90 minutos</strong>. No cuentan alargues ni penales.</li>
-          <li className="flex items-start gap-2"><span className="shrink-0">✅</span> Podés editar tus pronósticos hasta el cierre (minutos antes del partido).</li>
-          <li className="flex items-start gap-2"><span className="shrink-0">✅</span> Solo participan en el ranking oficial las planillas con <strong>precio pagado</strong>.</li>
-          <li className="flex items-start gap-2"><span className="shrink-0">✅</span> El ranking se actualiza automáticamente al publicar cada resultado.</li>
-          <li className="flex items-start gap-2"><span className="shrink-0">📊</span> La app tiene estadísticas, podios, campeonatos de amigos por estrellas y más.</li>
-          <li className="flex items-start gap-2"><span className="shrink-0">💬</span> Ante cualquier duda, comunicate por WhatsApp.</li>
+          <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span>Los resultados cuentan en los <strong>90 minutos</strong>. No cuentan alargues ni penales.</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span>Podés editar tus pronósticos hasta el cierre: <strong>5 minutos antes del inicio del primer partido</strong>.</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span>Solo participan en el ranking oficial las planillas con <strong>precio pagado</strong>.</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span>El ranking se actualiza automáticamente al publicar cada resultado.</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">📊</span><span>La app tiene estadísticas, podios, campeonatos de amigos por estrellas y más.</span></li>
+          <li className="flex items-start gap-2"><span className="shrink-0">💬</span><span>Ante cualquier duda, comunicate por WhatsApp.</span></li>
         </ul>
       </div>
 
       <p className="text-center text-sm text-gray-400 pb-2">¡Buena suerte a todos! 🏆</p>
+
+      {!token && (
+        <div className="bg-gradient-to-r from-[#001A4B] to-[#0042A5] rounded-2xl p-6 text-center space-y-4 mt-6">
+          <h2 className="text-white font-bold text-lg">¿Listo para jugar?</h2>
+          <p className="text-white/80 text-sm">Creá tu cuenta o inicia sesión para empezar a hacer pronósticos.</p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              to="/login"
+              className="bg-[#FFDF00] text-[#001A4B] font-bold py-3 px-8 rounded-xl hover:bg-yellow-300 transition-colors"
+            >
+              Iniciar Sesión
+            </Link>
+            <Link
+              to="/register"
+              className="bg-white text-[#001A4B] font-bold py-3 px-8 rounded-xl hover:bg-gray-100 transition-colors"
+            >
+              Crear Cuenta
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {showHomePromo && (
+        <a
+          href="/login"
+          className="block rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-shadow"
+          aria-label="Jugar ahora"
+        >
+          <img
+            src="/promo-jugar.png"
+            alt="¿Te la bancás? Jugá desde $25 — Jugar ahora"
+            className="w-full h-auto block"
+            loading="lazy"
+          />
+        </a>
+      )}
     </div>
   )
 }

@@ -1,10 +1,12 @@
 import { useRef, useState, useEffect, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
 import { useT } from '@/hooks/useT'
 import { TEAM_THEMES } from '@/types'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
+import { resetOnboarding } from '@/components/onboarding/Tour'
 
 const COUNTRY_CODES = [
   { code: '+54', flag: '🇦🇷', name: 'Argentina' },
@@ -47,13 +49,18 @@ function parsePhone(full: string): { code: string; local: string } {
   if (!full) return { code: '+54', local: '' }
   const match = COUNTRY_CODES.find(c => full.startsWith(c.code))
   if (match) return { code: match.code, local: full.slice(match.code.length) }
-  return { code: '+54', local: full.replace(/^\+/, '') }
+  // Handle numbers without + (e.g., "541155996222" becomes code: "+54", local: "1155996222")
+  const withoutPlus = full.replace(/^\+/, '')
+  const numMatch = COUNTRY_CODES.find(c => withoutPlus.startsWith(c.code.slice(1)))
+  if (numMatch) return { code: numMatch.code, local: withoutPlus.slice(numMatch.code.length - 1) }
+  return { code: '+54', local: withoutPlus }
 }
 
 export function Profile() {
   const { user, updateUser } = useAuthStore()
   const { show } = useToastStore()
   const t = useT()
+  const navigate = useNavigate()
   const fileRef = useRef<HTMLInputElement>(null)
   const [editName, setEditName] = useState(false)
   const [nombre, setNombre] = useState(user?.nombre || '')
@@ -134,7 +141,9 @@ export function Profile() {
     show(t.profile.themeActivated(TEAM_THEMES[tema]?.name || tema), 'success')
     try {
       await api.put(`/users/${user!.id}`, { tema_equipo: tema })
-    } catch { /* silent */ }
+    } catch {
+      show(t.profile.errorTheme, 'warning')
+    }
   }
 
   if (!user) return null
@@ -227,6 +236,20 @@ export function Profile() {
         </div>
       </div>
 
+      {/* Tour de bienvenida */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+        <button
+          onClick={() => {
+            resetOnboarding()
+            show(t.onboarding.restarted, 'info')
+            navigate('/apuestas')
+          }}
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-blue-200 bg-blue-50 text-blue-800 font-semibold text-sm hover:bg-blue-100 transition-colors"
+        >
+          🎓 {t.onboarding.showAgain}
+        </button>
+      </div>
+
       {/* WhatsApp */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-4">
         <h3 className="font-bold text-[#001A4B]">{t.profile.whatsappTitle}</h3>
@@ -258,6 +281,7 @@ export function Profile() {
           />
           <span className="text-xs text-gray-500 leading-relaxed">{t.profile.whatsappConsent}</span>
         </label>
+        <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 leading-relaxed">{t.profile.whatsappNotice}</p>
         <button
           onClick={handleSaveWhatsapp}
           disabled={savingWa || (waConsent && !waNumber)}

@@ -33,6 +33,8 @@ interface Props {
   onBetDeleted?: (matchId: string) => void
   readonly?: boolean
   planillaLocked?: boolean
+  /** True cuando el torneo ya arrancó (5min antes del primer partido). Bloquea TODAS las apuestas, incluso las de partidos que aún no empezaron. */
+  tournamentClosed?: boolean
   now?: number
 }
 
@@ -55,7 +57,7 @@ function TeamDisplay({ team }: { team: string }) {
   )
 }
 
-export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, readonly, planillaLocked, now: nowProp }: Props) {
+export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, readonly, planillaLocked, tournamentClosed, now: nowProp }: Props) {
   const { show } = useToastStore()
   const t = useT()
   const lang = useAuthStore(s => s.user?.idioma_pref || 'es')
@@ -90,7 +92,8 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
 
   const nowMs = nowProp ?? Date.now()
   const cutoffMs = new Date(match.time_cutoff).getTime()
-  const isClosed = nowMs > cutoffMs
+  // El torneo se cierra 5 min antes del primer partido — cuando eso pasa, todos los partidos quedan cerrados aunque su cutoff individual no haya llegado
+  const isClosed = nowMs > cutoffMs || !!tournamentClosed
   const isFinished = match.estado === 'finished'
   const isLive = match.estado === 'live'
   const dateLocale = lang === 'pt' ? ptBR : esLocale
@@ -225,8 +228,8 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
         {/* Local */}
         <div className="flex flex-col items-center gap-2">
           <span className={`text-[34px] leading-none tabular-nums ${
-            isFinished ? 'font-[500] t-text-nav'
-            : bet ? 'font-black t-text-primary'
+            isFinished ? 'font-[500] t-text-page-accent opacity-70'
+            : bet ? 'font-black t-text-page-accent'
             : 'font-[300] t-text-muted opacity-50'
           }`}>
             {isFinished ? match.resultado_local : bet ? bet.goles_local : '—'}
@@ -259,8 +262,8 @@ export function MatchCard({ match, bet, planillaId, onBetSaved, onBetDeleted, re
         {/* Visitante */}
         <div className="flex flex-col items-center gap-2">
           <span className={`text-[34px] leading-none tabular-nums ${
-            isFinished ? 'font-[500] t-text-nav'
-            : bet ? 'font-black t-text-primary'
+            isFinished ? 'font-[500] t-text-page-accent opacity-70'
+            : bet ? 'font-black t-text-page-accent'
             : 'font-[300] t-text-muted opacity-50'
           }`}>
             {isFinished ? match.resultado_visitante : bet ? bet.goles_visitante : '—'}

@@ -66,6 +66,7 @@ export function Planilla() {
   const totalBets = Object.keys(bets).length
   const pending = matches.filter(m => m.estado !== 'finished').length
   const betsDone = matches.filter(m => m.estado !== 'finished' && bets[m.id]).length
+  const tournamentClosed = matches.length > 0 && Date.now() > Math.min(...matches.map(m => new Date(m.time_cutoff).getTime()))
   const pts = planilla?.puntos_totales || 0
   const exactos = planilla?.exactos_count || 0
 
@@ -183,6 +184,7 @@ export function Planilla() {
             match={m}
             bet={bets[m.id]}
             planillaId={canEdit ? planillaId : undefined}
+            tournamentClosed={tournamentClosed}
             onBetSaved={refreshBets}
             onBetDeleted={(mid) => { const nb = { ...bets }; delete nb[mid]; setBets(nb) }}
             readonly={!canEdit}

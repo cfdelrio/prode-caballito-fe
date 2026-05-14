@@ -167,6 +167,14 @@ async function goToCompleteStep() {
   await user.click(screen.getByRole('button', { name: /Verificar/i }))
   await waitFor(() => expect(screen.getByText(/Email verificado/i)).toBeInTheDocument())
 
+  // Ingresar teléfono y aceptar consentimiento (ahora obligatorio)
+  await user.type(screen.getByPlaceholderText('11 1234 5678'), '1155996222')
+  const checkboxLabel = screen.getByText(/Acepto que mi número sea visible/)
+  const checkbox = checkboxLabel.closest('label')?.querySelector('input[type="checkbox"]')
+  if (checkbox && !checkbox.checked) {
+    await user.click(checkbox)
+  }
+
   return { user, api }
 }
 
@@ -261,10 +269,15 @@ describe('Register — paso 4: notificaciones', () => {
     return { user }
   }
 
-  it('muestra la pantalla de notificaciones con sus botones', async () => {
+  it('muestra la pantalla de notificaciones con el botón obligatorio', async () => {
     await goToNotifyStep()
     expect(screen.getByRole('button', { name: /Activar notificaciones/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Ahora no/i })).toBeInTheDocument()
+    expect(screen.getByText(/Las notificaciones son obligatorias/i)).toBeInTheDocument()
+  })
+
+  it('NO muestra botón "Ahora no" — notificaciones son obligatorias', async () => {
+    await goToNotifyStep()
+    expect(screen.queryByRole('button', { name: /Ahora no/i })).not.toBeInTheDocument()
   })
 
   it('muestra los 3 beneficios en la lista', async () => {

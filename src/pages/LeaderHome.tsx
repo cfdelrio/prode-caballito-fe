@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { QRCodeSVG } from 'qrcode.react'
 import { useAuthStore } from '@/store/authStore'
 import { MatchCard } from '@/components/match/MatchCard'
-import { AdCard } from '@/components/ui/AdCard'
 import type { Match, Bet, Planilla, RankingEntry } from '@/types'
 
 // Keyframes inyectados una vez
@@ -112,6 +112,7 @@ export function LeaderHome({
   const upcomingAll = matches
     .filter(m => m.estado !== 'finished')
     .slice(0, 4)
+  const tournamentClosed = matches.length > 0 && Date.now() > Math.min(...matches.map(m => new Date(m.time_cutoff).getTime()))
 
   const handleShare = async () => {
     const text =
@@ -673,13 +674,13 @@ export function LeaderHome({
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {upcomingAll.map((m, i) => (
+              {upcomingAll.map((m) => (
                 <div key={m.id}>
-                  {i === 2 && <div style={{ marginBottom: 12 }}><AdCard /></div>}
                   <MatchCard
                     match={m}
                     bet={bets[m.id]}
                     planillaId={planilla?.id}
+                    tournamentClosed={tournamentClosed}
                     onBetSaved={onBetSaved}
                     onBetDeleted={onBetDeleted}
                   />
@@ -759,6 +760,66 @@ export function LeaderHome({
           >
             {shared ? '✓ Link copiado' : 'Compartir que voy primero →'}
           </button>
+        </div>
+
+        {/* ── CANAL DE WHATSAPP ────────────────────────────────────────── */}
+        <div style={{
+          marginTop: 20,
+          background: 'rgba(37,211,102,0.06)',
+          border: '1px solid rgba(37,211,102,0.25)',
+          borderRadius: 20,
+          padding: '24px',
+          textAlign: 'center',
+        }}>
+          <p style={{
+            margin: '0 0 4px',
+            fontSize: 11, fontWeight: 900,
+            color: '#25D366',
+            textTransform: 'uppercase',
+            letterSpacing: '0.15em',
+          }}>
+            📢 Canal de WhatsApp
+          </p>
+          <p style={{
+            margin: '0 0 16px',
+            fontSize: 13, color: TEXT_DIM, lineHeight: 1.6,
+          }}>
+            Sumate al canal <strong style={{ color: TEXT_WHITE }}>ProdeCaballito</strong> para enterarte de novedades y resultados.
+          </p>
+          <div style={{
+            display: 'inline-block',
+            padding: 12,
+            background: '#fff',
+            borderRadius: 12,
+            marginBottom: 14,
+          }}>
+            <QRCodeSVG
+              value="https://whatsapp.com/channel/0029VbD5n7oDeON9vGA2gS3j"
+              size={172}
+              level="M"
+              marginSize={0}
+            />
+          </div>
+          <a
+            href="https://whatsapp.com/channel/0029VbD5n7oDeON9vGA2gS3j"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'block',
+              background: '#25D366',
+              color: '#fff',
+              fontWeight: 900,
+              fontSize: 14,
+              padding: '14px 24px',
+              borderRadius: 14,
+              textAlign: 'center',
+              textDecoration: 'none',
+              boxShadow: '0 6px 24px rgba(37,211,102,0.35)',
+              fontFamily: "'Arial Black', Arial, sans-serif",
+            }}
+          >
+            💬 Unirme al canal
+          </a>
         </div>
 
       </div>{/* /content */}

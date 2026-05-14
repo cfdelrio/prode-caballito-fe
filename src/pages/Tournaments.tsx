@@ -3,6 +3,7 @@ import { format, type Locale } from 'date-fns'
 import { es as esLocale, pt as ptLocale } from 'date-fns/locale'
 import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
+import { useToastStore } from '@/store/toastStore'
 import { useT } from '@/hooks/useT'
 import { Spinner } from '@/components/ui/Spinner'
 import { teamFlag } from '@/utils/teamFlags'
@@ -21,6 +22,7 @@ interface TournamentRankingEntry {
 
 export function Tournaments() {
   const { user } = useAuthStore()
+  const { show } = useToastStore()
   const t = useT()
   const [tournaments, setTournaments] = useState<Tournament[]>([])
   const [selected, setSelected] = useState<string>('')
@@ -40,7 +42,10 @@ export function Tournaments() {
         setTournaments(list)
         if (list.length > 0) setSelected(list[0].id)
       })
-      .catch(() => setTournaments([]))
+      .catch(() => {
+        setTournaments([])
+        show(t.tournaments.errorLoad, 'error')
+      })
       .finally(() => setLoadingTournaments(false))
   }, [])
 
@@ -53,11 +58,17 @@ export function Tournaments() {
         const all: Match[] = data.data.matches || []
         setMatches(all.filter(m => m.tournament_id === selected))
       })
-      .catch(() => setMatches([]))
+      .catch(() => {
+        setMatches([])
+        show(t.tournaments.errorLoadMatches, 'error')
+      })
       .finally(() => setLoadingMatches(false))
     api.get(`/tournaments/${selected}/ranking`)
       .then(({ data }) => setRanking(data.data || []))
-      .catch(() => setRanking([]))
+      .catch(() => {
+        setRanking([])
+        show(t.tournaments.errorLoadRanking, 'error')
+      })
       .finally(() => setLoadingRanking(false))
   }, [selected])
 
