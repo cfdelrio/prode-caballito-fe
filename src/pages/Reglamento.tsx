@@ -71,38 +71,6 @@ export function Reglamento({ showHomePromo = false }: { showHomePromo?: boolean 
       {/* Invitar amigo — CTA principal */}
       <InviteFriendCTA />
 
-      {/* Canal de WhatsApp */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="px-4 py-3 flex items-center gap-2" style={{ background: '#25D366' }}>
-          <span className="text-[10px] font-black text-white uppercase tracking-widest">📢 Canal de WhatsApp</span>
-        </div>
-        <div className="p-5 flex flex-col items-center text-center gap-3">
-          <p className="text-sm text-gray-700 font-semibold">
-            Sumate al canal <strong>ProdeCaballito</strong> para enterarte de novedades y resultados.
-          </p>
-          <div className="p-3 bg-white rounded-xl border border-gray-100">
-            <QRCodeSVG
-              value="https://whatsapp.com/channel/0029VbD5n7oDeON9vGA2gS3j"
-              size={192}
-              level="M"
-              marginSize={0}
-            />
-          </div>
-          <p className="text-[11px] text-gray-500">
-            Escaneá el código con la cámara de tu teléfono.
-          </p>
-          <a
-            href="https://whatsapp.com/channel/0029VbD5n7oDeON9vGA2gS3j"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-black text-sm py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all hover:brightness-105 active:scale-[0.98]"
-            style={{ background: '#25D366', color: '#fff', boxShadow: '0 4px 16px rgba(37,211,102,0.35)' }}
-          >
-            💬 Unirme al canal
-          </a>
-        </div>
-      </div>
-
       {/* Intro */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-3 text-sm text-gray-700 leading-relaxed">
         <p>
@@ -269,6 +237,38 @@ export function Reglamento({ showHomePromo = false }: { showHomePromo?: boolean 
           />
         </a>
       )}
+
+      {/* Canal de WhatsApp — siempre al final */}
+      <div data-testid="whatsapp-canal" className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="px-4 py-3 flex items-center gap-2" style={{ background: '#25D366' }}>
+          <span className="text-[10px] font-black text-white uppercase tracking-widest">📢 Canal de WhatsApp</span>
+        </div>
+        <div className="p-5 flex flex-col items-center text-center gap-3">
+          <p className="text-sm text-gray-700 font-semibold">
+            Sumate al canal <strong>ProdeCaballito</strong> para enterarte de novedades y resultados.
+          </p>
+          <div className="p-3 bg-white rounded-xl border border-gray-100">
+            <QRCodeSVG
+              value="https://whatsapp.com/channel/0029VbD5n7oDeON9vGA2gS3j"
+              size={192}
+              level="M"
+              marginSize={0}
+            />
+          </div>
+          <p className="text-[11px] text-gray-500">
+            Escaneá el código con la cámara de tu teléfono.
+          </p>
+          <a
+            href="https://whatsapp.com/channel/0029VbD5n7oDeON9vGA2gS3j"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-black text-sm py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all hover:brightness-105 active:scale-[0.98]"
+            style={{ background: '#25D366', color: '#fff', boxShadow: '0 4px 16px rgba(37,211,102,0.35)' }}
+          >
+            💬 Unirme al canal
+          </a>
+        </div>
+      </div>
     </div>
   )
 }
