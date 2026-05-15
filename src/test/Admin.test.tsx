@@ -780,7 +780,7 @@ describe('Admin — JobsTab (super admin)', () => {
     await userEvent.click(screen.getByText(/⚙️ Procesos/))
     expect(screen.getByText(/Recalcular Ranking/)).toBeInTheDocument()
     expect(screen.getByText(/Recalcular Jornada/)).toBeInTheDocument()
-    expect(screen.getByText(/Simular Ganador/)).toBeInTheDocument()
+    expect(screen.getByText(/Publicar Ganador/)).toBeInTheDocument()
     expect(screen.getByText(/Email Semanal/)).toBeInTheDocument()
     expect(screen.getByText(/Email de Bienvenida/)).toBeInTheDocument()
     expect(screen.getByText(/Test WhatsApp/)).toBeInTheDocument()
@@ -825,12 +825,12 @@ describe('Admin — JobsTab (super admin)', () => {
     await waitFor(() => expect(mockShow).toHaveBeenCalledWith(expect.stringContaining('Jornada recalculada'), 'success'))
   })
 
-  it('Simular Ganador: requiere email; valida + envía', async () => {
+  it('Publicar Ganador: requiere email; valida + envía', async () => {
     await setupApi({ tournamentsAll: [T_FUTURE] })
     renderAdmin()
     await userEvent.click(screen.getByText(/⚙️ Procesos/))
-    const card = screen.getByText(/Simular Ganador/).closest('div')!.parentElement!
-    const btn = within(card).getByText(/Disparar flujo ganador/) as HTMLButtonElement
+    const card = screen.getByText(/Publicar Ganador/).closest('div')!.parentElement!
+    const btn = within(card).getByText(/Publicar ganador/) as HTMLButtonElement
     expect(btn.disabled).toBe(true)
     const emailInput = within(card).getByPlaceholderText(/cfdelrio@gmail/)
     await userEvent.type(emailInput, 'ganador@x.com')
