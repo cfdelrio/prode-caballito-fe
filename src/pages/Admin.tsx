@@ -1047,6 +1047,8 @@ function JobsTab() {
   const [winnerEmail, setWinnerEmail] = useState('')
   const [winnerMatchdayName, setWinnerMatchdayName] = useState('')
   const [winnerPoints, setWinnerPoints] = useState('42')
+  const [winnerUserName, setWinnerUserName] = useState('')
+  const [winnerImageUrl, setWinnerImageUrl] = useState('')
   const [weeklyTestEmail, setWeeklyTestEmail] = useState('')
   const [welcomeEmail, setWelcomeEmail] = useState('')
   const [waTo, setWaTo] = useState('')
@@ -1134,8 +1136,8 @@ function JobsTab() {
         {jobResult?.id === 'matchday' && <p className="text-xs text-green-600 font-medium">{jobResult.text}</p>}
       </JobCard>
 
-      {/* Simular Ganador */}
-      <JobCard title="🏆 Simular Ganador de Jornada" description="Dispara el flujo completo: imagen FIFA, email, WhatsApp y push a todos.">
+      {/* Publicar Ganador */}
+      <JobCard title="🏆 Publicar Ganador de Jornada" description="Dispara notificaciones (email, WhatsApp, push) y publica la imagen hero en el modal de Ganadores.">
         <div className="space-y-3">
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">Email del ganador *</label>
@@ -1167,20 +1169,57 @@ function JobsTab() {
               />
             </div>
           </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Nombre del ganador (opcional)</label>
+            <input
+              value={winnerUserName}
+              onChange={e => setWinnerUserName(e.target.value)}
+              placeholder="Juan Pérez"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">URL imagen hero (opcional — si la cargás se muestra en el modal de Ganadores)</label>
+            <input
+              value={winnerImageUrl}
+              onChange={e => setWinnerImageUrl(e.target.value)}
+              placeholder="https://..."
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+            />
+          </div>
+          {winnerImageUrl && (
+            <img
+              src={winnerImageUrl}
+              alt="Preview"
+              className="w-full rounded-xl max-h-48 object-cover border border-gray-100"
+              onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+            />
+          )}
           <button
             onClick={() => runJob('winner', async () => {
               if (!winnerEmail) { show('Ingresá el email del ganador', 'error'); return '' }
+              const pts = winnerPoints ? parseInt(winnerPoints) : undefined
               await api.post('/admin/jobs/trigger-winner', {
                 email: winnerEmail,
                 matchday_name: winnerMatchdayName || undefined,
-                points: winnerPoints ? parseInt(winnerPoints) : undefined,
+                points: pts,
               })
-              return `Flujo de ganador disparado para ${winnerEmail} ✓`
+              if (winnerImageUrl) {
+                await api.post('/admin/winner-image', {
+                  image_url: winnerImageUrl,
+                  matchday_label: winnerMatchdayName || undefined,
+                  user_name: winnerUserName || undefined,
+                  points: pts,
+                })
+              }
+              const parts = [`Ganador publicado para ${winnerEmail} ✓`]
+              if (winnerImageUrl) parts.push('+ imagen hero guardada')
+              return parts.join(' ')
             })}
             disabled={!!loading || !winnerEmail}
             className="bg-green-600 text-white text-sm font-bold px-5 py-2 rounded-xl hover:bg-green-700 disabled:opacity-50"
           >
-            {loading === 'winner' ? 'Procesando...' : '🚀 Disparar flujo ganador'}
+            {loading === 'winner' ? 'Publicando...' : '🚀 Publicar ganador'}
           </button>
           {jobResult?.id === 'winner' && <p className="text-xs text-green-600 font-medium">{jobResult.text}</p>}
         </div>
