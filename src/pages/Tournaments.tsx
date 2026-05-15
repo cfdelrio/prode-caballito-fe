@@ -5,7 +5,7 @@ import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
 import { useT } from '@/hooks/useT'
-import { SkTournamentsPage, SkTournamentMatch, SkRankRow } from '@/components/ui/Skeleton'
+import { Sk, SkTournamentMatchRow, SkTournamentRankRow } from '@/components/ui/Skeleton'
 import { teamFlag } from '@/utils/teamFlags'
 import type { Tournament, Match } from '@/types'
 
@@ -21,6 +21,23 @@ interface TournamentRankingEntry {
   total_exactos: number
   posicion?: number
   position?: number
+}
+
+function TournamentsSkeleton() {
+  return (
+    <div className="max-w-3xl mx-auto px-4 py-6 space-y-5">
+      <Sk className="h-7 w-40 rounded" />
+      <div className="bg-gradient-to-r from-[#001A4B] to-[#0042A5] rounded-2xl p-5 space-y-2">
+        <Sk className="h-5 w-48 rounded bg-white/20" />
+        <Sk className="h-3 w-64 rounded bg-white/20" />
+        <Sk className="h-3 w-32 rounded bg-white/20 mt-3" />
+      </div>
+      <Sk className="h-9 w-48 rounded-xl" />
+      <div className="space-y-2">
+        {[0, 1, 2, 3, 4].map(i => <SkTournamentMatchRow key={i} />)}
+      </div>
+    </div>
+  )
 }
 
 export function Tournaments() {
@@ -82,7 +99,7 @@ export function Tournaments() {
   const finished = matches.filter(m => m.estado === 'finished')
   const pending = matches.filter(m => m.estado !== 'finished')
 
-  if (loadingTournaments) return <SkTournamentsPage />
+  if (loadingTournaments) return <TournamentsSkeleton />
 
   if (tournaments.length === 0) return (
     <div className="max-w-2xl mx-auto px-4 py-10 text-center">
@@ -172,7 +189,7 @@ export function Tournaments() {
       {tab === 'partidos' && (
         loadingMatches ? (
           <div className="space-y-2">
-            {[0, 1, 2, 3].map(i => <SkTournamentMatch key={i} />)}
+            {[0, 1, 2, 3, 4].map(i => <SkTournamentMatchRow key={i} />)}
           </div>
         ) : matches.length === 0 ? (
           <div className="bg-white rounded-xl border border-gray-100 p-8 text-center">
@@ -205,7 +222,7 @@ export function Tournaments() {
       {tab === 'ranking' && (
         loadingRanking ? (
           <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-            {[0, 1, 2, 3, 4, 5].map(i => <SkRankRow key={i} />)}
+            {[0, 1, 2, 3, 4, 5].map(i => <SkTournamentRankRow key={i} />)}
           </div>
         ) : ranking.length === 0 ? (
           <div className="bg-white rounded-xl border border-gray-100 p-8 text-center">

@@ -92,8 +92,8 @@ export function SkRankRow() {
   )
 }
 
-/** Tournament page match row skeleton — slim row with home / vs / away */
-export function SkTournamentMatch() {
+/** Compact match row skeleton — matches MatchRow in Tournaments */
+export function SkTournamentMatchRow() {
   return (
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-3">
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
@@ -114,26 +114,21 @@ export function SkTournamentMatch() {
   )
 }
 
-/** Full Tournaments page skeleton — header + selector + info card + tabs + list */
-export function SkTournamentsPage() {
+/** Tournament ranking row skeleton — matches grid-cols-[2rem_1fr_auto_auto_auto] */
+export function SkTournamentRankRow() {
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 space-y-5">
-      <Sk className="h-6 w-40" />
-      <div className="flex gap-2 flex-wrap">
-        {[0, 1].map(i => <Sk key={i} className="h-10 w-28 rounded-xl" />)}
+    <div className="grid grid-cols-[2rem_1fr_auto_auto_auto] gap-2 items-center px-4 py-3 border-b border-gray-50">
+      <Sk className="h-4 w-5 rounded" />
+      <div className="flex items-center gap-2">
+        <SkAvatar size="sm" />
+        <div className="space-y-1 min-w-0">
+          <Sk className="h-3 w-28 rounded" />
+          <Sk className="h-2.5 w-16 rounded" />
+        </div>
       </div>
-      <div className="bg-gradient-to-r from-[#001A4B] to-[#0042A5] rounded-2xl p-5 space-y-3">
-        <Sk className="h-5 w-44 bg-white/20" />
-        <Sk className="h-3 w-32 bg-white/20" />
-        <Sk className="h-3 w-28 bg-white/20" />
-      </div>
-      <div className="flex gap-1 bg-gray-100 p-1 rounded-xl w-fit">
-        <Sk className="h-7 w-24 rounded-lg" />
-        <Sk className="h-7 w-24 rounded-lg" />
-      </div>
-      <div className="space-y-2">
-        {[0, 1, 2, 3].map(i => <SkTournamentMatch key={i} />)}
-      </div>
+      <Sk className="h-3 w-5 rounded hidden sm:block" />
+      <Sk className="h-3 w-5 rounded hidden sm:block" />
+      <Sk className="h-4 w-8 rounded" />
     </div>
   )
 }
