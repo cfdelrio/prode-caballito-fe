@@ -126,7 +126,7 @@ export function GanadoresModal({ onClose }: { onClose: () => void }) {
 
         <div className="bg-white">
           {loading && (
-            <div className="flex flex-col items-center justify-center p-16 gap-4">
+            <div className="flex flex-col items-center justify-center p-16 gap-4" role="status" aria-label="Cargando">
               <div className="w-10 h-10 rounded-full border-4 border-gray-100 border-t-[#0042A5] animate-spin" />
               <div className="space-y-2 w-36">
                 <div className="h-3 bg-gray-100 rounded animate-pulse" />
