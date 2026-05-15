@@ -185,7 +185,7 @@ export function Matriz() {
   }, [])
 
   useEffect(() => {
-    loadMatrizData().finally(() => setLoading(false))
+    loadMatrizData().catch(() => show(t.matrix.errorLoad, 'error')).finally(() => setLoading(false))
     const interval = setInterval(loadMatrizData, 30000)
     return () => clearInterval(interval)
   }, [loadMatrizData])
