@@ -848,6 +848,22 @@ export function Home() {
         </div>
       </div>
 
+      {/* ── AYUDA — 0800 ────────────────────────────────────────── */}
+      <div className="px-4 mb-4">
+        <a
+          href="tel:08003451521"
+          className="flex items-center gap-4 bg-[#001A4B] rounded-2xl px-5 py-4 shadow-md hover:brightness-110 active:scale-[0.98] transition-all"
+          style={{ color: 'inherit', textDecoration: 'none' }}
+          aria-label="Llamar al 0800 3 45 1521"
+        >
+          <span className="text-3xl leading-none">📞</span>
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#FFDF00' }}>¿Tenés dudas? Llamá gratis</p>
+            <p className="text-xl font-black tracking-wide" style={{ color: '#FFFFFF' }}>0800 3 45 1521</p>
+          </div>
+        </a>
+      </div>
+
       {/* ── STICKY MOBILE BAR ───────────────────────────────────── */}
       <div
         className="fixed bottom-0 left-0 right-0 z-40 md:hidden"

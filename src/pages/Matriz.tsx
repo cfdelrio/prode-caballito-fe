@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from 'react'
+import { useEffect, useLayoutEffect, useState, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { api } from '@/api/client'
 import { useT } from '@/hooks/useT'
@@ -146,12 +146,30 @@ export function Matriz() {
   const [showVedaModal, setShowVedaModal] = useState(false)
   const tableRef = useRef<HTMLDivElement>(null)
   const headerInnerRef = useRef<HTMLDivElement>(null)
+  const bodyJugadorRef = useRef<HTMLTableCellElement>(null)
+  const headerJugadorRef = useRef<HTMLTableCellElement>(null)
 
   const onBodyScroll = () => {
     if (headerInnerRef.current && tableRef.current) {
       headerInnerRef.current.scrollLeft = tableRef.current.scrollLeft
     }
   }
+
+  // Sincroniza el ancho de la columna "Jugador" entre el header y el body.
+  // Son dos <table> separadas, entonces el browser las dimensiona independientemente.
+  useLayoutEffect(() => {
+    const sync = () => {
+      if (!bodyJugadorRef.current || !headerJugadorRef.current) return
+      const w = bodyJugadorRef.current.offsetWidth
+      if (w > 0) {
+        headerJugadorRef.current.style.minWidth = `${w}px`
+        headerJugadorRef.current.style.width = `${w}px`
+      }
+    }
+    sync()
+    window.addEventListener('resize', sync)
+    return () => window.removeEventListener('resize', sync)
+  }, [loading, ranking.length])
 
   const loadMatrizData = useCallback(async () => {
     const [mRes, rRes, bRes, favRes] = await Promise.all([
@@ -315,7 +333,7 @@ export function Matriz() {
             <table className="text-xs border-collapse min-w-max">
               <thead>
                 <tr className="bg-[#001A4B] text-white">
-                  <th className="sticky left-0 bg-[#001A4B] px-2 py-2 text-left font-semibold z-30 min-w-[140px] sm:min-w-[180px]">
+                  <th ref={headerJugadorRef} className="sticky left-0 bg-[#001A4B] px-2 py-2 text-left font-semibold z-30 min-w-[140px] sm:min-w-[180px]">
                     {t.ranking.player}
                   </th>
                   <th className="px-2 py-2 text-center font-semibold w-14 bg-[#001A4B]">{t.ranking.pts}</th>
@@ -360,7 +378,7 @@ export function Matriz() {
                 el mismo ancho mínimo que el header visible */}
             <thead aria-hidden>
               <tr className="invisible">
-                <th className="min-w-[140px] sm:min-w-[180px] p-0" />
+                <th ref={bodyJugadorRef} className="min-w-[140px] sm:min-w-[180px] p-0" />
                 <th className="w-14 p-0" />
                 {allMatches.map((m) => <th key={m.id} className="min-w-[60px] p-0" />)}
               </tr>

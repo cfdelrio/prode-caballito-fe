@@ -34,7 +34,15 @@ vi.mock('@/store/authStore', () => ({
 }))
 
 vi.mock('@/api/client', () => ({
-  api: { post: vi.fn().mockResolvedValue({}), put: vi.fn().mockResolvedValue({}) },
+  api: {
+    get: vi.fn().mockResolvedValue({ data: { data: [] } }),
+    post: vi.fn().mockResolvedValue({}),
+    put: vi.fn().mockResolvedValue({}),
+  },
+}))
+
+vi.mock('@/hooks/useNotificationHistory', () => ({
+  useNotificationHistory: () => ({ notifications: [], loading: false, error: null, unreadCount: 0, markAsRead: vi.fn(), deleteNotification: vi.fn(), refresh: vi.fn() }),
 }))
 
 vi.mock('@/components/layout/GanadoresModal', () => ({
