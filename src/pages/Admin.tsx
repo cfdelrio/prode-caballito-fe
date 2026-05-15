@@ -1047,6 +1047,10 @@ function JobsTab() {
   const [winnerEmail, setWinnerEmail] = useState('')
   const [winnerMatchdayName, setWinnerMatchdayName] = useState('')
   const [winnerPoints, setWinnerPoints] = useState('42')
+  const [heroImageUrl, setHeroImageUrl] = useState('')
+  const [heroMatchdayLabel, setHeroMatchdayLabel] = useState('')
+  const [heroUserName, setHeroUserName] = useState('')
+  const [heroPoints, setHeroPoints] = useState('')
   const [weeklyTestEmail, setWeeklyTestEmail] = useState('')
   const [welcomeEmail, setWelcomeEmail] = useState('')
   const [waTo, setWaTo] = useState('')
@@ -1183,6 +1187,76 @@ function JobsTab() {
             {loading === 'winner' ? 'Procesando...' : '🚀 Disparar flujo ganador'}
           </button>
           {jobResult?.id === 'winner' && <p className="text-xs text-green-600 font-medium">{jobResult.text}</p>}
+        </div>
+      </JobCard>
+
+      {/* Imagen Hero del Ganador */}
+      <JobCard title="🖼️ Imagen Hero del Ganador" description="Publica la imagen y datos del ganador que aparece en el modal de Ganadores de la navbar.">
+        <div className="space-y-3">
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">URL de la imagen *</label>
+            <input
+              value={heroImageUrl}
+              onChange={e => setHeroImageUrl(e.target.value)}
+              placeholder="https://..."
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Nombre de fecha</label>
+              <input
+                value={heroMatchdayLabel}
+                onChange={e => setHeroMatchdayLabel(e.target.value)}
+                placeholder="Fecha 1"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Puntos del ganador</label>
+              <input
+                type="number"
+                value={heroPoints}
+                onChange={e => setHeroPoints(e.target.value)}
+                placeholder="42"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Nombre del ganador (opcional)</label>
+            <input
+              value={heroUserName}
+              onChange={e => setHeroUserName(e.target.value)}
+              placeholder="Juan Pérez"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+            />
+          </div>
+          {heroImageUrl && (
+            <img
+              src={heroImageUrl}
+              alt="Preview"
+              className="w-full rounded-xl max-h-48 object-cover border border-gray-100"
+              onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+            />
+          )}
+          <button
+            onClick={() => runJob('hero-image', async () => {
+              if (!heroImageUrl) { show('La URL de la imagen es requerida', 'error'); return '' }
+              await api.post('/admin/winner-image', {
+                image_url: heroImageUrl,
+                matchday_label: heroMatchdayLabel || undefined,
+                user_name: heroUserName || undefined,
+                points: heroPoints ? parseInt(heroPoints) : undefined,
+              })
+              return `Hero publicado: ${heroMatchdayLabel || 'sin nombre'} ✓`
+            })}
+            disabled={!!loading || !heroImageUrl}
+            className="bg-[#0042A5] text-white text-sm font-bold px-5 py-2 rounded-xl hover:bg-[#003080] disabled:opacity-50"
+          >
+            {loading === 'hero-image' ? 'Publicando...' : '📸 Publicar imagen hero'}
+          </button>
+          {jobResult?.id === 'hero-image' && <p className="text-xs text-green-600 font-medium">{jobResult.text}</p>}
         </div>
       </JobCard>
 
