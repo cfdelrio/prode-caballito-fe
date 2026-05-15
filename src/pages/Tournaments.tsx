@@ -6,6 +6,7 @@ import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
 import { useT } from '@/hooks/useT'
 import { Sk, SkTournamentMatchRow, SkTournamentRankRow } from '@/components/ui/Skeleton'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { teamFlag } from '@/utils/teamFlags'
 import type { Tournament, Match } from '@/types'
 
@@ -102,9 +103,8 @@ export function Tournaments() {
   if (loadingTournaments) return <TournamentsSkeleton />
 
   if (tournaments.length === 0) return (
-    <div className="max-w-2xl mx-auto px-4 py-10 text-center">
-      <div className="text-5xl mb-3">🏆</div>
-      <p className="text-gray-400">{t.tournaments.noActive}</p>
+    <div className="max-w-2xl mx-auto px-4">
+      <EmptyState icon="🏆" message={t.tournaments.noActive} />
     </div>
   )
 
@@ -192,9 +192,8 @@ export function Tournaments() {
             {[0, 1, 2, 3, 4].map(i => <SkTournamentMatchRow key={i} />)}
           </div>
         ) : matches.length === 0 ? (
-          <div className="bg-white rounded-xl border border-gray-100 p-8 text-center">
-            <div className="text-3xl mb-2">⚽</div>
-            <p className="text-gray-400 text-sm">{t.tournaments.noMatches}</p>
+          <div className="bg-white rounded-xl border border-gray-100">
+            <EmptyState icon="⚽" message={t.tournaments.noMatches} />
           </div>
         ) : (
           <div className="space-y-2">
@@ -225,10 +224,8 @@ export function Tournaments() {
             {[0, 1, 2, 3, 4, 5].map(i => <SkTournamentRankRow key={i} />)}
           </div>
         ) : ranking.length === 0 ? (
-          <div className="bg-white rounded-xl border border-gray-100 p-8 text-center">
-            <div className="text-3xl mb-2">📊</div>
-            <p className="text-gray-400 text-sm">{t.tournaments.noRanking}</p>
-            <p className="text-gray-300 text-xs mt-1">{t.tournaments.noRankingDesc}</p>
+          <div className="bg-white rounded-xl border border-gray-100">
+            <EmptyState icon="📊" message={t.tournaments.noRanking} description={t.tournaments.noRankingDesc} />
           </div>
         ) : (
           <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
