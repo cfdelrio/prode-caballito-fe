@@ -33,10 +33,10 @@ function renderModal() {
 describe('GanadoresModal — estado loading', () => {
   beforeEach(() => vi.clearAllMocks())
 
-  it('muestra "Cargando..." mientras espera la API', () => {
+  it('muestra el indicador de carga mientras espera la API', () => {
     mockGet.mockReturnValue(new Promise(() => {}))  // never resolves
     renderModal()
-    expect(screen.getByText('Cargando...')).toBeInTheDocument()
+    expect(screen.getByRole('status', { name: 'Cargando' })).toBeInTheDocument()
   })
 })
 
@@ -121,7 +121,7 @@ describe('GanadoresModal — ganador único', () => {
   it('no muestra botones prev/next con un solo ganador', async () => {
     setupGet(winners(w1))
     renderModal()
-    await waitFor(() => expect(screen.queryByText('Cargando...')).not.toBeInTheDocument())
+    await waitFor(() => expect(screen.queryByRole('status', { name: 'Cargando' })).not.toBeInTheDocument())
     expect(screen.queryByLabelText('Anterior')).not.toBeInTheDocument()
     expect(screen.queryByLabelText('Siguiente')).not.toBeInTheDocument()
   })
