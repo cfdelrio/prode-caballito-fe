@@ -1069,7 +1069,7 @@ function JobsTab() {
         })
       )
       setMatchdays(all)
-    }).catch(() => {})
+    }).catch(() => show('Error al cargar fechas', 'error'))
   }, [])
 
   const runJob = async (jobId: string, fn: () => Promise<string>) => {
