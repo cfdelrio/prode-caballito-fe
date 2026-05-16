@@ -7,6 +7,7 @@ import { useT } from '@/hooks/useT'
 import { TEAM_THEMES } from '@/types'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
 import { resetOnboarding } from '@/components/onboarding/Tour'
+import { WhatsAppQRCard } from '@/components/WhatsAppQRCard'
 
 const COUNTRY_CODES = [
   { code: '+54', flag: '🇦🇷', name: 'Argentina' },
@@ -289,6 +290,13 @@ export function Profile() {
         >
           {savingWa ? '...' : t.profile.save}
         </button>
+
+        <div className="border-t border-gray-200 pt-4 mt-4">
+          <WhatsAppQRCard
+            title="📲 O escanea el código"
+            description="Escanea con WhatsApp para unirte al sandbox y recibir todas las novedades."
+          />
+        </div>
       </div>
 
       {/* Push Notifications */}
