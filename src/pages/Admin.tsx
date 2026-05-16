@@ -13,6 +13,14 @@ type Tab = 'partidos' | 'planillas' | 'usuarios' | 'torneos' | 'broadcast' | 'jo
 
 const SUPER_ADMIN_EMAIL = 'cfdelrio@gmail.com'
 
+// Argentina is permanently UTC-3 (no DST since 2000)
+const toArgentinaInput = (utcStr: string) => {
+  const d = new Date(utcStr)
+  const argMs = d.getTime() - 3 * 60 * 60 * 1000
+  return new Date(argMs).toISOString().slice(0, 16)
+}
+const fromArgentinaInput = (local: string) => local ? local + ':00-03:00' : local
+
 export function Admin() {
   const { show } = useToastStore()
   const { user } = useAuthStore()
@@ -54,11 +62,12 @@ export function Admin() {
   const handleSaveMatch = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
+      const payload = { ...matchForm, start_time: fromArgentinaInput(matchForm.start_time) }
       if (editMatch) {
-        await api.put(`/matches/${editMatch.id}`, matchForm)
+        await api.put(`/matches/${editMatch.id}`, payload)
         show('Partido actualizado ✓', 'success')
       } else {
-        await api.post('/matches', matchForm)
+        await api.post('/matches', payload)
         show('Partido creado ✓', 'success')
       }
       setShowMatchModal(false)
@@ -103,7 +112,7 @@ export function Admin() {
     setMatchForm({
       home_team: m.home_team,
       away_team: m.away_team,
-      start_time: m.start_time.slice(0, 16),
+      start_time: toArgentinaInput(m.start_time),
       tournament_id: m.tournament_id || '',
       halftime_minutes: String(m.halftime_minutes),
       sede: m.sede || '',
