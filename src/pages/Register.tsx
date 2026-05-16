@@ -4,6 +4,7 @@ import { api } from '@/api/client'
 import { useToastStore } from '@/store/toastStore'
 import { useAuthStore } from '@/store/authStore'
 import { useT } from '@/hooks/useT'
+import { WhatsAppQRCard } from '@/components/WhatsAppQRCard'
 
 type Step = 'form' | 'verify' | 'complete' | 'notify'
 
@@ -429,6 +430,13 @@ export function Register() {
                     <p className="text-xs text-gray-400 mt-3 text-center">
                       Las notificaciones son obligatorias para usar ProdeCaballito
                     </p>
+                  </div>
+
+                  <div className="border-t border-gray-200 pt-5 mt-5">
+                    <WhatsAppQRCard
+                      title="📲 También por WhatsApp"
+                      description="Escanea para recibir también las novedades, resultados y cambios de ranking en tiempo real por WhatsApp."
+                    />
                   </div>
                 </>
               ) : notifStatus === 'granted' ? (
