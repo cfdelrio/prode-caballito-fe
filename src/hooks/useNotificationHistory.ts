@@ -3,16 +3,18 @@ import { api } from '@/api/client'
 
 export interface Notification {
   id: string
-  type: 'reminder' | 'result' | 'ranking' | 'message'
+  type: 'reminder' | 'result' | 'ranking' | 'message' | string
   payload: {
-    title: string
-    body: string
+    title?: string
+    body?: string
+    titulo?: string
+    mensaje?: string
     icon?: string
     matchId?: string
     data?: Record<string, any>
   }
-  status: 'sent' | 'read' | 'deleted'
-  sent_at: string
+  status: 'sent' | 'read' | 'deleted' | 'pending' | 'failed'
+  sent_at: string | null
   created_at: string
 }
 
