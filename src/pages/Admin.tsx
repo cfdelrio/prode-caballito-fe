@@ -21,6 +21,47 @@ const toArgentinaInput = (utcStr: string) => {
 }
 const fromArgentinaInput = (local: string) => local ? local + ':00-03:00' : local
 
+interface ConfirmModalProps {
+  open: boolean
+  title: string
+  message: string
+  requireText?: string
+  onConfirm: () => void
+  onCancel: () => void
+}
+
+function ConfirmModal({ open, title, message, requireText, onConfirm, onCancel }: ConfirmModalProps) {
+  const [input, setInput] = useState('')
+  const canConfirm = !requireText || input === requireText
+  useEffect(() => { if (!open) setInput('') }, [open])
+  return (
+    <Modal open={open} onClose={onCancel} title={title}>
+      <p className="text-sm text-gray-700 mb-4">{message}</p>
+      {requireText && (
+        <div className="mb-4">
+          <label htmlFor="confirm-text-input" className="block text-xs text-gray-500 mb-1">{`Escribí "${requireText}" para confirmar`}</label>
+          <input
+            id="confirm-text-input"
+            type="text"
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            className="w-full border border-red-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
+            autoFocus
+          />
+        </div>
+      )}
+      <div className="flex gap-2 justify-end mt-2">
+        <button onClick={onCancel} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 rounded-lg">Cancelar</button>
+        <button
+          onClick={onConfirm}
+          disabled={!canConfirm}
+          className="px-4 py-2 text-sm font-bold bg-red-600 text-white rounded-xl hover:bg-red-700 disabled:opacity-40"
+        >Confirmar</button>
+      </div>
+    </Modal>
+  )
+}
+
 export function Admin() {
   const { show } = useToastStore()
   const { user } = useAuthStore()
@@ -30,6 +71,7 @@ export function Admin() {
   const [loading, setLoading] = useState(true)
   const [showMatchModal, setShowMatchModal] = useState(false)
   const [showResultModal, setShowResultModal] = useState(false)
+  const [confirmDeleteMatchId, setConfirmDeleteMatchId] = useState<string | null>(null)
   const [editMatch, setEditMatch] = useState<Match | null>(null)
   const [resultMatch, setResultMatch] = useState<Match | null>(null)
   const [matchForm, setMatchForm] = useState({
@@ -79,8 +121,11 @@ export function Admin() {
     }
   }
 
-  const handleDeleteMatch = async (id: string) => {
-    if (!confirm('¿Eliminar partido?')) return
+  const handleDeleteMatch = (id: string) => setConfirmDeleteMatchId(id)
+
+  const doDeleteMatch = async () => {
+    const id = confirmDeleteMatchId!
+    setConfirmDeleteMatchId(null)
     try {
       await api.delete(`/matches/${id}`)
       setMatches(matches.filter(m => m.id !== id))
@@ -276,6 +321,14 @@ export function Admin() {
           </button>
         </form>
       </Modal>
+
+      <ConfirmModal
+        open={!!confirmDeleteMatchId}
+        title="Eliminar partido"
+        message="¿Eliminar este partido? Esta acción no se puede deshacer."
+        onConfirm={doDeleteMatch}
+        onCancel={() => setConfirmDeleteMatchId(null)}
+      />
     </div>
   )
 }
@@ -791,6 +844,7 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
   const [loadingPlanillas, setLoadingPlanillas] = useState(false)
   const [planillaTournamentFilter, setPlanillaTournamentFilter] = useState<string>('all')
   const [allPlanillas, setAllPlanillas] = useState<Record<string, unknown>[] | null>(null)
+  const [confirmDeleteUser, setConfirmDeleteUser] = useState<{ id: string; name: string } | null>(null)
 
   const loadTabData = useCallback(async () => {
     if (tab === 'usuarios') {
@@ -841,13 +895,14 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
     }
   }, [expandedUserId, allPlanillas, show])
 
-  const handleDeleteUser = async (userId: string, userName: string) => {
-    const confirmed = confirm(`⚠️ ¿Eliminar a "${userName}" y TODOS sus datos (planillas, apuestas, scores)?`)
-    if (!confirmed) return
+  const handleDeleteUser = (userId: string, userName: string) => {
+    setConfirmDeleteUser({ id: userId, name: userName })
+  }
 
-    const confirmation = prompt(`Escribí "CONFIRMAR" para eliminar a ${userName} (es irreversible):`)
-    if (confirmation !== 'CONFIRMAR') return
-
+  const doDeleteUser = async () => {
+    if (!confirmDeleteUser) return
+    const { id: userId, name: userName } = confirmDeleteUser
+    setConfirmDeleteUser(null)
     try {
       await api.delete(`/users/${userId}`)
       setData(data.filter(u => String(u.id) !== userId))
@@ -1031,6 +1086,14 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
           })}
         </tbody>
       </table>
+      <ConfirmModal
+        open={!!confirmDeleteUser}
+        title="⚠️ Eliminar usuario"
+        message={`¿Eliminar a "${confirmDeleteUser?.name}" y TODOS sus datos (planillas, apuestas, scores)? Es irreversible.`}
+        requireText="CONFIRMAR"
+        onConfirm={doDeleteUser}
+        onCancel={() => setConfirmDeleteUser(null)}
+      />
     </div>
   )
 }
@@ -1063,6 +1126,7 @@ function JobsTab() {
   const [waTo, setWaTo] = useState('')
   const [waMessage, setWaMessage] = useState('')
   const [jobResult, setJobResult] = useState<{ id: string; text: string } | null>(null)
+  const [confirmWeekly, setConfirmWeekly] = useState(false)
 
   useEffect(() => {
     // GET /matchdays requires tournament_id → load all tournaments first, then matchdays per tournament
@@ -1248,11 +1312,13 @@ function JobsTab() {
             />
           </div>
           <button
-            onClick={() => runJob('weekly', async () => {
-              if (!weeklyTestEmail && !confirm('¿Enviar el email semanal a TODOS los usuarios?')) return ''
-              const { data } = await api.post('/admin/weekly-email', weeklyTestEmail ? { test_email: weeklyTestEmail } : {})
-              return `Email semanal: ${data.data.sent} enviados, ${data.data.failed} fallidos`
-            })}
+            onClick={() => {
+              if (!weeklyTestEmail) { setConfirmWeekly(true); return }
+              runJob('weekly', async () => {
+                const { data } = await api.post('/admin/weekly-email', { test_email: weeklyTestEmail })
+                return `Email semanal: ${data.data.sent} enviados, ${data.data.failed} fallidos`
+              })
+            }}
             disabled={!!loading}
             className="bg-[#FFDF00] text-[#001A4B] text-sm font-bold px-5 py-2 rounded-xl hover:bg-yellow-400 disabled:opacity-50 whitespace-nowrap"
           >
@@ -1325,6 +1391,19 @@ function JobsTab() {
           {jobResult?.id === 'whatsapp' && <p className="text-xs text-green-600 font-medium">{jobResult.text}</p>}
         </div>
       </JobCard>
+      <ConfirmModal
+        open={confirmWeekly}
+        title="Enviar email semanal"
+        message="¿Enviar el email semanal a TODOS los usuarios?"
+        onConfirm={() => {
+          setConfirmWeekly(false)
+          runJob('weekly', async () => {
+            const { data } = await api.post('/admin/weekly-email', {})
+            return `Email semanal: ${data.data.sent} enviados, ${data.data.failed} fallidos`
+          })
+        }}
+        onCancel={() => setConfirmWeekly(false)}
+      />
     </div>
   )
 }
@@ -1335,10 +1414,15 @@ function BroadcastTab() {
   const [message, setMessage] = useState('')
   const [sending, setSending] = useState(false)
   const [result, setResult] = useState<{ total: number; sent: number; failed: number } | null>(null)
+  const [confirmSend, setConfirmSend] = useState(false)
 
-  const handleSend = async () => {
+  const handleSend = () => {
     if (!message.trim()) { show('Escribí un mensaje', 'error'); return }
-    if (!confirm('¿Enviar este mensaje por WhatsApp a todos los usuarios que dieron su consentimiento?')) return
+    setConfirmSend(true)
+  }
+
+  const doSend = async () => {
+    setConfirmSend(false)
     setSending(true)
     setResult(null)
     try {
@@ -1388,6 +1472,13 @@ function BroadcastTab() {
           </div>
         )}
       </div>
+      <ConfirmModal
+        open={confirmSend}
+        title="Enviar broadcast WhatsApp"
+        message="¿Enviar este mensaje por WhatsApp a todos los usuarios que dieron su consentimiento?"
+        onConfirm={doSend}
+        onCancel={() => setConfirmSend(false)}
+      />
     </div>
   )
 }
