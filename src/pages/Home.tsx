@@ -3,7 +3,7 @@ import { usePolling } from '@/hooks/usePolling'
 import { Link } from 'react-router-dom'
 import { format } from 'date-fns'
 import { es as esLocale } from 'date-fns/locale'
-import { QRCodeSVG } from 'qrcode.react'
+import { LazyQR } from '@/components/ui/LazyQR'
 import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
@@ -826,7 +826,7 @@ export function Home() {
               Sumate al canal <strong>ProdeCaballito</strong> para enterarte de novedades y resultados.
             </p>
             <div className="p-3 bg-white rounded-xl border border-gray-100">
-              <QRCodeSVG
+              <LazyQR
                 value="https://whatsapp.com/channel/0029VbD5n7oDeON9vGA2gS3j"
                 size={192}
                 level="M"
