@@ -16,7 +16,6 @@
     "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
-    "@tailwindcss/oxide-linux-x64-gnu": "^4.2.2",
     "axios": "^1.15.0",
     "date-fns": "^4.1.0",
     "qrcode.react": "^4.2.0",
@@ -27,6 +26,7 @@
     "zustand": "^5.0.12"
   },
   "devDependencies": {
+    "@tailwindcss/oxide-linux-x64-gnu": "^4.2.2",
     "@eslint/js": "^9.25.0",
     "@playwright/test": "^1.59.1",
     "@tailwindcss/vite": "^4.2.2",
