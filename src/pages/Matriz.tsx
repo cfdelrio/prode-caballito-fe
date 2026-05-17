@@ -142,7 +142,18 @@ export function Matriz() {
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [activeCell, setActiveCell] = useState<ActiveCell | null>(null)
-  const [filterColors, setFilterColors] = useState<Set<string>>(new Set())
+  const [filterColors, setFilterColors] = useState<Set<string>>(() => {
+    try {
+      const raw = localStorage.getItem('matriz.filterColors')
+      if (!raw) return new Set()
+      const parsed = JSON.parse(raw)
+      if (!Array.isArray(parsed)) return new Set()
+      const valid = new Set(['celeste', 'rojo', 'verde', 'amarillo', 'gris'])
+      return new Set(parsed.filter((c: unknown) => typeof c === 'string' && valid.has(c)))
+    } catch {
+      return new Set()
+    }
+  })
   const [favorites, setFavorites] = useState<Set<string>>(new Set())
   const [togglingFav, setTogglingFav] = useState<string | null>(null)
   const [showVedaModal, setShowVedaModal] = useState(false)
@@ -196,6 +207,15 @@ export function Matriz() {
     const interval = setInterval(loadMatrizData, 30000)
     return () => clearInterval(interval)
   }, [loadMatrizData])
+
+  useEffect(() => {
+    try {
+      if (filterColors.size === 0) localStorage.removeItem('matriz.filterColors')
+      else localStorage.setItem('matriz.filterColors', JSON.stringify(Array.from(filterColors)))
+    } catch {
+      // Storage no disponible (Safari privado, cuota, etc.) — no es crítico
+    }
+  }, [filterColors])
 
   const handleToggleFavorite = useCallback(async (planillaId: string, e: React.MouseEvent) => {
     e.stopPropagation()
