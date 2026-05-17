@@ -437,6 +437,8 @@ export function Matriz() {
                             disabled={togglingFav === r.planilla_id}
                             className={`shrink-0 text-sm leading-none transition-opacity disabled:opacity-30 ${favorites.has(r.planilla_id) ? 'opacity-100' : 'opacity-40 hover:opacity-90'}`}
                             title={favorites.has(r.planilla_id) ? t.ranking.unfollow : t.ranking.follow}
+                            aria-label={favorites.has(r.planilla_id) ? t.ranking.unfollow : t.ranking.follow}
+                            aria-pressed={favorites.has(r.planilla_id)}
                           >
                             {favorites.has(r.planilla_id) ? '⭐' : '☆'}
                           </button>

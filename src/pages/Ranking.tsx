@@ -313,6 +313,8 @@ export function Ranking() {
                         onClick={(e) => handleToggleFavorite(r.planilla_id, e)}
                         disabled={isToggling}
                         title={isFav ? t.ranking.unfollow : t.ranking.follow}
+                        aria-label={isFav ? t.ranking.unfollow : t.ranking.follow}
+                        aria-pressed={isFav}
                         className={`text-base leading-none transition-all disabled:opacity-40 hover:scale-125 ${isFav ? 'opacity-100' : 'opacity-20 hover:opacity-60'}`}
                       >
                         {isToggling ? '…' : isFav ? '⭐' : '☆'}

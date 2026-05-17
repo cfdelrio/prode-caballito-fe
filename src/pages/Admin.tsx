@@ -5,6 +5,7 @@ import { es } from 'date-fns/locale'
 import { api } from '@/api/client'
 import { Modal } from '@/components/ui/Modal'
 import { Spinner } from '@/components/ui/Spinner'
+import { Button } from '@/components/ui/Button'
 import { useToastStore } from '@/store/toastStore'
 import { useAuthStore } from '@/store/authStore'
 import type { Match, Tournament } from '@/types'
@@ -292,9 +293,9 @@ export function Admin() {
               </select>
             </div>
           </div>
-          <button type="submit" className="w-full bg-[#0042A5] text-white font-bold py-2.5 rounded-xl hover:bg-[#003080]">
+          <Button type="submit" fullWidth>
             {editMatch ? 'Actualizar' : 'Crear partido'}
-          </button>
+          </Button>
         </form>
       </Modal>
 
@@ -813,10 +814,9 @@ function TorneosTab({ onRefresh }: { tournaments: Tournament[], onRefresh: () =>
                 </div>
 
                 <div className="flex gap-2 pt-1">
-                  <button type="button" onClick={() => handleSaveEdit(t.id)} disabled={saving}
-                    className="bg-[#0042A5] text-white text-sm font-bold px-5 py-2 rounded-xl hover:bg-[#003080] disabled:opacity-50">
+                  <Button onClick={() => handleSaveEdit(t.id)} disabled={saving}>
                     Guardar cambios
-                  </button>
+                  </Button>
                   <button type="button" onClick={() => setEditingId(null)}
                     className="text-sm text-gray-500 hover:text-gray-700 px-3 py-2">
                     Cancelar
@@ -1163,16 +1163,16 @@ function JobsTab() {
     <div className="space-y-4 max-w-2xl">
       {/* Recalcular Ranking */}
       <JobCard title="🔄 Recalcular Ranking" description="Suma todos los puntos de la tabla scores y recalcula posiciones.">
-        <button
+        <Button
           onClick={() => runJob('ranking', async () => {
             await api.post('/admin/jobs/recalculate-ranking', {})
             return 'Ranking recalculado ✓'
           })}
           disabled={!!loading}
-          className="bg-[#0042A5] text-white text-sm font-bold px-5 py-2 rounded-xl hover:bg-[#003080] disabled:opacity-50"
+          loading={loading === 'ranking'}
         >
           {loading === 'ranking' ? 'Recalculando...' : 'Ejecutar'}
-        </button>
+        </Button>
         {jobResult?.id === 'ranking' && <p className="text-xs text-green-600 font-medium">{jobResult.text}</p>}
       </JobCard>
 
@@ -1194,17 +1194,18 @@ function JobsTab() {
               ))}
             </select>
           </div>
-          <button
+          <Button
             onClick={() => runJob('matchday', async () => {
               if (!recalcMatchdayId) { show('Seleccioná una jornada', 'error'); return '' }
               const { data } = await api.post('/admin/jobs/recalc-matchday', { matchday_id: recalcMatchdayId })
               return `Jornada recalculada ✓ (${data.data?.updated ?? 0} apuestas)`
             })}
             disabled={!!loading || !recalcMatchdayId}
-            className="bg-[#0042A5] text-white text-sm font-bold px-5 py-2 rounded-xl hover:bg-[#003080] disabled:opacity-50 whitespace-nowrap"
+            loading={loading === 'matchday'}
+            className="whitespace-nowrap"
           >
             {loading === 'matchday' ? 'Calculando...' : 'Ejecutar'}
-          </button>
+          </Button>
         </div>
         {jobResult?.id === 'matchday' && <p className="text-xs text-green-600 font-medium">{jobResult.text}</p>}
       </JobCard>
@@ -1341,17 +1342,18 @@ function JobsTab() {
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
             />
           </div>
-          <button
+          <Button
             onClick={() => runJob('welcome', async () => {
               if (!welcomeEmail) { show('Ingresá un email', 'error'); return '' }
               await api.post('/admin/jobs/send-welcome', { email: welcomeEmail })
               return `Email de bienvenida enviado a ${welcomeEmail} ✓`
             })}
             disabled={!!loading || !welcomeEmail}
-            className="bg-[#0042A5] text-white text-sm font-bold px-5 py-2 rounded-xl hover:bg-[#003080] disabled:opacity-50 whitespace-nowrap"
+            loading={loading === 'welcome'}
+            className="whitespace-nowrap"
           >
             {loading === 'welcome' ? 'Enviando...' : '📤 Enviar'}
-          </button>
+          </Button>
         </div>
         {jobResult?.id === 'welcome' && <p className="text-xs text-green-600 font-medium">{jobResult.text}</p>}
       </JobCard>
