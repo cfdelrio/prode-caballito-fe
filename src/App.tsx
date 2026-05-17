@@ -6,6 +6,7 @@ import { applyTheme } from '@/utils/theme'
 import { Navbar } from '@/components/layout/Navbar'
 import { ToastContainer } from '@/components/ui/Toast'
 import { GoogleAdUnit } from '@/components/ui/GoogleAdUnit'
+import { PageSpinner } from '@/components/ui/Spinner'
 
 const Login               = lazy(() => import('@/pages/Login').then(m => ({ default: m.Login })))
 const Register            = lazy(() => import('@/pages/Register').then(m => ({ default: m.Register })))
@@ -63,11 +64,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <ToastContainer />
-      <Suspense fallback={
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0042A5]" />
-        </div>
-      }>
+      <Suspense fallback={<PageSpinner />}>
       <Routes>
         <Route path="/login"    element={<Login />} />
         <Route path="/register" element={<Register />} />

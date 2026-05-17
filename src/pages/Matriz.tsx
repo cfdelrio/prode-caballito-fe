@@ -4,6 +4,7 @@ import { api } from '@/api/client'
 import { useT } from '@/hooks/useT'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Sk, SkMatrizRow } from '@/components/ui/Skeleton'
+import { Button } from '@/components/ui/Button'
 import { calcularPuntaje, POINT_COLORS } from '@/utils/scoring'
 import { teamFlag } from '@/utils/teamFlags'
 import { useAuthStore } from '@/store/authStore'
@@ -542,12 +543,14 @@ export function Matriz() {
                 <p className="text-xs text-gray-400 leading-relaxed">
                   Una vez que comience el partido, podrás ver todos los pronósticos.
                 </p>
-                <button
+                <Button
+                  variant="dark"
+                  fullWidth
                   onClick={() => setShowVedaModal(false)}
-                  className="w-full bg-[#001A4B] text-white font-bold py-2.5 rounded-xl text-sm mt-2 hover:bg-[#002870] transition-colors"
+                  className="mt-2"
                 >
                   Entendido
-                </button>
+                </Button>
               </div>
             </div>
           </div>
