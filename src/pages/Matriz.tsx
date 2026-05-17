@@ -140,6 +140,7 @@ export function Matriz() {
   const [ranking, setRanking] = useState<RankingEntry[]>([])
   const [bets, setBets] = useState<BetMap>({})
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
   const [activeCell, setActiveCell] = useState<ActiveCell | null>(null)
   const [filterColors, setFilterColors] = useState<Set<string>>(new Set())
   const [favorites, setFavorites] = useState<Set<string>>(new Set())
@@ -173,16 +174,21 @@ export function Matriz() {
   }, [loading, ranking.length])
 
   const loadMatrizData = useCallback(async () => {
-    const [mRes, rRes, bRes, favRes] = await Promise.all([
-      api.get('/matches?limit=200'),
-      api.get('/ranking?limit=200&include_unpaid=true'),
-      api.get('/bets/all-for-matrix'),
-      api.get('/ranking/favorites').catch(() => ({ data: { data: [] } })),
-    ])
-    setMatches(mRes.data.data.matches)
-    setRanking(rRes.data.data.ranking)
-    setBets(bRes.data.data)
-    setFavorites(new Set(favRes.data.data || []))
+    setRefreshing(true)
+    try {
+      const [mRes, rRes, bRes, favRes] = await Promise.all([
+        api.get('/matches?limit=200'),
+        api.get('/ranking?limit=200&include_unpaid=true'),
+        api.get('/bets/all-for-matrix'),
+        api.get('/ranking/favorites').catch(() => ({ data: { data: [] } })),
+      ])
+      setMatches(mRes.data.data.matches)
+      setRanking(rRes.data.data.ranking)
+      setBets(bRes.data.data)
+      setFavorites(new Set(favRes.data.data || []))
+    } finally {
+      setRefreshing(false)
+    }
   }, [])
 
   useEffect(() => {
@@ -229,6 +235,7 @@ export function Matriz() {
   const filteredMatches = matches
   const finishedMatches = filteredMatches.filter(m => m.estado === 'finished')
   const pendingMatches  = filteredMatches.filter(m => m.estado !== 'finished')
+  const hasLiveMatch    = filteredMatches.some(m => m.estado === 'live')
   const allMatches = [...finishedMatches, ...pendingMatches]
 
   if (loading) return <MatrizSkeleton />
@@ -272,7 +279,19 @@ export function Matriz() {
 
       <div className="max-w-7xl mx-auto px-2 flex items-start justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-xl font-bold text-[#001A4B]">{t.matrix.title}</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-bold text-[#001A4B]">{t.matrix.title}</h1>
+            {hasLiveMatch && (
+              <span
+                className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide text-red-600"
+                aria-live="polite"
+                title={refreshing ? 'Actualizando datos' : 'Hay partidos en vivo'}
+              >
+                <span className={`w-1.5 h-1.5 rounded-full bg-red-500 ${refreshing ? 'animate-ping' : 'animate-pulse'}`} />
+                LIVE
+              </span>
+            )}
+          </div>
           <p className="text-xs text-gray-400 mt-1">
             {t.matrix.players(rows.length)} · {t.matrix.matches(allMatches.length)}
           </p>
