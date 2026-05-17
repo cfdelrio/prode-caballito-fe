@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { api } from '@/api/client'
 import { useToastStore } from '@/store/toastStore'
+import { Button } from '@/components/ui/Button'
 
 export function RecuperarContrasena() {
   const { show } = useToastStore()
@@ -79,13 +80,9 @@ export function RecuperarContrasena() {
                   required
                 />
               </div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-[#0042A5] text-white font-bold py-3 rounded-xl hover:bg-[#003080] disabled:opacity-50 transition-colors"
-              >
+              <Button type="submit" size="lg" fullWidth loading={loading}>
                 {loading ? 'Enviando...' : 'Enviar Código'}
-              </button>
+              </Button>
             </form>
           ) : (
             <form onSubmit={handleResetPassword} className="space-y-4">
@@ -126,13 +123,9 @@ export function RecuperarContrasena() {
                   required
                 />
               </div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-[#0042A5] text-white font-bold py-3 rounded-xl hover:bg-[#003080] disabled:opacity-50 transition-colors"
-              >
+              <Button type="submit" size="lg" fullWidth loading={loading}>
                 {loading ? 'Restableciendo...' : 'Restablecer Contraseña'}
-              </button>
+              </Button>
               <button
                 type="button"
                 onClick={() => setStep('email')}

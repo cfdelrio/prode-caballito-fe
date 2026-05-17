@@ -437,6 +437,8 @@ export function Matriz() {
                             disabled={togglingFav === r.planilla_id}
                             className={`shrink-0 text-sm leading-none transition-opacity disabled:opacity-30 ${favorites.has(r.planilla_id) ? 'opacity-100' : 'opacity-40 hover:opacity-90'}`}
                             title={favorites.has(r.planilla_id) ? t.ranking.unfollow : t.ranking.follow}
+                            aria-label={favorites.has(r.planilla_id) ? t.ranking.unfollow : t.ranking.follow}
+                            aria-pressed={favorites.has(r.planilla_id)}
                           >
                             {favorites.has(r.planilla_id) ? '⭐' : '☆'}
                           </button>
@@ -458,9 +460,18 @@ export function Matriz() {
                         return (
                           <td key={m.id} className="px-1 py-1.5 text-center">
                             <span
+                              role="button"
+                              tabIndex={0}
                               onClick={(e) => handleBadgeClick(e, m.id, rowKey, b, m, res)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  e.preventDefault()
+                                  handleBadgeClick(e as unknown as React.MouseEvent<HTMLSpanElement>, m.id, rowKey, b, m, res)
+                                }
+                              }}
+                              aria-label={`${m.home_team} vs ${m.away_team}: pronóstico ${b.home}-${b.away}, ${t.match.popLabels[res.color]}`}
                               title={`${m.home_team} vs ${m.away_team}: ${b.home}-${b.away} · ${t.match.popLabels[res.color]}`}
-                              className={`inline-block px-1.5 py-0.5 rounded font-bold text-[11px] cursor-pointer select-none transition-all
+                              className={`inline-block px-1.5 py-0.5 rounded font-bold text-[11px] cursor-pointer select-none transition-all focus:outline-none focus:ring-2 focus:ring-[#0042A5] focus:ring-offset-1
                                 ${POINT_COLORS[res.color]}
                                 ${isActive ? 'ring-2 ring-offset-1 ring-gray-400 scale-110' : 'hover:scale-105 hover:shadow-md'}
                                 ${filterColors.size > 0 && !filterColors.has(res.color) ? 'opacity-10 pointer-events-none' : ''}
@@ -486,8 +497,17 @@ export function Matriz() {
                         <td key={m.id} className="px-1 py-1.5 text-center">
                           {b
                             ? <span
+                                role="button"
+                                tabIndex={0}
                                 onClick={(e) => { e.stopPropagation(); setShowVedaModal(true) }}
-                                className="inline-block text-[13px] cursor-pointer select-none opacity-50 hover:opacity-80 transition-opacity"
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault()
+                                    setShowVedaModal(true)
+                                  }
+                                }}
+                                aria-label="Período de veda activo"
+                                className="inline-block text-[13px] cursor-pointer select-none opacity-50 hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-[#0042A5] rounded"
                                 title="Período de veda activo"
                               >🔒</span>
                             : <span className="text-gray-200">—</span>
