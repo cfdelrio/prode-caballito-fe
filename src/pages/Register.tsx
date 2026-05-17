@@ -6,6 +6,7 @@ import { useAuthStore } from '@/store/authStore'
 import { useT } from '@/hooks/useT'
 import { WhatsAppQRCard } from '@/components/WhatsAppQRCard'
 import { Button } from '@/components/ui/Button'
+import { Spinner } from '@/components/ui/Spinner'
 
 type Step = 'form' | 'verify' | 'complete' | 'notify'
 
@@ -446,7 +447,7 @@ export function Register() {
                     <h2 className="text-lg font-bold text-[#001A4B] mb-1">¡Todo listo!</h2>
                     <p className="text-sm text-gray-500">Notificaciones activadas. Ingresando al Prode...</p>
                   </div>
-                  <div className="w-8 h-8 border-3 border-[#0042A5] border-t-transparent rounded-full animate-spin" />
+                  <Spinner size="md" />
                 </>
               ) : (
                 <>
@@ -454,7 +455,7 @@ export function Register() {
                     <h2 className="text-lg font-bold text-[#001A4B] mb-1">Sin notificaciones</h2>
                     <p className="text-sm text-gray-500">Podés activarlas en cualquier momento desde el perfil.</p>
                   </div>
-                  <div className="w-8 h-8 border-3 border-gray-300 border-t-transparent rounded-full animate-spin" />
+                  <Spinner size="md" />
                 </>
               )}
 

@@ -9,6 +9,7 @@ import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
 import { useT } from '@/hooks/useT'
 import { Sk } from '@/components/ui/Skeleton'
+import { Button } from '@/components/ui/Button'
 import { usePWAInstall } from '@/hooks/usePWAInstall'
 import { teamFlag, teamAbbr } from '@/utils/teamFlags'
 import { LeaderHome } from '@/pages/LeaderHome'
@@ -1033,12 +1034,15 @@ export function Home() {
                 </div>
               </li>
             </ol>
-            <button
+            <Button
+              variant="dark"
+              size="lg"
+              fullWidth
               onClick={() => setShowIOSGuide(false)}
-              className="mt-6 w-full bg-[#001A4B] text-white font-bold py-3 rounded-xl text-sm"
+              className="mt-6"
             >
               {t.home.iosGotIt}
-            </button>
+            </Button>
           </div>
         </>
       )}
