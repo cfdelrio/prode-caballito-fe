@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
+import { Button } from '@/components/ui/Button'
 
 export function Login() {
   const navigate = useNavigate()
@@ -57,13 +58,9 @@ export function Login() {
               required
             />
           </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-[#0042A5] text-white font-bold py-3 rounded-xl hover:bg-[#003080] disabled:opacity-50 transition-colors mt-2"
-          >
+          <Button type="submit" size="lg" fullWidth loading={loading} className="mt-2">
             {loading ? 'Ingresando...' : 'Iniciar Sesión'}
-          </button>
+          </Button>
           <p className="text-center text-sm text-gray-500">
             <Link to="/recuperar-contrasena" className="text-[#0042A5] hover:underline">
               ¿Olvidaste tu contraseña?
