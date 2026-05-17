@@ -6,6 +6,7 @@ import { api } from '@/api/client'
 import { Modal } from '@/components/ui/Modal'
 import { Spinner } from '@/components/ui/Spinner'
 import { Button } from '@/components/ui/Button'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { useToastStore } from '@/store/toastStore'
 import { useAuthStore } from '@/store/authStore'
 import type { Match, Tournament } from '@/types'
@@ -381,7 +382,13 @@ function PartidosTab({ matches, tournaments, loading, onNewMatch, onEdit, onResu
               )
             })}
             {tournaments.length === 0 && (
-              <p className="text-sm text-gray-400 col-span-2 text-center py-8">No hay torneos. Creá uno en la pestaña Torneos.</p>
+              <div className="col-span-2">
+                <EmptyState
+                  icon="🏆"
+                  message="No hay torneos"
+                  description="Creá uno en la pestaña Torneos."
+                />
+              </div>
             )}
           </div>
         )}
@@ -431,7 +438,11 @@ function PartidosTab({ matches, tournaments, loading, onNewMatch, onEdit, onResu
             </thead>
             <tbody>
               {filtered.length === 0 ? (
-                <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-400 text-sm">No hay partidos en este torneo</td></tr>
+                <tr>
+                  <td colSpan={5}>
+                    <EmptyState icon="⚽" message="No hay partidos en este torneo" />
+                  </td>
+                </tr>
               ) : filtered.map((m) => (
                 <tr key={m.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                   <td className="px-4 py-3">
@@ -708,7 +719,7 @@ function TorneosTab({ onRefresh }: { tournaments: Tournament[], onRefresh: () =>
         {loadingAll ? (
           <div className="py-6 flex justify-center"><Spinner size="sm" /></div>
         ) : allTournaments.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center py-6">No hay torneos</p>
+          <EmptyState icon="🏆" message="No hay torneos" />
         ) : allTournaments.map((t) => (
           <div key={t.id} className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
             {/* Cabecera del torneo */}

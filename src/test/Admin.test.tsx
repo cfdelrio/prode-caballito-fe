@@ -185,7 +185,8 @@ describe('Admin — PartidosTab', () => {
     await setupApi()
     renderAdmin()
     await waitFor(() => {
-      expect(screen.getByText(/No hay torneos\. Creá uno en la pestaña Torneos/i)).toBeInTheDocument()
+      expect(screen.getByText('No hay torneos')).toBeInTheDocument()
+      expect(screen.getByText(/Creá uno en la pestaña Torneos/i)).toBeInTheDocument()
     })
   })
 
