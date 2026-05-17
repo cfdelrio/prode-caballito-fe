@@ -22,7 +22,13 @@ function NotificationItem({ notif, onMarkAsRead, onDelete }: {
 }) {
   const isUnread = notif.status === 'sent'
   const icon = ICON_MAP[notif.type] || '🔔'
-  const timeStr = format(new Date(notif.sent_at), 'dd MMM HH:mm', { locale: esLocale })
+  const title = notif.payload?.title || notif.payload?.titulo || 'Notificación'
+  const body = notif.payload?.body || notif.payload?.mensaje || ''
+  const rawDate = notif.sent_at || notif.created_at
+  const parsed = rawDate ? new Date(rawDate) : null
+  const timeStr = parsed && !isNaN(parsed.getTime())
+    ? format(parsed, 'dd MMM HH:mm', { locale: esLocale })
+    : ''
 
   return (
     <div
@@ -35,15 +41,17 @@ function NotificationItem({ notif, onMarkAsRead, onDelete }: {
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
           <h4 className={`text-sm font-semibold text-gray-900 ${isUnread ? 'font-black' : ''}`}>
-            {notif.payload.title}
+            {title}
           </h4>
           {isUnread && (
             <div className="w-2 h-2 rounded-full bg-blue-500 shrink-0 mt-1.5" />
           )}
         </div>
-        <p className="text-xs text-gray-600 leading-relaxed mt-0.5">
-          {notif.payload.body}
-        </p>
+        {body && (
+          <p className="text-xs text-gray-600 leading-relaxed mt-0.5">
+            {body}
+          </p>
+        )}
         <div className="flex items-center justify-between mt-2">
           <span className="text-[10px] text-gray-400">{timeStr}</span>
           <button
