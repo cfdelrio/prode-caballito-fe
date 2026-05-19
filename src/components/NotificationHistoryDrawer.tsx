@@ -10,9 +10,23 @@ interface Props {
 
 const ICON_MAP: Record<string, string> = {
   reminder: '⏰',
+  cutoff_reminder: '⏰',
+  bet_reminder: '⚽',
   result: '⚽',
-  ranking: '📈',
+  ranking: '🔥',
+  ranking_change: '📊',
+  ranking_passed: '👊',
+  near_podio: '🎯',
+  kickoff: '🟢',
+  second_half: '⏱️',
+  matchday_summary: '🏁',
+  personal_record: '🔥',
+  streak_exactos: '⭐',
+  tournament_tomorrow: '🏁',
+  payment_pending: '💸',
+  match_rescheduled: '📅',
   message: '💬',
+  winner: '👑',
 }
 
 function NotificationItem({ notif, onMarkAsRead, onDelete }: {

@@ -3,7 +3,12 @@ import { api } from '@/api/client'
 
 export interface Notification {
   id: string
-  type: 'reminder' | 'result' | 'ranking' | 'message' | string
+  type: 'reminder' | 'cutoff_reminder' | 'bet_reminder' | 'result' | 'ranking'
+    | 'ranking_change' | 'ranking_passed' | 'near_podio'
+    | 'kickoff' | 'second_half'
+    | 'matchday_summary' | 'personal_record' | 'streak_exactos'
+    | 'tournament_tomorrow' | 'payment_pending' | 'match_rescheduled'
+    | 'message' | 'winner' | string
   payload: {
     title?: string
     body?: string
