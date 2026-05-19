@@ -1,6 +1,6 @@
 import { POINT_COLORS } from '@/utils/scoring'
 import { Link } from 'react-router-dom'
-import { QRCodeSVG } from 'qrcode.react'
+import { LazyQR } from '@/components/ui/LazyQR'
 import { useAuthStore } from '@/store/authStore'
 import { InviteFriendCTA } from '@/components/InviteFriendCTA'
 
@@ -262,7 +262,7 @@ export function Reglamento({ showHomePromo = false }: { showHomePromo?: boolean 
             Sumate al canal <strong>ProdeCaballito</strong> para enterarte de novedades y resultados.
           </p>
           <div className="p-3 bg-white rounded-xl border border-gray-100">
-            <QRCodeSVG
+            <LazyQR
               value="https://whatsapp.com/channel/0029VbD5n7oDeON9vGA2gS3j"
               size={192}
               level="M"

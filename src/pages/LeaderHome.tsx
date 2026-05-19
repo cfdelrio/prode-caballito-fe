@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { QRCodeSVG } from 'qrcode.react'
+import { LazyQR } from '@/components/ui/LazyQR'
 import { useAuthStore } from '@/store/authStore'
 import { MatchCard } from '@/components/match/MatchCard'
 import type { Match, Bet, Planilla, RankingEntry } from '@/types'
@@ -793,7 +793,7 @@ export function LeaderHome({
             borderRadius: 12,
             marginBottom: 14,
           }}>
-            <QRCodeSVG
+            <LazyQR
               value="https://whatsapp.com/channel/0029VbD5n7oDeON9vGA2gS3j"
               size={172}
               level="M"

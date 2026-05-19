@@ -212,6 +212,7 @@ export const pt: T = {
     notFound: 'Planilha não encontrada',
     noMatches: 'Não há partidas nesta categoria',
     all: 'Todos', pendingFilter: 'Pendentes', finishedFilter: 'Finalizados',
+    copyLink: 'Copiar link', linkCopied: 'Link copiado ✓', linkCopyError: 'Não foi possível copiar',
   },
   fixture: {
     title: 'Fixture Copa do Mundo 2026',
