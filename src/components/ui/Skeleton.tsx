@@ -91,3 +91,44 @@ export function SkRankRow() {
     </div>
   )
 }
+
+/** Compact match row skeleton — matches MatchRow in Tournaments */
+export function SkTournamentMatchRow() {
+  return (
+    <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-3">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+        <div className="flex items-center gap-2 justify-end">
+          <Sk className="h-3 w-20" />
+          <Sk className="h-5 w-5 rounded-full" />
+        </div>
+        <div className="flex flex-col items-center gap-1 px-2 min-w-[64px]">
+          <Sk className="h-4 w-12" />
+          <Sk className="h-2 w-10" />
+        </div>
+        <div className="flex items-center gap-2">
+          <Sk className="h-5 w-5 rounded-full" />
+          <Sk className="h-3 w-20" />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/** Tournament ranking row skeleton — matches grid-cols-[2rem_1fr_auto_auto_auto] */
+export function SkTournamentRankRow() {
+  return (
+    <div className="grid grid-cols-[2rem_1fr_auto_auto_auto] gap-2 items-center px-4 py-3 border-b border-gray-50">
+      <Sk className="h-4 w-5 rounded" />
+      <div className="flex items-center gap-2">
+        <SkAvatar size="sm" />
+        <div className="space-y-1 min-w-0">
+          <Sk className="h-3 w-28 rounded" />
+          <Sk className="h-2.5 w-16 rounded" />
+        </div>
+      </div>
+      <Sk className="h-3 w-5 rounded hidden sm:block" />
+      <Sk className="h-3 w-5 rounded hidden sm:block" />
+      <Sk className="h-4 w-8 rounded" />
+    </div>
+  )
+}

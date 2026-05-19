@@ -54,7 +54,7 @@ export function GanadoresModal({ onClose }: { onClose: () => void }) {
           const single = r2.data?.data
           if (!single?.value) { setError(true); return }
           const parsed = parseValue(single.value) as WinnerData | null
-          if (parsed?.image_url) setWinners([parsed])
+          if (parsed?.user_name) setWinners([parsed])
           else setError(true)
         })
       })
@@ -126,11 +126,15 @@ export function GanadoresModal({ onClose }: { onClose: () => void }) {
 
         <div className="bg-white">
           {loading && (
-            <div className="flex items-center justify-center p-16 text-gray-400 text-sm">
-              Cargando...
+            <div className="flex flex-col items-center justify-center p-16 gap-4" role="status" aria-label="Cargando">
+              <div className="w-10 h-10 rounded-full border-4 border-gray-100 border-t-[#0042A5] animate-spin" />
+              <div className="space-y-2 w-36">
+                <div className="h-3 bg-gray-100 rounded animate-pulse" />
+                <div className="h-3 bg-gray-100 rounded animate-pulse w-3/4 mx-auto" />
+              </div>
             </div>
           )}
-          {!loading && (error || !current?.image_url) && (
+          {!loading && (error || !current) && (
             <div className="flex flex-col items-center justify-center p-16 text-gray-400 text-sm gap-2">
               <span className="text-4xl">🏆</span>
               <p>Todavía no hay ganadores publicados</p>
@@ -139,9 +143,32 @@ export function GanadoresModal({ onClose }: { onClose: () => void }) {
               </p>
             </div>
           )}
-          {!loading && !error && current?.image_url && (
+          {!loading && !error && current && (
             <>
-              {imgError ? (
+              {current.image_url && !imgError ? (
+                <>
+                  <img
+                    key={idx}
+                    src={current.image_url}
+                    alt={current.matchday_label ?? 'Ganador de la fecha'}
+                    className="w-full block"
+                    style={{ animation: 'ganadoresFadeIn .3s ease' }}
+                    onError={() => setImgError(true)}
+                  />
+                  {(current.user_name || current.points != null) && (
+                    <div className="flex items-center justify-center gap-3 px-5 py-3 border-t border-gray-100">
+                      {current.user_name && (
+                        <span className="font-bold text-[#001A4B]">{current.user_name}</span>
+                      )}
+                      {current.points != null && (
+                        <span className="text-sm font-semibold text-[#0042A5] bg-blue-50 px-2 py-0.5 rounded-full">
+                          {current.points} pts
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </>
+              ) : (
                 <div className="flex flex-col items-center justify-center py-14 px-8 gap-4"
                   style={{ background: 'linear-gradient(135deg, #001A4B 0%, #0042A5 100%)' }}>
                   <span className="text-7xl">🏆</span>
@@ -152,27 +179,6 @@ export function GanadoresModal({ onClose }: { onClose: () => void }) {
                     <p className="text-yellow-300 font-bold text-lg">{current.points} puntos</p>
                   )}
                   <p className="text-white/60 text-sm text-center">{current.matchday_label}</p>
-                </div>
-              ) : (
-                <img
-                  key={idx}
-                  src={current.image_url}
-                  alt={current.matchday_label ?? 'Ganador de la fecha'}
-                  className="w-full block"
-                  style={{ animation: 'ganadoresFadeIn .3s ease' }}
-                  onError={() => setImgError(true)}
-                />
-              )}
-              {!imgError && (current.user_name || current.points != null) && (
-                <div className="flex items-center justify-center gap-3 px-5 py-3 border-t border-gray-100">
-                  {current.user_name && (
-                    <span className="font-bold text-[#001A4B]">{current.user_name}</span>
-                  )}
-                  {current.points != null && (
-                    <span className="text-sm font-semibold text-[#0042A5] bg-blue-50 px-2 py-0.5 rounded-full">
-                      {current.points} pts
-                    </span>
-                  )}
                 </div>
               )}
             </>

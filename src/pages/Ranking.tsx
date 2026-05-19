@@ -88,6 +88,7 @@ export function Ranking() {
       api.get('/ranking/favorites').catch(() => ({ data: { data: [] } })),
     ]).then(([rRes, fRes]) => {
       if (rRes.status === 'fulfilled') setRanking(rRes.value.data.data.ranking || [])
+      else show(t.ranking.errorLoad, 'error')
       if (fRes.status === 'fulfilled') setFavorites(new Set(fRes.value.data.data || []))
     }).finally(() => setLoading(false))
   }, [])

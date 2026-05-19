@@ -92,7 +92,7 @@ export function Messages() {
       setMessages(data.data?.messages ?? data.data ?? [])
       setConversations(prev => prev.map(c => c.id === userId ? { ...c, unread: 0 } : c))
       setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 100)
-    })
+    }).catch(() => show(t.messages.errorLoad, 'error'))
   }, [userId])
 
   const handleSend = async (e: React.FormEvent) => {
