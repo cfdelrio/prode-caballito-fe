@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '@/api/client'
+import { Spinner } from '@/components/ui/Spinner'
 
 interface WinnerData {
   image_url: string
@@ -127,7 +128,7 @@ export function GanadoresModal({ onClose }: { onClose: () => void }) {
         <div className="bg-white">
           {loading && (
             <div className="flex flex-col items-center justify-center p-16 gap-4" role="status" aria-label="Cargando">
-              <div className="w-10 h-10 rounded-full border-4 border-gray-100 border-t-[#0042A5] animate-spin" />
+              <Spinner size="md" />
               <div className="space-y-2 w-36">
                 <div className="h-3 bg-gray-100 rounded animate-pulse" />
                 <div className="h-3 bg-gray-100 rounded animate-pulse w-3/4 mx-auto" />

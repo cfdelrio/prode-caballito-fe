@@ -251,6 +251,7 @@ export const es = {
     notFound: 'Planilla no encontrada',
     noMatches: 'No hay partidos en esta categoría',
     all: 'Todos', pendingFilter: 'Pendientes', finishedFilter: 'Finalizados',
+    copyLink: 'Copiar link', linkCopied: 'Link copiado ✓', linkCopyError: 'No se pudo copiar',
   },
   fixture: {
     title: 'Fixture Mundial 2026',
