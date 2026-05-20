@@ -14,6 +14,7 @@ import { usePWAInstall } from '@/hooks/usePWAInstall'
 import { teamFlag, teamAbbr } from '@/utils/teamFlags'
 import { LeaderHome } from '@/pages/LeaderHome'
 import { POINT_COLORS } from '@/utils/scoring'
+import { PollWidget } from '@/components/PollWidget'
 import type { Match, Bet, Planilla, RankingEntry } from '@/types'
 
 /* ── Flip clock animation (defined in index.css) ─────────────────────── */
@@ -658,6 +659,9 @@ export function Home() {
             </span>
           </Link>
         )}
+
+        {/* ── POLL WIDGET ─────────────────────────────────────── */}
+        <PollWidget />
 
         {/* ── PRECIO ──────────────────────────────────────────── */}
         <div
