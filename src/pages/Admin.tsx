@@ -11,7 +11,7 @@ import { useToastStore } from '@/store/toastStore'
 import { useAuthStore } from '@/store/authStore'
 import type { Match, Tournament } from '@/types'
 
-type Tab = 'partidos' | 'planillas' | 'usuarios' | 'torneos' | 'broadcast' | 'jobs'
+type Tab = 'partidos' | 'planillas' | 'usuarios' | 'torneos' | 'broadcast' | 'jobs' | 'polls'
 
 const SUPER_ADMIN_EMAIL = 'cfdelrio@gmail.com'
 
@@ -192,6 +192,7 @@ export function Admin() {
     { id: 'usuarios', label: '👥 Usuarios' },
     { id: 'torneos', label: '🏆 Torneos' },
     { id: 'broadcast',   label: '📣 WhatsApp' },
+    { id: 'polls',       label: '🗳️ Polls' },
     ...(isSuperAdmin ? [{ id: 'jobs' as Tab, label: '⚙️ Procesos' }] : []),
   ]
 
@@ -233,6 +234,9 @@ export function Admin() {
 
       {/* Tab: Procesos manuales */}
       {tab === 'jobs' && <JobsTab />}
+
+      {/* Tab: Polls */}
+      {tab === 'polls' && <PollsTab />}
 
       {/* Modal partido */}
       <Modal open={showMatchModal} onClose={() => setShowMatchModal(false)} title={editMatch ? 'Editar Partido' : 'Nuevo Partido'}>
@@ -1492,6 +1496,136 @@ function BroadcastTab() {
         onConfirm={doSend}
         onCancel={() => setConfirmSend(false)}
       />
+    </div>
+  )
+}
+
+/* ── PollsTab ────────────────────────────────────────────────────────── */
+interface PollOption { id: number; label: string; flag_emoji: string; flag_code: string; vote_count: number }
+interface PollData {
+  id: number; slug: string; title: string; active: boolean; ended: boolean
+  winner_option_id: number | null; options: PollOption[]; total_votes: number
+}
+
+function PollsTab() {
+  const [poll, setPoll] = useState<PollData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const { addToast } = useToastStore()
+
+  const load = useCallback(async () => {
+    try {
+      const r = await api.get('/public/polls/mundial-2026')
+      setPoll(r.data.data)
+    } catch {
+      setPoll(null)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => { load() }, [load])
+
+  const patch = async (body: Record<string, unknown>) => {
+    setSaving(true)
+    try {
+      await api.patch('/public/polls/mundial-2026', body)
+      await load()
+      addToast('Poll actualizada', 'success')
+    } catch {
+      addToast('Error al actualizar', 'error')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (loading) return <div className="py-8 text-center text-gray-400 text-sm">Cargando...</div>
+  if (!poll) return <div className="py-8 text-center text-gray-400 text-sm">Poll no encontrada — ejecutá las migraciones primero.</div>
+
+  const sorted = [...poll.options].sort((a, b) => b.vote_count - a.vote_count)
+  const max = sorted[0]?.vote_count || 1
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-[#001A4B] px-4 py-3 flex items-center justify-between">
+          <span className="text-[10px] font-black text-white uppercase tracking-widest">🗳️ {poll.title}</span>
+          <div className="flex items-center gap-2">
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${poll.active && !poll.ended ? 'bg-green-500 text-white' : 'bg-gray-500 text-white'}`}>
+              {poll.ended ? 'Cerrada' : poll.active ? 'Activa' : 'Inactiva'}
+            </span>
+            <span className="text-white/50 text-[10px]">{poll.total_votes.toLocaleString('es-AR')} votos</span>
+          </div>
+        </div>
+
+        {/* Acciones */}
+        <div className="px-4 py-3 flex flex-wrap gap-2 border-b border-gray-100">
+          {!poll.ended ? (
+            <button
+              onClick={() => patch({ ended: true, active: false })}
+              disabled={saving}
+              className="text-xs font-bold px-3 py-1.5 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition-colors disabled:opacity-50"
+            >
+              🔒 Cerrar votación
+            </button>
+          ) : (
+            <button
+              onClick={() => patch({ ended: false, active: true })}
+              disabled={saving}
+              className="text-xs font-bold px-3 py-1.5 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 transition-colors disabled:opacity-50"
+            >
+              🔓 Reabrir votación
+            </button>
+          )}
+          {poll.winner_option_id && (
+            <button
+              onClick={() => patch({ winner_option_id: null })}
+              disabled={saving}
+              className="text-xs font-bold px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors disabled:opacity-50"
+            >
+              ✕ Quitar ganador
+            </button>
+          )}
+        </div>
+
+        {/* Resultados */}
+        <div className="p-4 space-y-3">
+          {sorted.map(opt => {
+            const pct = poll.total_votes > 0 ? Math.round((opt.vote_count / poll.total_votes) * 100) : 0
+            const isWinner = poll.winner_option_id === opt.id
+            return (
+              <div key={opt.id} className={`p-3 rounded-xl border transition-all ${isWinner ? 'border-yellow-400 bg-yellow-50' : 'border-gray-100 bg-gray-50'}`}>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="flex items-center gap-2 font-semibold text-sm text-gray-800">
+                    {isWinner && <span className="text-yellow-500">★</span>}
+                    <span className="text-lg leading-none">{opt.flag_emoji}</span>
+                    {opt.label}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-black text-gray-600">{pct}% · {opt.vote_count.toLocaleString('es-AR')} votos</span>
+                    {!isWinner && (
+                      <button
+                        onClick={() => patch({ winner_option_id: opt.id, ended: true, active: false })}
+                        disabled={saving}
+                        className="text-[10px] font-bold px-2 py-1 rounded-lg bg-yellow-100 text-yellow-700 hover:bg-yellow-200 transition-colors disabled:opacity-50 whitespace-nowrap"
+                      >
+                        ★ Marcar ganador
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <div className="h-2 rounded-full bg-gray-200 overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all"
+                    style={{ width: `${(opt.vote_count / max) * 100}%`, background: isWinner ? '#f59e0b' : '#0042A5' }}
+                  />
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
     </div>
   )
 }
