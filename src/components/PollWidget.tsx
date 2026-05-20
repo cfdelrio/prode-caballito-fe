@@ -35,7 +35,7 @@ export function PollWidget() {
       .catch(() => {})
   }, [])
 
-  if (!data) return null
+  if (!data || !Array.isArray(data.options) || data.options.length === 0) return null
 
   const sorted = [...data.options]
     .sort((a, b) => b.vote_count - a.vote_count)
