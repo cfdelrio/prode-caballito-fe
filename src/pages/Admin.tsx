@@ -1511,7 +1511,7 @@ function PollsTab() {
   const [poll, setPoll] = useState<PollData | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const { addToast } = useToastStore()
+  const { show } = useToastStore()
 
   const load = useCallback(async () => {
     try {
@@ -1531,9 +1531,9 @@ function PollsTab() {
     try {
       await api.patch('/public/polls/mundial-2026', body)
       await load()
-      addToast('Poll actualizada', 'success')
+      show('Poll actualizada', 'success')
     } catch {
-      addToast('Error al actualizar', 'error')
+      show('Error al actualizar', 'error')
     } finally {
       setSaving(false)
     }
