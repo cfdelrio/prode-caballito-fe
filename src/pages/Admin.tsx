@@ -196,7 +196,7 @@ export function Admin() {
     { id: 'broadcast',   label: '📣 WhatsApp' },
     { id: 'polls',       label: '🗳️ Polls' },
     ...(isSuperAdmin ? [{ id: 'jobs' as Tab, label: '⚙️ Procesos' }] : []),
-    ...(isSuperAdmin ? [{ id: 'campanas' as Tab, label: '🎙️ Campañas' }] : []),
+    ...(isSuperAdmin ? [{ id: 'campanas' as Tab, label: '📡 Monitor' }] : []),
   ]
 
   return (

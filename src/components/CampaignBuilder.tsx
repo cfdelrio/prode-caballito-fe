@@ -3,43 +3,15 @@ import { api } from '@/api/client'
 import { useToastStore } from '@/store/toastStore'
 
 type VoiceEventType =
-  | 'prode.voice_nuevo_lider'
   | 'prode.voice_match_reminder'
-  | 'prode.voice_perfect_score'
-  | 'prode.voice_weekly_summary'
-  | 'prode.voice_trash_talk'
   | 'prode.voice_survey_campeon'
 
 const EVENT_META: Record<VoiceEventType, { label: string; emoji: string; script: string; endpoint: string }> = {
-  'prode.voice_nuevo_lider': {
-    label: 'Nuevo líder',
-    emoji: '🔥',
-    script: 'ATENCIÓN... hay nuevo puntero. {nombre} llegó al top con {puntos} pts.',
-    endpoint: '/admin/voice-campaigns/trigger',
-  },
   'prode.voice_match_reminder': {
     label: 'Match reminder',
     emoji: '📣',
     script: 'En 30 min arranca {home} vs {away} y no cargaste tu resultado. Entrá ya.',
     endpoint: '/admin/voice-match-reminder-trigger',
-  },
-  'prode.voice_perfect_score': {
-    label: 'Perfect score',
-    emoji: '💥',
-    script: '¡EXACTO! Adivinaste {home} {gl}-{gv} {away}. Sumaste 4 puntos. Sos un genio.',
-    endpoint: '/admin/voice-campaigns/trigger',
-  },
-  'prode.voice_weekly_summary': {
-    label: 'Weekly summary',
-    emoji: '📊',
-    script: 'Semana {N}. Líder: {nombre}. Mayor subida: {nombre2}. Tapado de la fecha: {nombre3}.',
-    endpoint: '/admin/voice-campaigns/trigger',
-  },
-  'prode.voice_trash_talk': {
-    label: 'Trash talk',
-    emoji: '😄',
-    script: '{rival} te pasó y ya empezó a hablar. Está en #{pos_rival}, vos en #{pos_mia}.',
-    endpoint: '/admin/voice-campaigns/trigger',
   },
   'prode.voice_survey_campeon': {
     label: 'Survey campeón',
@@ -51,7 +23,7 @@ const EVENT_META: Record<VoiceEventType, { label: string; emoji: string; script:
 
 export function CampaignBuilder() {
   const { show } = useToastStore()
-  const [eventType, setEventType] = useState<VoiceEventType>('prode.voice_nuevo_lider')
+  const [eventType, setEventType] = useState<VoiceEventType>('prode.voice_match_reminder')
   const [userIds, setUserIds] = useState('')
   const [dryRun, setDryRun] = useState(true)
   const [loading, setLoading] = useState(false)
@@ -64,7 +36,7 @@ export function CampaignBuilder() {
     setResult(null)
     try {
       const ids = userIds.split(',').map(s => s.trim()).filter(Boolean)
-      const body: Record<string, unknown> = { dry_run: dryRun, event_type: eventType }
+      const body: Record<string, unknown> = { dry_run: dryRun }
       if (ids.length > 0) body.user_ids = ids
       const { data } = await api.post(meta.endpoint, body)
       const summary = `${meta.label} ${dryRun ? '[dry-run]' : 'disparado'}: ${JSON.stringify(data?.data ?? data)}`
@@ -82,12 +54,22 @@ export function CampaignBuilder() {
   return (
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 space-y-4">
       <div>
-        <h3 className="text-sm font-bold text-[#001A4B]">🎙️ Disparar Campaña</h3>
-        <p className="text-xs text-gray-400 mt-0.5">Envía un evento de voz vía Engage. Dry-run muestra preview sin llamar.</p>
+        <h3 className="text-sm font-bold text-[#001A4B]">🎙️ Disparo manual</h3>
+        <p className="text-xs text-gray-400 mt-0.5">
+          Solo para campañas ad-hoc (match reminder fuera de ventana, encuestas puntuales).
+        </p>
+      </div>
+
+      <div className="bg-blue-50 border border-blue-100 rounded-lg p-3">
+        <p className="text-xs text-blue-800">
+          ℹ️ <strong>El testing de eventos se hace en el panel de Engage.</strong> Los eventos
+          automáticos (nuevo líder, perfect score, weekly summary, trash talk) se disparan solos
+          cuando ocurren en PC — no se prueban desde acá.
+        </p>
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-gray-600 mb-1">Tipo de evento</label>
+        <label className="block text-xs font-medium text-gray-600 mb-1">Campaña</label>
         <select
           value={eventType}
           onChange={e => setEventType(e.target.value as VoiceEventType)}
@@ -100,7 +82,7 @@ export function CampaignBuilder() {
       </div>
 
       <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
-        <p className="text-xs text-gray-500 mb-1">Script preview:</p>
+        <p className="text-xs text-gray-500 mb-1">Script base:</p>
         <p className="text-xs text-gray-700 italic">"{meta.script}"</p>
       </div>
 
@@ -124,7 +106,7 @@ export function CampaignBuilder() {
         disabled={loading}
         className="bg-purple-600 text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-purple-700 disabled:opacity-50 w-full"
       >
-        {loading ? 'Procesando...' : dryRun ? '🔍 Preview' : '📞 Disparar campaña'}
+        {loading ? 'Procesando...' : dryRun ? '🔍 Preview' : '📞 Disparar'}
       </button>
 
       {result && (
