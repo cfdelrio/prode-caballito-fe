@@ -1049,6 +1049,9 @@ function JobsTab() {
   const [winnerPoints, setWinnerPoints] = useState('42')
   const [weeklyTestEmail, setWeeklyTestEmail] = useState('')
   const [welcomeEmail, setWelcomeEmail] = useState('')
+  const [voice5dayUserIds, setVoice5dayUserIds] = useState('')
+  const [voice5dayDryRun, setVoice5dayDryRun] = useState(true)
+  const [voice5dayPreview, setVoice5dayPreview] = useState<Array<{ tournament: string; user: string; phone: string; pending: number }>>([])
   const [waTo, setWaTo] = useState('')
   const [waMessage, setWaMessage] = useState('')
   const [jobResult, setJobResult] = useState<{ id: string; text: string } | null>(null)
@@ -1275,6 +1278,74 @@ function JobsTab() {
             {loading === 'whatsapp' ? 'Enviando...' : '📱 Enviar WhatsApp'}
           </button>
           {jobResult?.id === 'whatsapp' && <p className="text-xs text-green-600 font-medium">{jobResult.text}</p>}
+        </div>
+      </JobCard>
+
+      {/* Voice Survey 5 días antes del torneo */}
+      <JobCard
+        title="📞 Voice Survey 5 días"
+        description="Dispara prode.voice_survey via Engage para usuarios con apuestas pendientes a 5 días del primer partido. Usa el template 'Onboarding Workcup 2026' + voice.orkestai."
+      >
+        <div className="space-y-3">
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">User IDs (opcional, separados por coma)</label>
+            <input
+              value={voice5dayUserIds}
+              onChange={e => setVoice5dayUserIds(e.target.value)}
+              placeholder="vacío = todos los users con bets pendientes en ventana T-5d"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]"
+            />
+          </div>
+          <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={voice5dayDryRun}
+              onChange={e => setVoice5dayDryRun(e.target.checked)}
+              className="w-4 h-4"
+            />
+            <span>Dry-run (preview sin llamar)</span>
+          </label>
+          <button
+            onClick={() => runJob('voice5day', async () => {
+              const userIds = voice5dayUserIds.split(',').map(s => s.trim()).filter(Boolean)
+              if (!voice5dayDryRun && userIds.length === 0 && !confirm('¿Disparar voice survey a TODOS los users con bets pendientes? Esto cuesta plata 💸')) return ''
+              const body: { user_ids?: string[]; dry_run: boolean } = { dry_run: voice5dayDryRun }
+              if (userIds.length > 0) body.user_ids = userIds
+              const { data } = await api.post('/admin/voice-5day-trigger', body)
+              setVoice5dayPreview(data.data.preview || [])
+              const mode = voice5dayDryRun ? 'preview' : 'disparado'
+              return `Voice 5d ${mode}: ${data.data.users_notified} users, ${data.data.tournaments_in_window} torneos en ventana, ${data.data.skipped} skip`
+            })}
+            disabled={!!loading}
+            className="bg-purple-600 text-white text-sm font-bold px-5 py-2 rounded-xl hover:bg-purple-700 disabled:opacity-50 whitespace-nowrap"
+          >
+            {loading === 'voice5day' ? 'Procesando...' : voice5dayDryRun ? '🔍 Preview' : '📞 Disparar llamadas'}
+          </button>
+          {jobResult?.id === 'voice5day' && <p className="text-xs text-green-600 font-medium">{jobResult.text}</p>}
+          {voice5dayPreview.length > 0 && (
+            <div className="mt-3 border border-gray-200 rounded-lg overflow-hidden">
+              <table className="w-full text-xs">
+                <thead className="bg-gray-50 text-gray-600">
+                  <tr>
+                    <th className="text-left px-3 py-2">Torneo</th>
+                    <th className="text-left px-3 py-2">Usuario</th>
+                    <th className="text-left px-3 py-2">Teléfono</th>
+                    <th className="text-right px-3 py-2">Pending</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {voice5dayPreview.map((r, i) => (
+                    <tr key={i}>
+                      <td className="px-3 py-2">{r.tournament}</td>
+                      <td className="px-3 py-2">{r.user}</td>
+                      <td className="px-3 py-2 font-mono text-gray-500">{r.phone}</td>
+                      <td className="px-3 py-2 text-right">{r.pending}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </JobCard>
     </div>
