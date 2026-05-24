@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
+import { Button } from '@/components/ui/Button'
 
 export function Login() {
   const navigate = useNavigate()
@@ -32,7 +33,7 @@ export function Login() {
         <div className="bg-gradient-to-r from-[#001A4B] to-[#0042A5] px-8 py-6 text-center">
           <div className="text-4xl mb-2">⚽</div>
           <h1 className="text-white font-bold text-2xl">PRODE Caballito</h1>
-          <p className="text-[#FFDF00] text-sm mt-1">Qatar 2026</p>
+          <p className="text-[#FFDF00] text-sm mt-1">Mundial 2026</p>
         </div>
         <form onSubmit={handleSubmit} className="p-8 space-y-4">
           <div>
@@ -57,13 +58,9 @@ export function Login() {
               required
             />
           </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-[#0042A5] text-white font-bold py-3 rounded-xl hover:bg-[#003080] disabled:opacity-50 transition-colors mt-2"
-          >
+          <Button type="submit" size="lg" fullWidth loading={loading} className="mt-2">
             {loading ? 'Ingresando...' : 'Iniciar Sesión'}
-          </button>
+          </Button>
           <p className="text-center text-sm text-gray-500">
             <Link to="/recuperar-contrasena" className="text-[#0042A5] hover:underline">
               ¿Olvidaste tu contraseña?

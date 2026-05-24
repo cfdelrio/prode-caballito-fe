@@ -7,6 +7,8 @@ import { useT } from '@/hooks/useT'
 import { TEAM_THEMES } from '@/types'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
 import { resetOnboarding } from '@/components/onboarding/Tour'
+import { WhatsAppQRCard } from '@/components/WhatsAppQRCard'
+import { Button } from '@/components/ui/Button'
 
 const COUNTRY_CODES = [
   { code: '+54', flag: '🇦🇷', name: 'Argentina' },
@@ -282,13 +284,22 @@ export function Profile() {
           <span className="text-xs text-gray-500 leading-relaxed">{t.profile.whatsappConsent}</span>
         </label>
         <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 leading-relaxed">{t.profile.whatsappNotice}</p>
-        <button
+        <Button
+          variant="dark"
+          fullWidth
           onClick={handleSaveWhatsapp}
           disabled={savingWa || (waConsent && !waNumber)}
-          className="w-full bg-[#001A4B] text-white text-sm font-bold py-2.5 rounded-xl hover:bg-[#002870] transition-colors disabled:opacity-40"
+          loading={savingWa}
         >
           {savingWa ? '...' : t.profile.save}
-        </button>
+        </Button>
+
+        <div className="border-t border-gray-200 pt-4 mt-4">
+          <WhatsAppQRCard
+            title="📲 O escanea el código"
+            description="Escanea con WhatsApp para unirte al sandbox y recibir todas las novedades."
+          />
+        </div>
       </div>
 
       {/* Push Notifications */}
@@ -312,13 +323,15 @@ export function Profile() {
               {push.loading ? '...' : '🔕 Desactivar notificaciones'}
             </button>
           ) : (
-            <button
+            <Button
+              variant="dark"
+              fullWidth
               onClick={push.subscribe}
               disabled={push.loading || push.state === 'denied'}
-              className="w-full bg-[#001A4B] text-white text-sm font-bold py-2.5 rounded-xl hover:bg-[#002870] transition-colors disabled:opacity-40"
+              loading={push.loading}
             >
               {push.loading ? '...' : '🔔 Activar notificaciones'}
-            </button>
+            </Button>
           )}
         </div>
       )}

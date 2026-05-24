@@ -5,7 +5,8 @@ import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
 import { useT } from '@/hooks/useT'
-import { Spinner } from '@/components/ui/Spinner'
+import { Sk, SkTournamentMatchRow, SkTournamentRankRow } from '@/components/ui/Skeleton'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { teamFlag } from '@/utils/teamFlags'
 import type { Tournament, Match } from '@/types'
 
@@ -13,11 +14,31 @@ interface TournamentRankingEntry {
   user_id: string
   user_name: string
   user_avatar?: string
+  planilla_id: string
+  nombre_planilla: string
+  precio_pagado?: boolean
   puntos: number
   total_aciertos: number
   total_exactos: number
   posicion?: number
   position?: number
+}
+
+function TournamentsSkeleton() {
+  return (
+    <div className="max-w-3xl mx-auto px-4 py-6 space-y-5">
+      <Sk className="h-7 w-40 rounded" />
+      <div className="bg-gradient-to-r from-[#001A4B] to-[#0042A5] rounded-2xl p-5 space-y-2">
+        <Sk className="h-5 w-48 rounded bg-white/20" />
+        <Sk className="h-3 w-64 rounded bg-white/20" />
+        <Sk className="h-3 w-32 rounded bg-white/20 mt-3" />
+      </div>
+      <Sk className="h-9 w-48 rounded-xl" />
+      <div className="space-y-2">
+        {[0, 1, 2, 3, 4].map(i => <SkTournamentMatchRow key={i} />)}
+      </div>
+    </div>
+  )
 }
 
 export function Tournaments() {
@@ -79,12 +100,11 @@ export function Tournaments() {
   const finished = matches.filter(m => m.estado === 'finished')
   const pending = matches.filter(m => m.estado !== 'finished')
 
-  if (loadingTournaments) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>
+  if (loadingTournaments) return <TournamentsSkeleton />
 
   if (tournaments.length === 0) return (
-    <div className="max-w-2xl mx-auto px-4 py-10 text-center">
-      <div className="text-5xl mb-3">🏆</div>
-      <p className="text-gray-400">{t.tournaments.noActive}</p>
+    <div className="max-w-2xl mx-auto px-4">
+      <EmptyState icon="🏆" message={t.tournaments.noActive} />
     </div>
   )
 
@@ -168,11 +188,12 @@ export function Tournaments() {
       {/* Tab: Partidos */}
       {tab === 'partidos' && (
         loadingMatches ? (
-          <div className="flex justify-center py-10"><Spinner /></div>
+          <div className="space-y-2">
+            {[0, 1, 2, 3, 4].map(i => <SkTournamentMatchRow key={i} />)}
+          </div>
         ) : matches.length === 0 ? (
-          <div className="bg-white rounded-xl border border-gray-100 p-8 text-center">
-            <div className="text-3xl mb-2">⚽</div>
-            <p className="text-gray-400 text-sm">{t.tournaments.noMatches}</p>
+          <div className="bg-white rounded-xl border border-gray-100">
+            <EmptyState icon="⚽" message={t.tournaments.noMatches} />
           </div>
         ) : (
           <div className="space-y-2">
@@ -199,12 +220,12 @@ export function Tournaments() {
       {/* Tab: Ranking */}
       {tab === 'ranking' && (
         loadingRanking ? (
-          <div className="flex justify-center py-10"><Spinner /></div>
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+            {[0, 1, 2, 3, 4, 5].map(i => <SkTournamentRankRow key={i} />)}
+          </div>
         ) : ranking.length === 0 ? (
-          <div className="bg-white rounded-xl border border-gray-100 p-8 text-center">
-            <div className="text-3xl mb-2">📊</div>
-            <p className="text-gray-400 text-sm">{t.tournaments.noRanking}</p>
-            <p className="text-gray-300 text-xs mt-1">{t.tournaments.noRankingDesc}</p>
+          <div className="bg-white rounded-xl border border-gray-100">
+            <EmptyState icon="📊" message={t.tournaments.noRanking} description={t.tournaments.noRankingDesc} />
           </div>
         ) : (
           <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
@@ -220,7 +241,7 @@ export function Tournaments() {
               const isMe = r.user_id === user?.id
               return (
                 <div
-                  key={r.user_id}
+                  key={r.planilla_id || `${r.user_id}-${i}`}
                   className={`grid grid-cols-[2rem_1fr_auto_auto_auto] gap-2 items-center px-4 py-3 ${i < ranking.length - 1 ? 'border-b border-gray-50' : ''} ${isMe ? 'bg-blue-50' : ''}`}
                 >
                   <span className="text-sm font-bold text-gray-400">
@@ -233,9 +254,14 @@ export function Tournaments() {
                           {(r.user_name || '?')[0].toUpperCase()}
                         </div>
                     }
-                    <p className={`text-sm font-semibold truncate ${isMe ? 'text-[#0042A5]' : 'text-[#001A4B]'}`}>
-                      {r.user_name} {isMe && <span className="text-xs font-normal">{t.tournaments.you}</span>}
-                    </p>
+                    <div className="min-w-0">
+                      <p className={`text-sm font-semibold truncate ${isMe ? 'text-[#0042A5]' : 'text-[#001A4B]'}`}>
+                        {r.user_name} {isMe && <span className="text-xs font-normal">{t.tournaments.you}</span>}
+                      </p>
+                      {r.nombre_planilla && (
+                        <p className="text-xs text-gray-400 truncate">{r.nombre_planilla}</p>
+                      )}
+                    </div>
                   </div>
                   <span className="text-xs text-center text-gray-500 hidden sm:block">{r.total_exactos}</span>
                   <span className="text-xs text-center text-gray-500 hidden sm:block">{r.total_aciertos}</span>

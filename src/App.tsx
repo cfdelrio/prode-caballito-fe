@@ -6,6 +6,7 @@ import { applyTheme } from '@/utils/theme'
 import { Navbar } from '@/components/layout/Navbar'
 import { ToastContainer } from '@/components/ui/Toast'
 import { GoogleAdUnit } from '@/components/ui/GoogleAdUnit'
+import { PageSpinner } from '@/components/ui/Spinner'
 
 const Login               = lazy(() => import('@/pages/Login').then(m => ({ default: m.Login })))
 const Register            = lazy(() => import('@/pages/Register').then(m => ({ default: m.Register })))
@@ -21,6 +22,7 @@ const Reglamento = lazy(() => import('@/pages/Reglamento').then(m => ({ default:
 const Planilla   = lazy(() => import('@/pages/Planilla').then(m => ({ default: m.Planilla })))
 const Tournaments = lazy(() => import('@/pages/Tournaments').then(m => ({ default: m.Tournaments })))
 const Fixture    = lazy(() => import('@/pages/Fixture').then(m => ({ default: m.Fixture })))
+const VozHinchada = lazy(() => import('@/pages/VozHinchada').then(m => ({ default: m.VozHinchada })))
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { token } = useAuthStore()
@@ -63,11 +65,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <ToastContainer />
-      <Suspense fallback={
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0042A5]" />
-        </div>
-      }>
+      <Suspense fallback={<PageSpinner />}>
       <Routes>
         <Route path="/login"    element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -109,6 +107,9 @@ export default function App() {
         } />
         <Route path="/admin/planillas" element={
           <RequireAuth><RequireAdmin><AppLayout><Admin /></AppLayout></RequireAdmin></RequireAuth>
+        } />
+        <Route path="/hinchada" element={
+          <AppLayout adSlot={null}><VozHinchada /></AppLayout>
         } />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

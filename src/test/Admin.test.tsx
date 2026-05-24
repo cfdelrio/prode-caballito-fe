@@ -185,7 +185,8 @@ describe('Admin — PartidosTab', () => {
     await setupApi()
     renderAdmin()
     await waitFor(() => {
-      expect(screen.getByText(/No hay torneos\. Creá uno en la pestaña Torneos/i)).toBeInTheDocument()
+      expect(screen.getByText('No hay torneos')).toBeInTheDocument()
+      expect(screen.getByText(/Creá uno en la pestaña Torneos/i)).toBeInTheDocument()
     })
   })
 
@@ -254,38 +255,35 @@ describe('Admin — PartidosTab', () => {
   })
 
   it('eliminar partido: confirma y hace DELETE', async () => {
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
     await setupApi({ tournaments: [T_FUTURE], matches: [makeMatch('m1')] })
     renderAdmin()
     await userEvent.click(await screen.findByText('Mundial 2026'))
     await userEvent.click(screen.getByText('×'))
+    await userEvent.click(await screen.findByRole('button', { name: 'Confirmar' }))
     const { api } = await import('@/api/client')
     await waitFor(() => expect(api.delete).toHaveBeenCalledWith('/matches/m1'))
     await waitFor(() => expect(mockShow).toHaveBeenCalledWith('Partido eliminado', 'info'))
-    confirmSpy.mockRestore()
   })
 
   it('eliminar partido: cancelado por usuario no llama a la API', async () => {
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false)
     await setupApi({ tournaments: [T_FUTURE], matches: [makeMatch('m1')] })
     renderAdmin()
     await userEvent.click(await screen.findByText('Mundial 2026'))
     await userEvent.click(screen.getByText('×'))
+    await userEvent.click(await screen.findByRole('button', { name: 'Cancelar' }))
     const { api } = await import('@/api/client')
     expect(api.delete).not.toHaveBeenCalled()
-    confirmSpy.mockRestore()
   })
 
   it('eliminar partido: error → muestra toast', async () => {
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
     await setupApi({ tournaments: [T_FUTURE], matches: [makeMatch('m1')] })
     const { api } = await import('@/api/client')
     ;(api.delete as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('fail'))
     renderAdmin()
     await userEvent.click(await screen.findByText('Mundial 2026'))
     await userEvent.click(screen.getByText('×'))
+    await userEvent.click(await screen.findByRole('button', { name: 'Confirmar' }))
     await waitFor(() => expect(mockShow).toHaveBeenCalledWith('Error al eliminar', 'error'))
-    confirmSpy.mockRestore()
   })
 
   it('publicar resultado: abre modal y hace POST', async () => {
@@ -629,45 +627,43 @@ describe('Admin — AdminSubTab Usuarios', () => {
     await waitFor(() => expect(screen.getByText(/no tiene planillas/i)).toBeInTheDocument())
   })
 
-  it('eliminar usuario: confirma + prompt → DELETE', async () => {
+  it('eliminar usuario: confirma en modal → DELETE', async () => {
     const users = [{ id: 'u1', nombre: 'Carlos', email: 'c@x.com', rol: 'usuario', email_verified: true }]
     await setupApi({ users })
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
-    const promptSpy = vi.spyOn(window, 'prompt').mockReturnValue('CONFIRMAR')
     renderAdmin()
     await userEvent.click(screen.getByText(/👥 Usuarios/))
     await userEvent.click(await screen.findByText(/Eliminar/))
+    const input = await screen.findByLabelText(/Escribí "CONFIRMAR"/)
+    await userEvent.type(input, 'CONFIRMAR')
+    await userEvent.click(screen.getByRole('button', { name: 'Confirmar' }))
     const { api } = await import('@/api/client')
     await waitFor(() => expect(api.delete).toHaveBeenCalledWith('/users/u1'))
     await waitFor(() => expect(mockShow).toHaveBeenCalledWith(expect.stringContaining('Carlos'), 'success'))
-    confirmSpy.mockRestore()
-    promptSpy.mockRestore()
   })
 
-  it('eliminar usuario: prompt incorrecto → no llama DELETE', async () => {
+  it('eliminar usuario: texto incorrecto → botón Confirmar deshabilitado', async () => {
     const users = [{ id: 'u1', nombre: 'Carlos', email: 'c@x.com', rol: 'usuario', email_verified: true }]
     await setupApi({ users })
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
-    const promptSpy = vi.spyOn(window, 'prompt').mockReturnValue('cancelar')
     renderAdmin()
     await userEvent.click(screen.getByText(/👥 Usuarios/))
     await userEvent.click(await screen.findByText(/Eliminar/))
+    const input = await screen.findByLabelText(/Escribí "CONFIRMAR"/)
+    await userEvent.type(input, 'cancelar')
+    const btn = screen.getByRole('button', { name: 'Confirmar' }) as HTMLButtonElement
+    expect(btn.disabled).toBe(true)
     const { api } = await import('@/api/client')
     expect(api.delete).not.toHaveBeenCalled()
-    confirmSpy.mockRestore()
-    promptSpy.mockRestore()
   })
 
-  it('eliminar usuario: confirm rechazado → no llama DELETE', async () => {
+  it('eliminar usuario: cancelar modal → no llama DELETE', async () => {
     const users = [{ id: 'u1', nombre: 'Carlos', email: 'c@x.com', rol: 'usuario', email_verified: true }]
     await setupApi({ users })
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false)
     renderAdmin()
     await userEvent.click(screen.getByText(/👥 Usuarios/))
     await userEvent.click(await screen.findByText(/Eliminar/))
+    await userEvent.click(await screen.findByRole('button', { name: 'Cancelar' }))
     const { api } = await import('@/api/client')
     expect(api.delete).not.toHaveBeenCalled()
-    confirmSpy.mockRestore()
   })
 
   it('eliminar usuario: error de API → muestra toast', async () => {
@@ -675,14 +671,13 @@ describe('Admin — AdminSubTab Usuarios', () => {
     await setupApi({ users })
     const { api } = await import('@/api/client')
     ;(api.delete as ReturnType<typeof vi.fn>).mockRejectedValueOnce({ response: { data: { error: 'No autorizado' } } })
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
-    const promptSpy = vi.spyOn(window, 'prompt').mockReturnValue('CONFIRMAR')
     renderAdmin()
     await userEvent.click(screen.getByText(/👥 Usuarios/))
     await userEvent.click(await screen.findByText(/Eliminar/))
+    const input = await screen.findByLabelText(/Escribí "CONFIRMAR"/)
+    await userEvent.type(input, 'CONFIRMAR')
+    await userEvent.click(screen.getByRole('button', { name: 'Confirmar' }))
     await waitFor(() => expect(mockShow).toHaveBeenCalledWith('No autorizado', 'error'))
-    confirmSpy.mockRestore()
-    promptSpy.mockRestore()
   })
 
   it('error al cargar usuarios → muestra toast', async () => {
@@ -715,47 +710,44 @@ describe('Admin — BroadcastTab', () => {
     expect(btn.disabled).toBe(true)
   })
 
-  it('enviar broadcast: confirm + POST + resultado', async () => {
+  it('enviar broadcast: confirma en modal + POST + resultado', async () => {
     await setupApi()
     const { api } = await import('@/api/client')
     ;(api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: { data: { total: 10, sent: 9, failed: 1 } } })
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
     renderAdmin()
     await userEvent.click(screen.getByText(/📣 WhatsApp/))
     const textarea = document.querySelector('textarea') as HTMLTextAreaElement
     await userEvent.type(textarea, 'Hola a todos')
     await userEvent.click(screen.getByText('📤 Enviar a todos'))
+    await userEvent.click(await screen.findByRole('button', { name: 'Confirmar' }))
     await waitFor(() => expect(api.post).toHaveBeenCalledWith('/internal/broadcast-whatsapp', { message: 'Hola a todos' }, expect.any(Object)))
     await waitFor(() => expect(screen.getByText('Total destinatarios:')).toBeInTheDocument())
     expect(screen.getByText(/Fallidos:/)).toBeInTheDocument()
-    confirmSpy.mockRestore()
   })
 
-  it('enviar broadcast: confirm rechazado → no llama API', async () => {
+  it('enviar broadcast: cancelar modal → no llama API', async () => {
     await setupApi()
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false)
     renderAdmin()
     await userEvent.click(screen.getByText(/📣 WhatsApp/))
     const textarea = document.querySelector('textarea') as HTMLTextAreaElement
     await userEvent.type(textarea, 'X')
     await userEvent.click(screen.getByText('📤 Enviar a todos'))
+    await userEvent.click(await screen.findByRole('button', { name: 'Cancelar' }))
     const { api } = await import('@/api/client')
     expect(api.post).not.toHaveBeenCalledWith('/internal/broadcast-whatsapp', expect.anything(), expect.anything())
-    confirmSpy.mockRestore()
   })
 
   it('enviar broadcast: error API → muestra toast', async () => {
     await setupApi()
     const { api } = await import('@/api/client')
     ;(api.post as ReturnType<typeof vi.fn>).mockRejectedValueOnce({ response: { data: { error: 'Sin permiso' } } })
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
     renderAdmin()
     await userEvent.click(screen.getByText(/📣 WhatsApp/))
     const textarea = document.querySelector('textarea') as HTMLTextAreaElement
     await userEvent.type(textarea, 'Hola')
     await userEvent.click(screen.getByText('📤 Enviar a todos'))
+    await userEvent.click(await screen.findByRole('button', { name: 'Confirmar' }))
     await waitFor(() => expect(mockShow).toHaveBeenCalledWith('Sin permiso', 'error'))
-    confirmSpy.mockRestore()
   })
 
   it('contador de caracteres se actualiza', async () => {
@@ -780,7 +772,7 @@ describe('Admin — JobsTab (super admin)', () => {
     await userEvent.click(screen.getByText(/⚙️ Procesos/))
     expect(screen.getByText(/Recalcular Ranking/)).toBeInTheDocument()
     expect(screen.getByText(/Recalcular Jornada/)).toBeInTheDocument()
-    expect(screen.getByText(/Simular Ganador/)).toBeInTheDocument()
+    expect(screen.getByText(/Publicar Ganador/)).toBeInTheDocument()
     expect(screen.getByText(/Email Semanal/)).toBeInTheDocument()
     expect(screen.getByText(/Email de Bienvenida/)).toBeInTheDocument()
     expect(screen.getByText(/Test WhatsApp/)).toBeInTheDocument()
@@ -825,12 +817,12 @@ describe('Admin — JobsTab (super admin)', () => {
     await waitFor(() => expect(mockShow).toHaveBeenCalledWith(expect.stringContaining('Jornada recalculada'), 'success'))
   })
 
-  it('Simular Ganador: requiere email; valida + envía', async () => {
+  it('Publicar Ganador: requiere email; valida + envía', async () => {
     await setupApi({ tournamentsAll: [T_FUTURE] })
     renderAdmin()
     await userEvent.click(screen.getByText(/⚙️ Procesos/))
-    const card = screen.getByText(/Simular Ganador/).closest('div')!.parentElement!
-    const btn = within(card).getByText(/Disparar flujo ganador/) as HTMLButtonElement
+    const card = screen.getByText(/Publicar Ganador/).closest('div')!.parentElement!
+    const btn = within(card).getByText(/Publicar ganador/) as HTMLButtonElement
     expect(btn.disabled).toBe(true)
     const emailInput = within(card).getByPlaceholderText(/cfdelrio@gmail/)
     await userEvent.type(emailInput, 'ganador@x.com')
@@ -839,17 +831,16 @@ describe('Admin — JobsTab (super admin)', () => {
     await waitFor(() => expect(api.post).toHaveBeenCalledWith('/admin/jobs/trigger-winner', expect.objectContaining({ email: 'ganador@x.com' })))
   })
 
-  it('Email Semanal: vacío + confirm → POST', async () => {
+  it('Email Semanal: vacío + confirma modal → POST', async () => {
     await setupApi({ tournamentsAll: [T_FUTURE] })
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
     const { api } = await import('@/api/client')
     ;(api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: { data: { sent: 10, failed: 0 } } })
     renderAdmin()
     await userEvent.click(screen.getByText(/⚙️ Procesos/))
     const card = screen.getByText(/Email Semanal/).closest('div')!.parentElement!
     await userEvent.click(within(card).getByText('📤 Enviar'))
+    await userEvent.click(await screen.findByRole('button', { name: 'Confirmar' }))
     await waitFor(() => expect(api.post).toHaveBeenCalledWith('/admin/weekly-email', {}))
-    confirmSpy.mockRestore()
   })
 
   it('Email Semanal: con email de prueba → POST con test_email', async () => {

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
+import { useToastStore } from '@/store/toastStore'
 import { useT } from '@/hooks/useT'
 import { useMatches } from '@/hooks/useMatches'
 import { usePlanilla } from '@/hooks/usePlanilla'
@@ -44,8 +45,18 @@ function PlanillaSkeleton() {
 export function Planilla() {
   const { planillaId } = useParams<{ planillaId: string }>()
   const { user } = useAuthStore()
+  const { show } = useToastStore()
   const t = useT()
   const [filter, setFilter] = useState<'todos' | 'pendientes' | 'finalizados'>('todos')
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href)
+      show(t.planilla.linkCopied, 'success')
+    } catch {
+      show(t.planilla.linkCopyError, 'error')
+    }
+  }
 
   const { planilla, loading: loadingPlanilla } = usePlanilla(planillaId)
   const { matches, loading: loadingMatches }   = useMatches(200)
@@ -95,8 +106,8 @@ export function Planilla() {
         <Link to="/profile" className="-ml-1 flex items-center justify-center w-9 h-9 rounded-full hover:bg-gray-100 active:bg-gray-200 transition-colors shrink-0" aria-label="Volver">
           <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 t-text-nav" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
         </Link>
-        <div className="flex-1">
-          <h1 className="text-xl font-bold text-[#001A4B]">{planilla.nombre_planilla}</h1>
+        <div className="flex-1 min-w-0">
+          <h1 className="text-xl font-bold text-[#001A4B] truncate">{planilla.nombre_planilla}</h1>
           <div className="flex gap-2 mt-0.5">
             <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${planilla.precio_pagado ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-600'}`}>
               {planilla.precio_pagado ? t.planilla.paid : t.planilla.unpaid}
@@ -106,6 +117,16 @@ export function Planilla() {
             )}
           </div>
         </div>
+        <button
+          onClick={handleCopyLink}
+          className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-gray-100 active:bg-gray-200 transition-colors shrink-0 text-[#001A4B]"
+          aria-label={t.planilla.copyLink}
+          title={t.planilla.copyLink}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 015.656 0l1.415 1.415a4 4 0 010 5.656l-2.829 2.829a4 4 0 01-5.656 0l-1.415-1.415m0-7.07L9.172 13.829a4 4 0 000 5.656l1.415 1.415m2.828-9.9a4 4 0 015.656 0l1.415 1.415a4 4 0 010 5.656l-2.829 2.829" />
+          </svg>
+        </button>
       </div>
 
       {/* Stats */}

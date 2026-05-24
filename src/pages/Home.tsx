@@ -3,16 +3,18 @@ import { usePolling } from '@/hooks/usePolling'
 import { Link } from 'react-router-dom'
 import { format } from 'date-fns'
 import { es as esLocale } from 'date-fns/locale'
-import { QRCodeSVG } from 'qrcode.react'
+import { LazyQR } from '@/components/ui/LazyQR'
 import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
 import { useT } from '@/hooks/useT'
 import { Sk } from '@/components/ui/Skeleton'
+import { Button } from '@/components/ui/Button'
 import { usePWAInstall } from '@/hooks/usePWAInstall'
 import { teamFlag, teamAbbr } from '@/utils/teamFlags'
 import { LeaderHome } from '@/pages/LeaderHome'
 import { POINT_COLORS } from '@/utils/scoring'
+import { PollWidget } from '@/components/PollWidget'
 import type { Match, Bet, Planilla, RankingEntry } from '@/types'
 
 /* ── Flip clock animation (defined in index.css) ─────────────────────── */
@@ -658,6 +660,9 @@ export function Home() {
           </Link>
         )}
 
+        {/* ── POLL WIDGET ─────────────────────────────────────── */}
+        <PollWidget />
+
         {/* ── PRECIO ──────────────────────────────────────────── */}
         <div
           className="rounded-2xl overflow-hidden shadow-md border section-animate"
@@ -825,7 +830,7 @@ export function Home() {
               Sumate al canal <strong>ProdeCaballito</strong> para enterarte de novedades y resultados.
             </p>
             <div className="p-3 bg-white rounded-xl border border-gray-100">
-              <QRCodeSVG
+              <LazyQR
                 value="https://whatsapp.com/channel/0029VbD5n7oDeON9vGA2gS3j"
                 size={192}
                 level="M"
@@ -846,6 +851,22 @@ export function Home() {
             </a>
           </div>
         </div>
+      </div>
+
+      {/* ── AYUDA — 0800 ────────────────────────────────────────── */}
+      <div className="px-4 mb-4">
+        <a
+          href="tel:08003451521"
+          className="flex items-center gap-4 bg-[#001A4B] rounded-2xl px-5 py-4 shadow-md hover:brightness-110 active:scale-[0.98] transition-all"
+          style={{ color: 'inherit', textDecoration: 'none' }}
+          aria-label="Llamar al 0800 3 45 1521"
+        >
+          <span className="text-3xl leading-none">📞</span>
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#FFDF00' }}>¿Tenés dudas? Llamá gratis</p>
+            <p className="text-xl font-black tracking-wide" style={{ color: '#FFFFFF' }}>0800 3 45 1521</p>
+          </div>
+        </a>
       </div>
 
       {/* ── STICKY MOBILE BAR ───────────────────────────────────── */}
@@ -1017,12 +1038,15 @@ export function Home() {
                 </div>
               </li>
             </ol>
-            <button
+            <Button
+              variant="dark"
+              size="lg"
+              fullWidth
               onClick={() => setShowIOSGuide(false)}
-              className="mt-6 w-full bg-[#001A4B] text-white font-bold py-3 rounded-xl text-sm"
+              className="mt-6"
             >
               {t.home.iosGotIt}
-            </button>
+            </Button>
           </div>
         </>
       )}

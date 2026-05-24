@@ -4,6 +4,9 @@ import { api } from '@/api/client'
 import { useToastStore } from '@/store/toastStore'
 import { useAuthStore } from '@/store/authStore'
 import { useT } from '@/hooks/useT'
+import { WhatsAppQRCard } from '@/components/WhatsAppQRCard'
+import { Button } from '@/components/ui/Button'
+import { Spinner } from '@/components/ui/Spinner'
 
 type Step = 'form' | 'verify' | 'complete' | 'notify'
 
@@ -273,10 +276,9 @@ export function Register() {
                   className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0042A5] text-sm"
                   placeholder="Mínimo 6 caracteres" minLength={6} required />
               </div>
-              <button type="submit" disabled={loading}
-                className="w-full bg-[#0042A5] text-white font-bold py-3 rounded-xl hover:bg-[#003080] disabled:opacity-50 transition-colors">
+              <Button type="submit" size="lg" fullWidth loading={loading}>
                 {loading ? 'Enviando...' : 'Continuar →'}
-              </button>
+              </Button>
               <p className="text-center text-sm text-gray-500">
                 ¿Ya tenés cuenta?{' '}
                 <Link to="/login" className="text-[#0042A5] font-semibold hover:underline">Iniciá sesión</Link>
@@ -295,10 +297,9 @@ export function Register() {
                   className="w-full border-2 border-[#0042A5] rounded-xl px-4 py-3 focus:outline-none text-2xl font-bold text-center tracking-widest"
                   placeholder="000000" maxLength={6} required />
               </div>
-              <button type="submit" disabled={loading}
-                className="w-full bg-[#0042A5] text-white font-bold py-3 rounded-xl hover:bg-[#003080] disabled:opacity-50 transition-colors">
+              <Button type="submit" size="lg" fullWidth loading={loading}>
                 {loading ? 'Verificando...' : 'Verificar →'}
-              </button>
+              </Button>
               <button type="button" onClick={handleResend} className="w-full text-sm text-gray-500 hover:text-[#0042A5]">
                 ¿No llegó? Reenviar código
               </button>
@@ -419,16 +420,25 @@ export function Register() {
                   </ul>
 
                   <div className="w-full pt-1">
-                    <button
+                    <Button
                       onClick={handleAllowNotifications}
-                      disabled={notifStatus === 'requesting'}
-                      className="w-full bg-[#001A4B] text-white font-bold py-3.5 rounded-xl hover:bg-[#002870] disabled:opacity-60 transition-colors text-sm"
+                      variant="dark"
+                      size="lg"
+                      fullWidth
+                      loading={notifStatus === 'requesting'}
                     >
                       {notifStatus === 'requesting' ? 'Esperando permiso...' : 'Activar notificaciones'}
-                    </button>
+                    </Button>
                     <p className="text-xs text-gray-400 mt-3 text-center">
                       Las notificaciones son obligatorias para usar ProdeCaballito
                     </p>
+                  </div>
+
+                  <div className="border-t border-gray-200 pt-5 mt-5">
+                    <WhatsAppQRCard
+                      title="📲 También por WhatsApp"
+                      description="Escanea para recibir también las novedades, resultados y cambios de ranking en tiempo real por WhatsApp."
+                    />
                   </div>
                 </>
               ) : notifStatus === 'granted' ? (
@@ -437,7 +447,7 @@ export function Register() {
                     <h2 className="text-lg font-bold text-[#001A4B] mb-1">¡Todo listo!</h2>
                     <p className="text-sm text-gray-500">Notificaciones activadas. Ingresando al Prode...</p>
                   </div>
-                  <div className="w-8 h-8 border-3 border-[#0042A5] border-t-transparent rounded-full animate-spin" />
+                  <Spinner size="md" />
                 </>
               ) : (
                 <>
@@ -445,7 +455,7 @@ export function Register() {
                     <h2 className="text-lg font-bold text-[#001A4B] mb-1">Sin notificaciones</h2>
                     <p className="text-sm text-gray-500">Podés activarlas en cualquier momento desde el perfil.</p>
                   </div>
-                  <div className="w-8 h-8 border-3 border-gray-300 border-t-transparent rounded-full animate-spin" />
+                  <Spinner size="md" />
                 </>
               )}
 
