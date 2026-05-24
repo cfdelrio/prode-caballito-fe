@@ -10,8 +10,10 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { useToastStore } from '@/store/toastStore'
 import { useAuthStore } from '@/store/authStore'
 import type { Match, Tournament } from '@/types'
+import { CampaignBuilder } from '@/components/CampaignBuilder'
+import { CampaignLiveActivity } from '@/components/CampaignLiveActivity'
 
-type Tab = 'partidos' | 'planillas' | 'usuarios' | 'torneos' | 'broadcast' | 'jobs' | 'polls'
+type Tab = 'partidos' | 'planillas' | 'usuarios' | 'torneos' | 'broadcast' | 'jobs' | 'polls' | 'campanas'
 
 const SUPER_ADMIN_EMAIL = 'cfdelrio@gmail.com'
 
@@ -194,6 +196,7 @@ export function Admin() {
     { id: 'broadcast',   label: '📣 WhatsApp' },
     { id: 'polls',       label: '🗳️ Polls' },
     ...(isSuperAdmin ? [{ id: 'jobs' as Tab, label: '⚙️ Procesos' }] : []),
+    ...(isSuperAdmin ? [{ id: 'campanas' as Tab, label: '🎙️ Campañas' }] : []),
   ]
 
   return (
@@ -237,6 +240,9 @@ export function Admin() {
 
       {/* Tab: Polls */}
       {tab === 'polls' && <PollsTab />}
+
+      {/* Tab: Campañas (super-admin only) */}
+      {tab === 'campanas' && isSuperAdmin && <CampanasTab />}
 
       {/* Modal partido */}
       <Modal open={showMatchModal} onClose={() => setShowMatchModal(false)} title={editMatch ? 'Editar Partido' : 'Nuevo Partido'}>
@@ -1718,6 +1724,16 @@ function PollsTab() {
           })}
         </div>
       </div>
+    </div>
+  )
+}
+
+/* ── CampanasTab ─────────────────────────────────────────────────────── */
+function CampanasTab() {
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <CampaignBuilder />
+      <CampaignLiveActivity />
     </div>
   )
 }

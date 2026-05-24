@@ -9,6 +9,8 @@ import { usePushNotifications } from '@/hooks/usePushNotifications'
 import { resetOnboarding } from '@/components/onboarding/Tour'
 import { WhatsAppQRCard } from '@/components/WhatsAppQRCard'
 import { Button } from '@/components/ui/Button'
+import { BadgesGrid } from '@/components/BadgesGrid'
+import { useGamification } from '@/hooks/useGamification'
 
 const COUNTRY_CODES = [
   { code: '+54', flag: '🇦🇷', name: 'Argentina' },
@@ -62,6 +64,7 @@ export function Profile() {
   const { user, updateUser } = useAuthStore()
   const { show } = useToastStore()
   const t = useT()
+  const { data: gamification } = useGamification(user?.id ?? null)
   const navigate = useNavigate()
   const fileRef = useRef<HTMLInputElement>(null)
   const [editName, setEditName] = useState(false)
@@ -333,6 +336,25 @@ export function Profile() {
               {push.loading ? '...' : '🔔 Activar notificaciones'}
             </Button>
           )}
+        </div>
+      )}
+
+      {(gamification.badges.length > 0 || gamification.streaks.length > 0) && (
+        <div className="bg-white rounded-2xl shadow p-4 mt-4">
+          <h3 className="text-base font-bold text-[#001A4B] mb-3">🏅 Logros</h3>
+          {gamification.streaks.length > 0 && (
+            <div className="mb-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg p-3">
+              {gamification.streaks.map(s => (
+                <div key={s.streak_type} className="text-sm text-orange-800 dark:text-orange-200">
+                  🔥 Llevás <strong>{s.current_streak}</strong> exactos seguidos en {s.nombre_planilla}
+                  {s.best_streak > s.current_streak && (
+                    <span className="opacity-70"> (mejor: {s.best_streak})</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+          <BadgesGrid badges={gamification.badges} />
         </div>
       )}
 

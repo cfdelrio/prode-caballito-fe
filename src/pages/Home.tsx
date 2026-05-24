@@ -15,6 +15,7 @@ import { teamFlag, teamAbbr } from '@/utils/teamFlags'
 import { LeaderHome } from '@/pages/LeaderHome'
 import { POINT_COLORS } from '@/utils/scoring'
 import { PollWidget } from '@/components/PollWidget'
+import { useGamification } from '@/hooks/useGamification'
 import type { Match, Bet, Planilla, RankingEntry } from '@/types'
 
 /* ── Flip clock animation (defined in index.css) ─────────────────────── */
@@ -367,6 +368,8 @@ export function Home() {
   const [inviteMessage, setInviteMessage] = useState('')
   const { state: pwaState, install: pwaInstall } = usePWAInstall()
   const { show: showToast } = useToastStore()
+  const { data: gamification } = useGamification(user?.id ?? null)
+  const myStreak = gamification.streaks[0]?.current_streak ?? 0
 
   useEffect(() => {
     const interval = setInterval(() => setNow(new Date()), 60000)
@@ -551,7 +554,7 @@ export function Home() {
               <em style={{ color: '#FFDF00', fontStyle: 'italic' }}>TAMBIÉN</em>
             </h1>
 
-            <p className="text-white/50 text-xs mt-2 mb-5">
+            <p className="text-white/50 text-xs mt-2 mb-2">
               {getGreeting(now)}, {user?.nombre?.split(' ')[0] || 'jugador'}
               {myEntry && (
                 <>
@@ -562,6 +565,16 @@ export function Home() {
                 </>
               )}
             </p>
+
+            {myStreak >= 3 && (
+              <div
+                className="inline-flex items-center gap-2 mb-4 px-3 py-1.5 rounded-full font-bold text-xs"
+                style={{ background: 'rgba(255,165,0,0.15)', color: '#FFB84D', border: '1px solid rgba(255,165,0,0.35)' }}
+              >
+                <span>🔥</span>
+                <span>Llevás {myStreak} exactos seguidos · ¡no la rompas!</span>
+              </div>
+            )}
 
             <div className="flex flex-col gap-2.5">
               {urgentUnbet > 0 ? (

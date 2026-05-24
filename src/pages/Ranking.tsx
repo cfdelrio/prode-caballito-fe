@@ -6,6 +6,8 @@ import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
 import { useT } from '@/hooks/useT'
 import { Sk, SkRankRow } from '@/components/ui/Skeleton'
+import { StreakBadge } from '@/components/StreakBadge'
+import { useGamification } from '@/hooks/useGamification'
 
 function RankingSkeleton() {
   return (
@@ -63,6 +65,8 @@ const MEDAL = ['🥇', '🥈', '🥉']
 
 export function Ranking() {
   const { user } = useAuthStore()
+  const { data: gamification } = useGamification(user?.id ?? null)
+  const myStreak = gamification.streaks[0]?.current_streak ?? 0
   const { show } = useToastStore()
   const t = useT()
   const [ranking, setRanking] = useState<RankingEntry[]>([])
@@ -284,6 +288,7 @@ export function Ranking() {
                           <p className={`text-sm font-semibold truncate ${isMe ? 't-text-primary' : 't-text-nav'}`}>
                             {r.user_name} {isMe && <span className="text-xs font-normal">{t.ranking.you}</span>}
                           </p>
+                          {isMe && myStreak >= 3 && <StreakBadge streak={myStreak} />}
                           {r.whatsapp_number && (
                             <a
                               href={`https://wa.me/${r.whatsapp_number}`}
