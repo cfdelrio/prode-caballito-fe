@@ -5,8 +5,11 @@ import { useToastStore } from '@/store/toastStore'
 type VoiceEventType =
   | 'prode.voice_match_reminder'
   | 'prode.voice_survey_campeon'
+  | 'prode.voice_5day_reminder'
+  | 'prode.cutoff_reminder'
+  | 'prode.broadcast_manual'
 
-const EVENT_META: Record<VoiceEventType, { label: string; emoji: string; script: string; endpoint: string; supportsSkipWindow?: boolean }> = {
+const EVENT_META: Record<VoiceEventType, { label: string; emoji: string; script: string; endpoint: string; supportsSkipWindow?: boolean; bodyField?: string }> = {
   'prode.voice_match_reminder': {
     label: 'Match reminder',
     emoji: '📣',
@@ -14,11 +17,30 @@ const EVENT_META: Record<VoiceEventType, { label: string; emoji: string; script:
     endpoint: '/admin/voice-match-reminder-trigger',
     supportsSkipWindow: true,
   },
+  'prode.voice_5day_reminder': {
+    label: 'Voice 5-day reminder',
+    emoji: '🔔',
+    script: 'Faltan 5 días para que cierre tu planilla. No pierdas tu racha.',
+    endpoint: '/admin/voice-5day-trigger',
+  },
   'prode.voice_survey_campeon': {
     label: 'Survey campeón',
     emoji: '🏆',
     script: '¿Quién sale campeón del mundial? Presioná 1 Argentina, 2 Brasil, 3 otro.',
     endpoint: '/admin/voice-campeon-survey',
+  },
+  'prode.cutoff_reminder': {
+    label: 'Cutoff reminders',
+    emoji: '⏰',
+    script: 'Quedan pocos minutos para cargar tu pronóstico. ¡Entrá ya!',
+    endpoint: '/admin/jobs/cutoff-reminders',
+  },
+  'prode.broadcast_manual': {
+    label: 'Broadcast WhatsApp',
+    emoji: '📢',
+    script: 'Mensaje libre a todos los usuarios con WhatsApp consent.',
+    endpoint: '/internal/broadcast-whatsapp',
+    bodyField: 'message',
   },
 }
 
@@ -26,6 +48,7 @@ export function CampaignBuilder() {
   const { show } = useToastStore()
   const [eventType, setEventType] = useState<VoiceEventType>('prode.voice_match_reminder')
   const [userIds, setUserIds] = useState('')
+  const [messageText, setMessageText] = useState('')
   const [dryRun, setDryRun] = useState(true)
   const [skipWindow, setSkipWindow] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -41,6 +64,7 @@ export function CampaignBuilder() {
       const body: Record<string, unknown> = { dry_run: dryRun }
       if (ids.length > 0) body.user_ids = ids
       if (skipWindow && meta.supportsSkipWindow) body.skip_window = true
+      if (meta.bodyField && messageText.trim()) body[meta.bodyField] = messageText.trim()
       const { data } = await api.post(meta.endpoint, body)
       const resData = data?.data ?? data
       const summary = `${meta.label} ${dryRun ? '[dry-run]' : 'disparado'}:\n${JSON.stringify(resData, null, 2)}`
@@ -89,6 +113,19 @@ export function CampaignBuilder() {
         <p className="text-xs text-gray-500 mb-1">Script base:</p>
         <p className="text-xs text-gray-700 italic">"{meta.script}"</p>
       </div>
+
+      {meta.bodyField && (
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-1">Mensaje</label>
+          <textarea
+            value={messageText}
+            onChange={e => setMessageText(e.target.value)}
+            placeholder="Escribí el mensaje a enviar..."
+            rows={3}
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
+          />
+        </div>
+      )}
 
       <div>
         <label className="block text-xs font-medium text-gray-600 mb-1">User IDs (opcional, CSV)</label>
