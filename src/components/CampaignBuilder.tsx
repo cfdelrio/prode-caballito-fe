@@ -6,12 +6,13 @@ type VoiceEventType =
   | 'prode.voice_match_reminder'
   | 'prode.voice_survey_campeon'
 
-const EVENT_META: Record<VoiceEventType, { label: string; emoji: string; script: string; endpoint: string }> = {
+const EVENT_META: Record<VoiceEventType, { label: string; emoji: string; script: string; endpoint: string; supportsSkipWindow?: boolean }> = {
   'prode.voice_match_reminder': {
     label: 'Match reminder',
     emoji: '📣',
     script: 'En 30 min arranca {home} vs {away} y no cargaste tu resultado. Entrá ya.',
     endpoint: '/admin/voice-match-reminder-trigger',
+    supportsSkipWindow: true,
   },
   'prode.voice_survey_campeon': {
     label: 'Survey campeón',
@@ -26,6 +27,7 @@ export function CampaignBuilder() {
   const [eventType, setEventType] = useState<VoiceEventType>('prode.voice_match_reminder')
   const [userIds, setUserIds] = useState('')
   const [dryRun, setDryRun] = useState(true)
+  const [skipWindow, setSkipWindow] = useState(false)
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<string | null>(null)
 
@@ -38,8 +40,10 @@ export function CampaignBuilder() {
       const ids = userIds.split(',').map(s => s.trim()).filter(Boolean)
       const body: Record<string, unknown> = { dry_run: dryRun }
       if (ids.length > 0) body.user_ids = ids
+      if (skipWindow && meta.supportsSkipWindow) body.skip_window = true
       const { data } = await api.post(meta.endpoint, body)
-      const summary = `${meta.label} ${dryRun ? '[dry-run]' : 'disparado'}: ${JSON.stringify(data?.data ?? data)}`
+      const resData = data?.data ?? data
+      const summary = `${meta.label} ${dryRun ? '[dry-run]' : 'disparado'}:\n${JSON.stringify(resData, null, 2)}`
       setResult(summary)
       show(summary, 'success')
     } catch (e: unknown) {
@@ -96,10 +100,19 @@ export function CampaignBuilder() {
         />
       </div>
 
-      <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-        <input type="checkbox" checked={dryRun} onChange={e => setDryRun(e.target.checked)} className="w-4 h-4" />
-        <span>Dry-run (no llama, solo preview)</span>
-      </label>
+      <div className="space-y-2">
+        <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+          <input type="checkbox" checked={dryRun} onChange={e => setDryRun(e.target.checked)} className="w-4 h-4" />
+          <span>Dry-run (no llama, solo preview)</span>
+        </label>
+
+        {meta.supportsSkipWindow && (
+          <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+            <input type="checkbox" checked={skipWindow} onChange={e => setSkipWindow(e.target.checked)} className="w-4 h-4" />
+            <span>Ignorar ventana de tiempo (testing)</span>
+          </label>
+        )}
+      </div>
 
       <button
         onClick={handleFire}
