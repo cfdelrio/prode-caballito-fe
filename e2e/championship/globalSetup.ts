@@ -25,9 +25,9 @@ const ADMIN_EMAIL    = process.env.E2E_ADMIN_EMAIL?.trim()    || 'cfdelrio@gmail
 const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD?.trim() || 'carlitos'
 
 const USERS = {
-  lider:   { email: process.env.E2E_LIDER_EMAIL?.trim()   || 'cfdelrio+lider@gmail.com',   password: process.env.E2E_LIDER_PASS?.trim()   || 'carlitos', nombre: 'E2E Lider'   },
-  rival:   { email: process.env.E2E_RIVAL_EMAIL?.trim()   || 'cfdelrio+rival@gmail.com',   password: process.env.E2E_RIVAL_PASS?.trim()   || 'carlitos', nombre: 'E2E Rival'   },
-  virtual: { email: process.env.E2E_VIRTUAL_EMAIL?.trim() || 'cfdelrio+virtual@gmail.com', password: process.env.E2E_VIRTUAL_PASS?.trim() || 'carlitos', nombre: 'E2E Virtual' },
+  lider:   { email: process.env.E2E_LIDER_EMAIL?.trim()   || 'cfdelrio+lider@gmail.com',   password: process.env.E2E_LIDER_PASS?.trim()   || 'e2etest2026', nombre: 'E2E Lider'   },
+  rival:   { email: process.env.E2E_RIVAL_EMAIL?.trim()   || 'cfdelrio+rival@gmail.com',   password: process.env.E2E_RIVAL_PASS?.trim()   || 'e2etest2026', nombre: 'E2E Rival'   },
+  virtual: { email: process.env.E2E_VIRTUAL_EMAIL?.trim() || 'cfdelrio+virtual@gmail.com', password: process.env.E2E_VIRTUAL_PASS?.trim() || 'e2etest2026', nombre: 'E2E Virtual' },
 }
 
 async function globalSetup() {
