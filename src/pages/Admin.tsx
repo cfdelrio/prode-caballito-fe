@@ -1728,12 +1728,204 @@ function PollsTab() {
   )
 }
 
+/* ── NotificationsSentPanel ──────────────────────────────────────────── */
+interface AdminNotif {
+  id: string
+  user_id: string
+  user_name?: string
+  type: string
+  payload: { title?: string; body?: string; titulo?: string; mensaje?: string }
+  status: string
+  sent_at: string | null
+  created_at: string
+}
+
+const NOTIF_ICON_MAP: Record<string, string> = {
+  reminder: '⏰', cutoff_reminder: '⏰', bet_reminder: '⚽', result: '⚽',
+  ranking: '🔥', ranking_change: '📊', ranking_passed: '👊', near_podio: '🎯',
+  kickoff: '🟢', second_half: '⏱️', matchday_summary: '🏁', personal_record: '🔥',
+  streak_exactos: '⭐', tournament_tomorrow: '🏁', payment_pending: '💸',
+  match_rescheduled: '📅', message: '💬', winner: '👑',
+}
+
+function NotificationsSentPanel() {
+  const [notifs, setNotifs] = useState<AdminNotif[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [groupByUser, setGroupByUser] = useState(false)
+  const [expanded, setExpanded] = useState<Set<string>>(new Set())
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const res = await api.get('/admin/notifications?limit=50&sort=desc')
+      const data = res.data?.data
+      setNotifs(Array.isArray(data) ? data : [])
+    } catch (e: unknown) {
+      setError((e as { response?: { data?: { error?: string } } }).response?.data?.error || 'Error al cargar notificaciones')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => { load() }, [load])
+
+  const toggleUser = (uid: string) =>
+    setExpanded(prev => {
+      const next = new Set(prev)
+      next.has(uid) ? next.delete(uid) : next.add(uid)
+      return next
+    })
+
+  const fmtDate = (raw: string | null) => {
+    if (!raw) return '—'
+    try { return format(new Date(raw), 'dd MMM HH:mm', { locale: es }) } catch { return raw }
+  }
+
+  // Grouped view: Map<user_id, { label, items }>
+  const grouped = useCallback(() => {
+    const map = new Map<string, { label: string; items: AdminNotif[] }>()
+    for (const n of notifs) {
+      const key = n.user_id ?? 'sin-usuario'
+      if (!map.has(key)) map.set(key, { label: n.user_name ?? n.user_id ?? 'Sin usuario', items: [] })
+      map.get(key)!.items.push(n)
+    }
+    return map
+  }, [notifs])
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div>
+          <h3 className="text-sm font-bold text-[#001A4B]">📬 Últimas notificaciones enviadas</h3>
+          <p className="text-xs text-gray-400 mt-0.5">{notifs.length} notificaciones · últimas 50</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setGroupByUser(g => !g)}
+            className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-all ${
+              groupByUser ? 'bg-[#001A4B] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            👤 Agrupar por usuario
+          </button>
+          <button
+            onClick={load}
+            disabled={loading}
+            className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all disabled:opacity-50"
+          >
+            🔄 Actualizar
+          </button>
+        </div>
+      </div>
+
+      {/* States */}
+      {loading && <p className="text-xs text-gray-400 text-center py-4">Cargando...</p>}
+      {error && <p className="text-xs text-red-600 bg-red-50 rounded p-2">{error}</p>}
+      {!loading && !error && notifs.length === 0 && (
+        <p className="text-xs text-gray-400 text-center py-4">Sin notificaciones registradas.</p>
+      )}
+
+      {/* Flat view */}
+      {!loading && !groupByUser && notifs.length > 0 && (
+        <div className="border border-gray-100 rounded-lg overflow-hidden">
+          <table className="w-full text-xs">
+            <thead className="bg-gray-50 text-gray-600">
+              <tr>
+                <th className="text-left px-3 py-2">Tipo</th>
+                <th className="text-left px-3 py-2">Usuario</th>
+                <th className="text-left px-3 py-2">Título</th>
+                <th className="text-left px-3 py-2">Estado</th>
+                <th className="text-right px-3 py-2">Fecha</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {notifs.map(n => (
+                <tr key={n.id} className="hover:bg-gray-50">
+                  <td className="px-3 py-2 whitespace-nowrap">
+                    <span title={n.type}>{NOTIF_ICON_MAP[n.type] ?? '🔔'}</span>
+                    <span className="ml-1 text-gray-500">{n.type}</span>
+                  </td>
+                  <td className="px-3 py-2 font-medium text-gray-800">{n.user_name ?? n.user_id ?? '—'}</td>
+                  <td className="px-3 py-2 text-gray-600 max-w-[200px] truncate">
+                    {n.payload?.title ?? n.payload?.titulo ?? '—'}
+                  </td>
+                  <td className="px-3 py-2">
+                    <span className={`inline-block px-2 py-0.5 rounded-full font-semibold ${
+                      n.status === 'sent' || n.status === 'read' ? 'bg-green-100 text-green-700' :
+                      n.status === 'failed' ? 'bg-red-100 text-red-700' :
+                      'bg-yellow-100 text-yellow-700'
+                    }`}>{n.status}</span>
+                  </td>
+                  <td className="px-3 py-2 text-right text-gray-400 whitespace-nowrap">{fmtDate(n.sent_at ?? n.created_at)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Grouped view */}
+      {!loading && groupByUser && notifs.length > 0 && (
+        <div className="space-y-2">
+          {[...grouped().entries()].map(([uid, { label, items }]) => (
+            <div key={uid} className="border border-gray-100 rounded-lg overflow-hidden">
+              {/* User header — clickable to expand/collapse */}
+              <button
+                onClick={() => toggleUser(uid)}
+                className="w-full flex items-center justify-between px-4 py-2.5 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
+              >
+                <span className="font-semibold text-sm text-[#001A4B]">👤 {label}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs bg-[#001A4B] text-white px-2 py-0.5 rounded-full font-bold">{items.length}</span>
+                  <span className="text-gray-400 text-xs">{expanded.has(uid) ? '▲' : '▼'}</span>
+                </div>
+              </button>
+              {/* Notification rows */}
+              {expanded.has(uid) && (
+                <table className="w-full text-xs">
+                  <tbody className="divide-y divide-gray-100">
+                    {items.map(n => (
+                      <tr key={n.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-2 whitespace-nowrap w-8">
+                          {NOTIF_ICON_MAP[n.type] ?? '🔔'}
+                        </td>
+                        <td className="px-2 py-2 text-gray-500">{n.type}</td>
+                        <td className="px-2 py-2 text-gray-700 max-w-[200px] truncate">
+                          {n.payload?.title ?? n.payload?.titulo ?? '—'}
+                        </td>
+                        <td className="px-2 py-2">
+                          <span className={`inline-block px-2 py-0.5 rounded-full font-semibold ${
+                            n.status === 'sent' || n.status === 'read' ? 'bg-green-100 text-green-700' :
+                            n.status === 'failed' ? 'bg-red-100 text-red-700' :
+                            'bg-yellow-100 text-yellow-700'
+                          }`}>{n.status}</span>
+                        </td>
+                        <td className="px-2 py-2 text-right text-gray-400 whitespace-nowrap pr-4">{fmtDate(n.sent_at ?? n.created_at)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 /* ── CampanasTab ─────────────────────────────────────────────────────── */
 function CampanasTab() {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <CampaignBuilder />
-      <CampaignLiveActivity />
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <CampaignBuilder />
+        <CampaignLiveActivity />
+      </div>
+      <NotificationsSentPanel />
     </div>
   )
 }
