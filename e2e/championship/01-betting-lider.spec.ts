@@ -19,22 +19,9 @@ const AUTH_FILE = path.join(import.meta.dirname, '../.auth/lider.json')
 test.use({ storageState: AUTH_FILE })
 
 async function selectPlanilla(page: any) {
-  // Select the E2E planilla from the dropdown
-  const selector = page.locator('[data-tour="planilla-selector"]')
-  await selector.waitFor({ timeout: 10_000 })
-  // Try to find and click the planilla option
-  const planillaText = PLANILLA_NAMES.lider
-  const option = selector.getByText(planillaText)
-  if (await option.isVisible().catch(() => false)) {
-    await option.click()
-  } else {
-    // If it's a native select
-    await selector.locator('select').selectOption({ label: planillaText }).catch(async () => {
-      // If it's a custom dropdown, click to open then select
-      await selector.click()
-      await page.getByText(planillaText).click()
-    })
-  }
+  const select = page.locator('[data-tour="planilla-selector"] select')
+  await select.waitFor({ state: 'attached', timeout: 15_000 })
+  await select.selectOption({ label: PLANILLA_NAMES.lider })
 }
 
 async function placeBetInUI(
