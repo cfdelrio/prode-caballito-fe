@@ -72,7 +72,9 @@ async function placeBetInUI(
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/apuestas')
-  await page.waitForSelector('[data-tour="planilla-selector"]', { timeout: 15_000 })
+  // Verify we're on /apuestas (not redirected to /login due to expired auth)
+  await expect(page).not.toHaveURL(/\/login/, { timeout: 10_000 })
+  await page.waitForSelector('[data-tour="planilla-selector"]', { timeout: 30_000 })
   await selectPlanilla(page)
 })
 

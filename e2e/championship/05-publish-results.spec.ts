@@ -14,8 +14,8 @@ import { RESULTS, MATCHES } from './helpers/fixture'
 const AUTH_FILE = path.join(import.meta.dirname, '../.auth/user.json')
 test.use({ storageState: AUTH_FILE })
 
-const ADMIN_EMAIL    = process.env.E2E_ADMIN_EMAIL    ?? 'cfdelrio@gmail.com'
-const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD ?? 'qatar2022'
+const ADMIN_EMAIL    = process.env.E2E_ADMIN_EMAIL?.trim()    || 'cfdelrio@gmail.com'
+const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD?.trim() || 'carlitos'
 
 // Publish all 4 results before browser assertions
 test.beforeAll(async () => {
