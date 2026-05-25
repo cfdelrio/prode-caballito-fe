@@ -12,6 +12,7 @@ import { useAuthStore } from '@/store/authStore'
 import type { Match, Tournament } from '@/types'
 import { CampaignBuilder } from '@/components/CampaignBuilder'
 import { CampaignLiveActivity } from '@/components/CampaignLiveActivity'
+import { EngageVerifyPanel } from '@/components/EngageVerifyPanel'
 
 type Tab = 'partidos' | 'planillas' | 'usuarios' | 'torneos' | 'broadcast' | 'jobs' | 'polls' | 'campanas'
 
@@ -1731,9 +1732,12 @@ function PollsTab() {
 /* ── CampanasTab ─────────────────────────────────────────────────────── */
 function CampanasTab() {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <CampaignBuilder />
-      <CampaignLiveActivity />
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <CampaignBuilder />
+        <CampaignLiveActivity />
+      </div>
+      <EngageVerifyPanel />
     </div>
   )
 }
