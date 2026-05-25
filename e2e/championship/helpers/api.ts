@@ -40,10 +40,11 @@ export class ApiClient {
     })
     const loginData = await loginRes.json()
     const loginToken = loginData.data?.token ?? loginData.token
-    if (loginData.success && loginToken) {
+    const loginUserId = loginData.data?.user?.id
+    if (loginData.success && loginToken && loginUserId) {
       return {
         client: new ApiClient(loginToken),
-        userId: loginData.data?.user?.id ?? loginData.user?.id ?? loginData.userId,
+        userId: loginUserId,
       }
     }
     // Register
@@ -59,7 +60,16 @@ export class ApiClient {
     }
     // Login after register to get a fresh token
     const client = await ApiClient.login(email, password)
-    const userId = regData.data?.user?.id ?? regData.user?.id ?? regData.userId
+    const loginAfterRegRes = await fetch(`${API_BASE}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    })
+    const loginAfterRegData = await loginAfterRegRes.json()
+    const userId = loginAfterRegData.data?.user?.id
+    if (!userId) {
+      throw new Error(`Could not extract userId after register for ${email}`)
+    }
     return { client, userId }
   }
 
