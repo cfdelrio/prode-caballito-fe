@@ -16,6 +16,7 @@ import {
   createMatchPastCutoff,
   createPlanilla,
   renamePlanilla,
+  publishResult,
 } from './helpers/api'
 import { writeState } from './helpers/state'
 import { MATCHES, PLANILLA_NAMES } from './helpers/fixture'
@@ -60,6 +61,12 @@ async function globalSetup() {
     }
   }
   console.log(`  ✓ ${Object.keys(matchIds).length} matches created`)
+
+  // Publish mCutoff result immediately so it's 'finished' before planilla locking.
+  // The lock validation checks ALL pending matches globally — if mCutoff stays pending
+  // with no bets it would block locking even though it's not in the tournament.
+  await publishResult(admin, matchIds.mCutoff, 1, 0)
+  console.log('  ✓ mCutoff result published (match now finished, won\'t block planilla lock)')
 
   // 4. Register/login test users
   const userIds:   Record<string, string> = {}
