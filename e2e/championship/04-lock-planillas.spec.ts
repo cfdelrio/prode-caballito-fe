@@ -11,13 +11,13 @@ import { test, expect } from '@playwright/test'
 import { ApiClient, lockPlanilla } from './helpers/api'
 import { readState } from './helpers/state'
 
-const ADMIN_EMAIL    = process.env.E2E_ADMIN_EMAIL    ?? 'cfdelrio@gmail.com'
-const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD ?? 'qatar2022'
+const ADMIN_EMAIL    = process.env.E2E_ADMIN_EMAIL?.trim()    || 'cfdelrio@gmail.com'
+const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD?.trim() || 'carlitos'
 
-const LIDER_EMAIL   = process.env.E2E_LIDER_EMAIL  ?? 'e2e.lider@prode.test'
-const LIDER_PASS    = process.env.E2E_LIDER_PASS   ?? 'e2etest2026'
-const RIVAL_EMAIL   = process.env.E2E_RIVAL_EMAIL  ?? 'e2e.rival@prode.test'
-const RIVAL_PASS    = process.env.E2E_RIVAL_PASS   ?? 'e2etest2026'
+const LIDER_EMAIL   = process.env.E2E_LIDER_EMAIL?.trim()  || 'cfdelrio.e2e.lider@gmail.com'
+const LIDER_PASS    = process.env.E2E_LIDER_PASS?.trim()   || 'e2etest2026'
+const RIVAL_EMAIL   = process.env.E2E_RIVAL_EMAIL?.trim()  || 'cfdelrio.e2e.rival@gmail.com'
+const RIVAL_PASS    = process.env.E2E_RIVAL_PASS?.trim()   || 'e2etest2026'
 
 test('Lider puede cerrar su planilla (todas las apuestas ya están colocadas)', async () => {
   const state  = readState()
