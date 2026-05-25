@@ -2,10 +2,14 @@
  * Championship auth setup — creates test users via API (if needed) and
  * injects their JWT tokens directly into localStorage. No browser login.
  *
- * This avoids rate limiting from multiple login attempts and is ~5x faster.
+ * Runs serially (mode: serial) to avoid hammering the rate limiter with
+ * 3 simultaneous login attempts from the same CI IP.
  */
 import { test as setup, expect } from '@playwright/test'
 import path from 'path'
+
+// Run all 3 auth tests one at a time (not in parallel)
+setup.describe.configure({ mode: 'serial' })
 
 export const AUTH_LIDER   = path.join(import.meta.dirname, '.auth/lider.json')
 export const AUTH_RIVAL   = path.join(import.meta.dirname, '.auth/rival.json')
@@ -14,6 +18,8 @@ export const AUTH_VIRTUAL = path.join(import.meta.dirname, '.auth/virtual.json')
 const API_BASE =
   process.env.API_BASE?.trim() ||
   'https://t49euho172.execute-api.us-east-1.amazonaws.com/prod/api'
+
+const API_TIMEOUT = 10_000
 
 const USERS = [
   {
@@ -48,17 +54,24 @@ interface AuthData {
 interface LoginResult {
   data: AuthData | null
   error: string
+  rateLimited: boolean
 }
 
 async function loginViaAPI(email: string, password: string): Promise<LoginResult> {
-  const res = await fetch(`${API_BASE}/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  })
-  const body = await res.json()
-  if (body.success && body.data?.token) return { data: body.data, error: '' }
-  return { data: null, error: body.error || JSON.stringify(body) }
+  try {
+    const res = await fetch(`${API_BASE}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+      signal: AbortSignal.timeout(API_TIMEOUT),
+    })
+    const body = await res.json()
+    if (body.success && body.data?.token) return { data: body.data, error: '', rateLimited: false }
+    const rateLimited = res.status === 429 || Boolean(body.error?.includes('Demasiados'))
+    return { data: null, error: body.error || JSON.stringify(body), rateLimited }
+  } catch (e: any) {
+    return { data: null, error: e.message, rateLimited: false }
+  }
 }
 
 async function loginOrRegisterViaAPI(
@@ -66,50 +79,48 @@ async function loginOrRegisterViaAPI(
   password: string,
   nombre: string,
 ): Promise<AuthData> {
-  // Try login first
+  // Attempt 1: login
   const first = await loginViaAPI(email, password)
   if (first.data) return first.data
   console.log(`  Login failed for ${email}: ${first.error}`)
 
-  // If rate-limited on login, wait and retry before trying register
-  if (first.error.includes('Demasiados')) {
-    console.log(`  Rate limited — waiting 60s...`)
-    await new Promise(r => setTimeout(r, 60_000))
+  if (first.rateLimited) {
+    // Rate limited — wait 20s then retry login (don't attempt register, it'll also be blocked)
+    console.log(`  Rate limited — waiting 20s...`)
+    await new Promise(r => setTimeout(r, 20_000))
     const retry = await loginViaAPI(email, password)
     if (retry.data) return retry.data
-    console.log(`  Retry after 60s failed: ${retry.error}`)
+    console.log(`  Login retry after 20s: ${retry.error}`)
   }
 
-  // Try register
-  const regRes = await fetch(`${API_BASE}/auth/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password, nombre }),
-  })
-  const regData = await regRes.json()
-  if (regData.success && regData.data?.token) {
-    console.log(`  ✓ Registered new test user: ${email}`)
-    return regData.data
-  }
-  console.log(`  Register failed for ${email}: ${regData.error}`)
-
-  // User already exists but login failed → likely rate-limited; retry with backoff
-  const backoff = [10_000, 20_000, 30_000, 60_000]
-  for (const delay of backoff) {
-    console.log(`  Waiting ${delay / 1000}s before login retry...`)
-    await new Promise(r => setTimeout(r, delay))
-    const retry = await loginViaAPI(email, password)
-    if (retry.data) {
-      console.log(`  ✓ Login succeeded after ${delay / 1000}s wait`)
-      return retry.data
+  // Not rate limited (or rate limit cleared) — try register
+  try {
+    const regRes = await fetch(`${API_BASE}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, nombre }),
+      signal: AbortSignal.timeout(API_TIMEOUT),
+    })
+    const regData = await regRes.json()
+    if (regData.success && regData.data?.token) {
+      console.log(`  ✓ Registered new test user: ${email}`)
+      return regData.data
     }
-    console.log(`  Still failing: ${retry.error}`)
-  }
+    console.log(`  Register failed: ${regData.error}`)
 
-  throw new Error(
-    `Could not authenticate ${email}. ` +
-    `Login: ${first.error} | Register: ${regData.error}`,
-  )
+    // "already registered" means user exists — just login is failing
+    if (regData.error?.includes('ya está registrado')) {
+      console.log(`  User exists, retrying login in 5s...`)
+      await new Promise(r => setTimeout(r, 5_000))
+      const retry = await loginViaAPI(email, password)
+      if (retry.data) return retry.data
+      throw new Error(`User ${email} exists but login still fails: ${retry.error}`)
+    }
+
+    throw new Error(`Register error: ${regData.error}`)
+  } catch (e: any) {
+    throw new Error(`Could not authenticate ${email}: ${e.message}`)
+  }
 }
 
 for (const user of USERS) {
@@ -134,7 +145,7 @@ for (const user of USERS) {
     // 5. Save storageState for use in championship specs
     await page.context().storageState({ path: user.authFile })
 
-    // Delay between users to avoid rate limiting
+    // Delay between users to reduce rate limit pressure
     await new Promise(r => setTimeout(r, 2_000))
   })
 }
