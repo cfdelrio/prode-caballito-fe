@@ -12,17 +12,9 @@ const AUTH_FILE = path.join(import.meta.dirname, '../.auth/rival.json')
 test.use({ storageState: AUTH_FILE })
 
 async function selectPlanilla(page: any) {
-  const selector = page.locator('[data-tour="planilla-selector"]')
-  await selector.waitFor({ timeout: 10_000 })
-  const option = selector.getByText(PLANILLA_NAMES.rival)
-  if (await option.isVisible().catch(() => false)) {
-    await option.click()
-  } else {
-    await selector.locator('select').selectOption({ label: PLANILLA_NAMES.rival }).catch(async () => {
-      await selector.click()
-      await page.getByText(PLANILLA_NAMES.rival).click()
-    })
-  }
+  const select = page.locator('[data-tour="planilla-selector"] select')
+  await select.waitFor({ state: 'attached', timeout: 15_000 })
+  await select.selectOption({ label: PLANILLA_NAMES.rival })
 }
 
 async function placeBetInUI(page: any, homeTeam: string, awayTeam: string, score: string) {
