@@ -23,39 +23,39 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('/ranking muestra Lider en posición #1', async ({ page }) => {
-  const liderRow = page.getByRole('row').filter({ hasText: PLANILLA_NAMES.lider })
+  const liderRow = page.locator('.row-entrance').filter({ hasText: PLANILLA_NAMES.lider })
   await expect(liderRow).toBeVisible()
   // Should show position 1 (as number, #1, or medal emoji 🥇)
   await expect(liderRow.getByText(/^1$|^#1$|🥇/).or(liderRow.getByText('1').first())).toBeVisible()
 })
 
 test('/ranking muestra Lider con 13 puntos', async ({ page }) => {
-  const liderRow = page.getByRole('row').filter({ hasText: PLANILLA_NAMES.lider })
+  const liderRow = page.locator('.row-entrance').filter({ hasText: PLANILLA_NAMES.lider })
   await expect(liderRow.getByText(String(TOTALS.lider.pts))).toBeVisible()
 })
 
 test('/ranking muestra Rival en posición #2', async ({ page }) => {
-  const rivalRow = page.getByRole('row').filter({ hasText: PLANILLA_NAMES.rival })
+  const rivalRow = page.locator('.row-entrance').filter({ hasText: PLANILLA_NAMES.rival })
   await expect(rivalRow).toBeVisible()
   await expect(rivalRow.getByText(/^2$|^#2$|🥈/).or(rivalRow.getByText('2').first())).toBeVisible()
 })
 
 test('/ranking muestra Virtual con badge "No oficial"', async ({ page }) => {
-  const virtualRow = page.getByRole('row').filter({ hasText: PLANILLA_NAMES.virtual })
+  const virtualRow = page.locator('.row-entrance').filter({ hasText: PLANILLA_NAMES.virtual })
   await expect(virtualRow).toBeVisible()
   await expect(virtualRow.getByText(/no oficial|no pagad/i)).toBeVisible()
 })
 
 test('Lider aparece antes que Rival en el DOM (orden visual)', async ({ page }) => {
-  const liderRow = page.getByRole('row').filter({ hasText: PLANILLA_NAMES.lider })
-  const rivalRow = page.getByRole('row').filter({ hasText: PLANILLA_NAMES.rival })
+  const liderRow = page.locator('.row-entrance').filter({ hasText: PLANILLA_NAMES.lider })
+  const rivalRow = page.locator('.row-entrance').filter({ hasText: PLANILLA_NAMES.rival })
   const liderBox = await liderRow.boundingBox()
   const rivalBox = await rivalRow.boundingBox()
   expect(liderBox?.y).toBeLessThan(rivalBox?.y ?? Infinity)
 })
 
 test('Clic en fila del Lider abre drawer con stats', async ({ page }) => {
-  const liderRow = page.getByRole('row').filter({ hasText: PLANILLA_NAMES.lider })
+  const liderRow = page.locator('.row-entrance').filter({ hasText: PLANILLA_NAMES.lider })
   await liderRow.click()
   // Drawer/modal should open with planilla details
   const drawer = page.locator('[class*="drawer"], [class*="modal"], [class*="fixed"]')
@@ -70,7 +70,7 @@ test('Clic en fila del Lider abre drawer con stats', async ({ page }) => {
 
 test('Favoritos: marcar Rival como favorito y filtrar', async ({ page }) => {
   // Find and click the favorite button (⭐) for Rival (not own row)
-  const rivalRow = page.getByRole('row').filter({ hasText: PLANILLA_NAMES.rival })
+  const rivalRow = page.locator('.row-entrance').filter({ hasText: PLANILLA_NAMES.rival })
   const favBtn   = rivalRow.getByRole('button').filter({ hasText: /⭐|☆|fav/i }).first()
   const hasFavBtn = await favBtn.isVisible().catch(() => false)
   if (!hasFavBtn) {
@@ -85,7 +85,7 @@ test('Favoritos: marcar Rival como favorito y filtrar', async ({ page }) => {
   await filterBtn.click()
 
   // Rival should still be visible in the filtered view
-  await expect(rivalRow).toBeVisible({ timeout: 5_000 })
+  await expect(page.locator('.row-entrance').filter({ hasText: PLANILLA_NAMES.rival })).toBeVisible({ timeout: 5_000 })
 
   // Clean up: unmark favorite and clear filter
   await favBtn.click()
