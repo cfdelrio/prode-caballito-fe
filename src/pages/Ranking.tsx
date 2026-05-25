@@ -58,10 +58,18 @@ function RankingContentSkeleton() {
     </>
   )
 }
+import { useRankingDeltas } from '@/hooks/useRankingDeltas'
 import type { RankingEntry } from '@/types'
 
 const MEDAL = ['🥇', '🥈', '🥉']
+const PODIUM_BORDER = ['border-l-2 border-l-yellow-400', 'border-l-2 border-l-slate-300', 'border-l-2 border-l-amber-600/60']
 
+function getPlayerBadge(r: RankingEntry): { emoji: string; label: string } | null {
+  if (r.exactos_count >= 10) return { emoji: '🎯', label: 'Sniper' }
+  if (r.aciertos_celeste >= 5) return { emoji: '⚡', label: 'Bonus' }
+  if (r.position > 5 && r.exactos_count >= 5) return { emoji: '🎭', label: 'Tapado' }
+  return null
+}
 
 export function Ranking() {
   const { user } = useAuthStore()
@@ -146,6 +154,7 @@ export function Ranking() {
   }, [togglingFav, show, t])
 
   const myEntry = ranking.find((r) => r.user_id === user?.id)
+  const deltas = useRankingDeltas(ranking)
 
   if (loading) return <RankingSkeleton />
 
@@ -227,6 +236,33 @@ export function Ranking() {
                   <p className="text-white/60 text-xs">{t.ranking.points}</p>
                 </div>
               </div>
+
+              {/* Social pressure — gap to rival */}
+              {myEntry.position === 1 && (() => {
+                const below = ranking.find(r => r.position === 2)
+                if (!below || !myEntry.puntos_totales) return null
+                const gap = myEntry.puntos_totales - below.puntos_totales
+                return (
+                  <p className="text-yellow-300/70 text-xs text-center mt-2">
+                    {gap === 0
+                      ? `¡${below.user_name} te empató! 👀 Cuidado`
+                      : `${below.user_name} te persigue a ${gap} pt${gap !== 1 ? 's' : ''} 🔥`}
+                  </p>
+                )
+              })()}
+              {myEntry.position > 1 && (() => {
+                const above = ranking.find(r => r.position === myEntry.position - 1)
+                if (!above) return null
+                const gap = above.puntos_totales - myEntry.puntos_totales
+                return (
+                  <p className="text-white/50 text-xs text-center mt-2">
+                    {gap === 0
+                      ? `Empatado con ${above.user_name} 🤝`
+                      : `${above.user_name} te lleva ${gap} pt${gap !== 1 ? 's' : ''} — podés alcanzarlo`}
+                  </p>
+                )
+              })()}
+
               {myEntry.puntos_totales > 0 && (
                 <button
                   onClick={handleShareMine}
@@ -267,11 +303,22 @@ export function Ranking() {
                 const isMe = r.user_id === user?.id
                 const isFav = favorites.has(r.planilla_id)
                 const isToggling = togglingFav === r.planilla_id
+                const deltaInfo = deltas.get(r.planilla_id)
+                const rankChangeClass = deltaInfo?.delta && deltaInfo.delta > 0
+                  ? 'row-rank-up'
+                  : deltaInfo?.delta && deltaInfo.delta < 0
+                    ? 'row-rank-down'
+                    : deltaInfo?.isNew
+                      ? 'row-rank-new'
+                      : ''
+                const podiumBorder = i < 3 ? PODIUM_BORDER[i] : ''
+                const playerBadge = !isMe ? getPlayerBadge(r) : null
                 return (
                   <div
                     key={r.planilla_id}
                     onClick={() => setSelected(r)}
-                    className={`grid grid-cols-[2rem_1fr_auto_auto_2rem] gap-2 items-center px-4 py-3 cursor-pointer transition-colors ${i < displayRanking.length - 1 ? `border-b ${i === 0 ? 'border-yellow-100' : 'border-gray-50'}` : ''} ${i === 0 ? 'bg-yellow-50' : (isMe ? 't-row-me' : 'hover:bg-gray-50')}`}
+                    style={{ '--row-i': Math.min(i, 25) } as React.CSSProperties}
+                    className={`row-entrance ${rankChangeClass} ${podiumBorder} grid grid-cols-[2rem_1fr_auto_auto_2rem] gap-2 items-center px-4 py-3 cursor-pointer transition-colors ${i < displayRanking.length - 1 ? `border-b ${i === 0 ? 'border-yellow-100' : 'border-gray-50'}` : ''} ${i === 0 ? 'bg-yellow-50' : (isMe ? 't-row-me' : 'hover:bg-gray-50')}`}
                   >
                     <span className="text-sm font-bold text-gray-400">
                       {i < 3 ? MEDAL[i] : r.position}
@@ -284,11 +331,33 @@ export function Ranking() {
                           </div>
                       }
                       <div className="min-w-0">
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 flex-wrap">
                           <p className={`text-sm font-semibold truncate ${isMe ? 't-text-primary' : 't-text-nav'}`}>
                             {r.user_name} {isMe && <span className="text-xs font-normal">{t.ranking.you}</span>}
                           </p>
                           {isMe && myStreak >= 3 && <StreakBadge streak={myStreak} />}
+                          {/* Gamification badge for other players */}
+                          {playerBadge && (
+                            <span className="inline-flex items-center gap-0.5 text-[9px] px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-600 font-bold shrink-0">
+                              {playerBadge.emoji} {playerBadge.label}
+                            </span>
+                          )}
+                          {/* Position delta badge */}
+                          {deltaInfo && deltaInfo.delta > 0 && (
+                            <span className="inline-flex items-center gap-0.5 text-[9px] px-1 py-0.5 rounded bg-green-100 text-green-600 font-bold shrink-0 leading-none">
+                              ↑{deltaInfo.delta}
+                            </span>
+                          )}
+                          {deltaInfo && deltaInfo.delta < 0 && (
+                            <span className="inline-flex items-center gap-0.5 text-[9px] px-1 py-0.5 rounded bg-red-100 text-red-500 font-bold shrink-0 leading-none">
+                              ↓{Math.abs(deltaInfo.delta)}
+                            </span>
+                          )}
+                          {deltaInfo?.isNew && (
+                            <span className="inline-flex items-center text-[9px] px-1 py-0.5 rounded bg-yellow-100 text-yellow-600 font-bold shrink-0 leading-none">
+                              ★ nuevo
+                            </span>
+                          )}
                           {r.whatsapp_number && (
                             <a
                               href={`https://wa.me/${r.whatsapp_number}`}
@@ -399,6 +468,21 @@ export function Ranking() {
                   </div>
                 ))}
               </div>
+
+              {/* Gap to leader */}
+              {selected.position > 1 && ranking.length > 0 && (
+                <div className="mt-3 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-center">
+                  <p className="text-xs text-blue-600 font-medium">
+                    {(() => {
+                      const leader = ranking[0]
+                      const gap = leader.puntos_totales - selected.puntos_totales
+                      return gap === 0
+                        ? `¡Empató con el líder ${leader.user_name}! 🤝`
+                        : `A ${gap} pt${gap !== 1 ? 's' : ''} del líder ${leader.user_name} 🏆`
+                    })()}
+                  </p>
+                </div>
+              )}
               <div className="flex gap-3 mt-5">
                 <Link
                   to={`/planilla/${selected.planilla_id}`}

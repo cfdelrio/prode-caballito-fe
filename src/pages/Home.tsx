@@ -219,7 +219,7 @@ function NextMatchDesktopPanel({ matches, bets }: { matches: Match[]; bets: Reco
   const cdSecs  = Math.floor((diffMs % 60000) / 1000)
 
   return (
-    <div className="hidden md:flex flex-col justify-center px-6 py-5 md:flex-[2] border-l border-gray-100 bg-white gap-4">
+    <div className="hidden md:flex flex-col justify-between px-6 py-6 md:flex-[2] border-l border-gray-100 bg-white gap-3">
       <div className="text-center">
         <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">
           FALTA PARA EL PRÓXIMO PARTIDO
