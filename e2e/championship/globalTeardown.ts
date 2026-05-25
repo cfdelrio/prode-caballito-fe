@@ -11,8 +11,8 @@
 import { ApiClient, deleteMatch, deletePlanilla, deactivateTournament } from './helpers/api'
 import { readState, deleteState } from './helpers/state'
 
-const ADMIN_EMAIL    = process.env.E2E_ADMIN_EMAIL    ?? 'cfdelrio@gmail.com'
-const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD ?? 'qatar2022'
+const ADMIN_EMAIL    = process.env.E2E_ADMIN_EMAIL?.trim()    || 'cfdelrio@gmail.com'
+const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD?.trim() || 'qatar2022'
 
 async function globalTeardown() {
   if (process.env.E2E_SKIP_TEARDOWN === 'true') {

@@ -20,22 +20,22 @@ const API_BASE =
 const USERS = [
   {
     key:      'lider',
-    email:    process.env.E2E_LIDER_EMAIL   ?? 'e2e.lider@prode.test',
-    password: process.env.E2E_LIDER_PASS    ?? 'e2etest2026',
+    email:    process.env.E2E_LIDER_EMAIL?.trim()   || 'cfdelrio.e2e.lider@gmail.com',
+    password: process.env.E2E_LIDER_PASS?.trim()    || 'e2etest2026',
     nombre:   'E2E Lider',
     authFile: AUTH_LIDER,
   },
   {
     key:      'rival',
-    email:    process.env.E2E_RIVAL_EMAIL   ?? 'e2e.rival@prode.test',
-    password: process.env.E2E_RIVAL_PASS    ?? 'e2etest2026',
+    email:    process.env.E2E_RIVAL_EMAIL?.trim()   || 'cfdelrio.e2e.rival@gmail.com',
+    password: process.env.E2E_RIVAL_PASS?.trim()    || 'e2etest2026',
     nombre:   'E2E Rival',
     authFile: AUTH_RIVAL,
   },
   {
     key:      'virtual',
-    email:    process.env.E2E_VIRTUAL_EMAIL ?? 'e2e.virtual@prode.test',
-    password: process.env.E2E_VIRTUAL_PASS  ?? 'e2etest2026',
+    email:    process.env.E2E_VIRTUAL_EMAIL?.trim() || 'cfdelrio.e2e.virtual@gmail.com',
+    password: process.env.E2E_VIRTUAL_PASS?.trim()  || 'e2etest2026',
     nombre:   'E2E Virtual',
     authFile: AUTH_VIRTUAL,
   },

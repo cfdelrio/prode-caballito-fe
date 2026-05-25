@@ -21,13 +21,13 @@ import {
 import { writeState } from './helpers/state'
 import { MATCHES, PLANILLA_NAMES } from './helpers/fixture'
 
-const ADMIN_EMAIL    = process.env.E2E_ADMIN_EMAIL    ?? 'cfdelrio@gmail.com'
-const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD ?? 'qatar2022'
+const ADMIN_EMAIL    = process.env.E2E_ADMIN_EMAIL?.trim()    || 'cfdelrio@gmail.com'
+const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD?.trim() || 'qatar2022'
 
 const USERS = {
-  lider:   { email: process.env.E2E_LIDER_EMAIL   ?? 'e2e.lider@prode.test',   password: 'e2etest2026', nombre: 'E2E Lider'   },
-  rival:   { email: process.env.E2E_RIVAL_EMAIL   ?? 'e2e.rival@prode.test',   password: 'e2etest2026', nombre: 'E2E Rival'   },
-  virtual: { email: process.env.E2E_VIRTUAL_EMAIL ?? 'e2e.virtual@prode.test', password: 'e2etest2026', nombre: 'E2E Virtual' },
+  lider:   { email: process.env.E2E_LIDER_EMAIL?.trim()   || 'cfdelrio.e2e.lider@gmail.com',   password: 'e2etest2026', nombre: 'E2E Lider'   },
+  rival:   { email: process.env.E2E_RIVAL_EMAIL?.trim()   || 'cfdelrio.e2e.rival@gmail.com',   password: 'e2etest2026', nombre: 'E2E Rival'   },
+  virtual: { email: process.env.E2E_VIRTUAL_EMAIL?.trim() || 'cfdelrio.e2e.virtual@gmail.com', password: 'e2etest2026', nombre: 'E2E Virtual' },
 }
 
 async function globalSetup() {
