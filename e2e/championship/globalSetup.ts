@@ -7,7 +7,6 @@
  *   - 1 match with past cutoff (for cutoff enforcement tests)
  *   - 3 test users (lider, rival, virtual) — registers if not exist
  *   - 3 planillas, one per user — named with [E2E] prefix
- *   - Marks lider and rival planillas as paid (via admin)
  */
 import {
   ApiClient,
@@ -34,69 +33,65 @@ const USERS = {
 async function globalSetup() {
   console.log('\n🏆 Championship globalSetup starting...')
 
-  // 1. Admin login
+  // Step 1: Admin login
   const admin = await ApiClient.login(ADMIN_EMAIL, ADMIN_PASSWORD)
   console.log('  ✓ Admin logged in')
 
-  // 2. Create tournament
-  const ts            = Date.now()
-  const tournamentId  = await createTournament(admin, `[E2E] Copa Test ${ts}`)
+  // Step 2: Create tournament (matches need its ID)
+  const ts           = Date.now()
+  const tournamentId = await createTournament(admin, `[E2E] Copa Test ${ts}`)
   console.log(`  ✓ Tournament created: ${tournamentId}`)
 
-  // 3. Create 4 main matches + 1 with past cutoff
-  // Note: mCutoff has NO tournament_id — keeps it out of planilla lock validation
-  const matchIds: Record<string, string> = {}
-  for (const [key, m] of Object.entries(MATCHES)) {
-    if (key === 'mCutoff') {
-      matchIds[key] = await createMatchPastCutoff(admin, {
-        home_team: m.home,
-        away_team: m.away,
+  // Step 3: Create all matches + register all users in parallel (independent)
+  const [matchEntries, userResults] = await Promise.all([
+    Promise.all(
+      Object.entries(MATCHES).map(async ([key, m]) => {
+        const id = key === 'mCutoff'
+          ? await createMatchPastCutoff(admin, { home_team: m.home, away_team: m.away })
+          : await createMatch(admin, { home_team: m.home, away_team: m.away, tournament_id: tournamentId, jornada: m.jornada })
+        return [key, id] as const
       })
-    } else {
-      matchIds[key] = await createMatch(admin, {
-        home_team:     m.home,
-        away_team:     m.away,
-        tournament_id: tournamentId,
-        jornada:       m.jornada,
-      })
-    }
-  }
+    ),
+    Promise.all(
+      Object.entries(USERS).map(([key, u]) =>
+        ApiClient.loginOrRegister(u.email, u.password, u.nombre).then(r => [key, r] as const)
+      )
+    ),
+  ])
+
+  const matchIds: Record<string, string> = Object.fromEntries(matchEntries)
   console.log(`  ✓ ${Object.keys(matchIds).length} matches created`)
 
-  // Publish mCutoff result immediately so it's 'finished' before planilla locking.
-  // The lock validation checks ALL pending matches globally — if mCutoff stays pending
-  // with no bets it would block locking even though it's not in the tournament.
-  await publishResult(admin, matchIds.mCutoff, 1, 0)
-  console.log('  ✓ mCutoff result published (match now finished, won\'t block planilla lock)')
-
-  // 4. Register/login test users
-  const userIds:   Record<string, string> = {}
+  const userIds:    Record<string, string> = {}
   const userTokens: Record<string, string> = {}
-  for (const [key, u] of Object.entries(USERS)) {
-    const { client, userId } = await ApiClient.loginOrRegister(u.email, u.password, u.nombre)
+  for (const [key, { client, userId }] of userResults) {
     userIds[key]    = userId
     userTokens[key] = client.token
-    // Small delay to avoid rate limiting
-    await new Promise(r => setTimeout(r, 400))
   }
   console.log('  ✓ Test users ready')
 
-  // 5. Create planillas for each user
-  const planillaIds: Record<string, string> = {}
-  for (const [key, u] of Object.entries(USERS)) {
-    const userClient = new ApiClient(userTokens[key])
-    const planillaId = await createPlanilla(userClient)
-    await renamePlanilla(userClient, planillaId, PLANILLA_NAMES[key as keyof typeof PLANILLA_NAMES])
-    planillaIds[key] = planillaId
-    await new Promise(r => setTimeout(r, 300))
-  }
-  console.log('  ✓ Planillas created and renamed')
+  // Step 4: Publish mCutoff + create planillas in parallel
+  // - mCutoff must be 'finished' before planilla locking (spec 04).
+  //   Lock validation checks ALL pending matches globally; mCutoff has no tournament
+  //   but would block locking if it stayed pending.
+  // - Planillas are independent of mCutoff publish.
+  const [, planillaEntries] = await Promise.all([
+    publishResult(admin, matchIds.mCutoff, 1, 0),
+    Promise.all(
+      Object.keys(USERS).map(async key => {
+        const userClient = new ApiClient(userTokens[key])
+        const planillaId = await createPlanilla(userClient)
+        await renamePlanilla(userClient, planillaId, PLANILLA_NAMES[key as keyof typeof PLANILLA_NAMES])
+        return [key, planillaId] as const
+      })
+    ),
+  ])
 
-  // 6. Planillas are NOT locked yet — locking happens in spec 04 after all bets
-  //    are placed through the browser UI (specs 01-03).
+  const planillaIds: Record<string, string> = Object.fromEntries(planillaEntries)
+  console.log('  ✓ mCutoff result published + planillas created and renamed')
   console.log('  ✓ Planillas ready (locking happens after betting in spec 04)')
 
-  // 7. Persist state for all specs
+  // Step 5: Persist state for all specs
   writeState({ tournamentId, matchIds, planillaIds, userIds })
   console.log('  ✓ State persisted to .champ-state.json')
   console.log('🏆 Championship globalSetup complete!\n')

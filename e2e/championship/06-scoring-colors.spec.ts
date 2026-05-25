@@ -22,8 +22,11 @@ test.use({ storageState: AUTH_FILE })
 test.beforeEach(async ({ page }) => {
   await page.goto('/matriz')
   await page.waitForSelector('table', { timeout: 20_000 })
-  // Wait for all cells to have color data (not loading state)
-  await page.waitForTimeout(2_000)
+  // Wait for scoring cells to render with color data (not loading state)
+  await page.waitForSelector(
+    '[class*="sky-"], [class*="red-"], [class*="yellow-"], [class*="gray-"]',
+    { timeout: 15_000 }
+  )
 })
 
 // Helper: find a player's row in the matrix

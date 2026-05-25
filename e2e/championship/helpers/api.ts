@@ -15,6 +15,7 @@ export class ApiClient {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
+      signal: AbortSignal.timeout(15_000),
     })
     const data = await res.json()
     // Auth responses are wrapped: { success, data: { token, user, refreshToken } }
@@ -35,6 +36,7 @@ export class ApiClient {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
+      signal: AbortSignal.timeout(15_000),
     })
     const loginData = await loginRes.json()
     const loginToken = loginData.data?.token ?? loginData.token
@@ -49,6 +51,7 @@ export class ApiClient {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password, nombre }),
+      signal: AbortSignal.timeout(15_000),
     })
     const regData = await regRes.json()
     if (!regData.success) {
@@ -68,6 +71,7 @@ export class ApiClient {
         Authorization: `Bearer ${this.token}`,
       },
       body: body ? JSON.stringify(body) : undefined,
+      signal: AbortSignal.timeout(15_000),
     })
     const data = await res.json()
     return data

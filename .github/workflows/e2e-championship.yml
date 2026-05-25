@@ -19,7 +19,7 @@ jobs:
   championship:
     name: Simular campeonato completo
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
 
     # Si se disparó por workflow_run, solo correr si el deploy fue exitoso
     if: >
