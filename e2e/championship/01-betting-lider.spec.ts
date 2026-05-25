@@ -15,18 +15,9 @@ import { BETS_LIDER, MATCHES, PLANILLA_NAMES } from './helpers/fixture'
 const AUTH_FILE = path.join(import.meta.dirname, '../.auth/lider.json')
 
 async function selectPlanilla(page: Page) {
-  const selector = page.locator('[data-tour="planilla-selector"]')
-  await selector.waitFor({ timeout: 10_000 })
-  const planillaText = PLANILLA_NAMES.lider
-  const option = selector.getByText(planillaText)
-  if (await option.isVisible().catch(() => false)) {
-    await option.click()
-  } else {
-    await selector.locator('select').selectOption({ label: planillaText }).catch(async () => {
-      await selector.click()
-      await page.getByText(planillaText).click()
-    })
-  }
+  const select = page.locator('[data-tour="planilla-selector"] select')
+  await select.waitFor({ state: 'attached', timeout: 15_000 })
+  await select.selectOption({ label: PLANILLA_NAMES.lider })
 }
 
 async function placeBetInUI(
