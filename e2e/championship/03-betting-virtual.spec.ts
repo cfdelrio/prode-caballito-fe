@@ -43,7 +43,8 @@ async function placeBetInUI(page: any, homeTeam: string, awayTeam: string, score
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/apuestas')
-  await page.waitForSelector('[data-tour="planilla-selector"]', { timeout: 15_000 })
+  await expect(page).not.toHaveURL(/\/login/, { timeout: 10_000 })
+  await page.waitForSelector('[data-tour="planilla-selector"]', { timeout: 30_000 })
   await selectPlanilla(page)
 })
 
