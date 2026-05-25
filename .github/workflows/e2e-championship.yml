@@ -44,14 +44,6 @@ jobs:
       - name: Install Playwright + Chromium
         run: npx playwright install chromium --with-deps
 
-      # ── Auth: admin (necesario para specs 05-10 que loguean como admin) ───
-
-      - name: Auth setup — admin
-        env:
-          E2E_EMAIL:    ${{ secrets.E2E_EMAIL }}
-          E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
-        run: npx playwright test e2e/auth.setup.ts
-
       # ── Championship ────────────────────────────────────────────────────────
       # Un solo comando corre todo en orden:
       #   1. globalSetup  → crea torneo, partidos, planillas via API
