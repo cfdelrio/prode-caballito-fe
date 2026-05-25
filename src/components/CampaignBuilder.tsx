@@ -34,6 +34,7 @@ const EVENT_META: Record<VoiceEventType, { label: string; emoji: string; script:
     emoji: '⏰',
     script: 'Quedan pocos minutos para cargar tu pronóstico. ¡Entrá ya!',
     endpoint: '/admin/jobs/cutoff-reminders',
+    supportsSkipWindow: true,
   },
   'prode.broadcast_manual': {
     label: 'Broadcast WhatsApp',
