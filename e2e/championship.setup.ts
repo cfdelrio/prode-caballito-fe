@@ -45,34 +45,45 @@ interface AuthData {
   user: Record<string, unknown>
 }
 
+async function loginViaAPI(email: string, password: string): Promise<AuthData | null> {
+  const res = await fetch(`${API_BASE}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  })
+  const data = await res.json()
+  if (data.success && data.data?.token) return data.data
+  return null
+}
+
 async function loginOrRegisterViaAPI(
   email: string,
   password: string,
   nombre: string,
 ): Promise<AuthData> {
-  // Try login first
-  const loginRes = await fetch(`${API_BASE}/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  })
-  const loginData = await loginRes.json()
-  if (loginData.success && loginData.data?.token) {
-    return loginData.data
-  }
+  // Try login
+  const first = await loginViaAPI(email, password)
+  if (first) return first
 
-  // Register if login failed
+  // Login failed — register
   const regRes = await fetch(`${API_BASE}/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password, nombre }),
   })
   const regData = await regRes.json()
-  if (!regData.success || !regData.data?.token) {
-    throw new Error(`Could not create user ${email}: ${JSON.stringify(regData)}`)
+  if (regData.success && regData.data?.token) {
+    console.log(`  ✓ Registered new test user: ${email}`)
+    return regData.data
   }
-  console.log(`  ✓ Registered new test user: ${email}`)
-  return regData.data
+
+  // Register failed ("already registered" or rate limited) — retry login with delay
+  console.log(`  ⚠ Register failed (${regData.error}), retrying login after delay...`)
+  await new Promise(r => setTimeout(r, 3000))
+  const retry = await loginViaAPI(email, password)
+  if (retry) return retry
+
+  throw new Error(`Could not authenticate ${email}. Login: failed, Register: ${JSON.stringify(regData)}`)
 }
 
 for (const user of USERS) {
