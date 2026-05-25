@@ -53,8 +53,17 @@ jobs:
       #
       # Si skip_teardown=true, pasamos una variable de entorno que globalTeardown chequeará.
 
+      # E2E_RUN_TIMESTAMP se genera UNA SOLA VEZ y se comparte entre
+      # championship-auth (proceso 1) y globalSetup (proceso 2). Sin esto,
+      # cada proceso llama Date.now() con distinto valor → distintos emails
+      # → globalSetup crea planillas para un usuario distinto al autenticado.
+      - name: Set E2E run timestamp
+        run: echo "E2E_RUN_TIMESTAMP=$(date +%s%3N)" >> $GITHUB_ENV
+
       - name: Correr campeonato E2E
         env:
+          # Timestamp compartido entre championship-auth y globalSetup
+          E2E_RUN_TIMESTAMP:  ${{ env.E2E_RUN_TIMESTAMP }}
           # Admin (mismo secret que el e2e regular)
           E2E_ADMIN_EMAIL:    ${{ secrets.E2E_EMAIL }}
           E2E_ADMIN_PASSWORD: ${{ secrets.E2E_PASSWORD }}
