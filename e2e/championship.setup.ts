@@ -7,7 +7,7 @@
  */
 import { test as setup, expect } from '@playwright/test'
 import path from 'path'
-import { E2E_RUN_TIMESTAMP } from './e2e/championship/helpers/timestamp'
+import { E2E_RUN_TIMESTAMP } from './championship/helpers/timestamp'
 
 // Run all 3 auth tests one at a time (not in parallel)
 setup.describe.configure({ mode: 'serial' })
