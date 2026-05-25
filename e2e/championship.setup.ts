@@ -12,6 +12,7 @@ import { E2E_RUN_TIMESTAMP } from './championship/helpers/timestamp'
 // Run all 3 auth tests one at a time (not in parallel)
 setup.describe.configure({ mode: 'serial' })
 
+export const AUTH_ADMIN   = path.join(import.meta.dirname, '.auth/user.json')
 export const AUTH_LIDER   = path.join(import.meta.dirname, '.auth/lider.json')
 export const AUTH_RIVAL   = path.join(import.meta.dirname, '.auth/rival.json')
 export const AUTH_VIRTUAL = path.join(import.meta.dirname, '.auth/virtual.json')
@@ -23,6 +24,13 @@ const API_BASE =
 const API_TIMEOUT = 10_000
 
 const USERS = [
+  {
+    key:      'admin',
+    email:    process.env.E2E_ADMIN_EMAIL?.trim()    || 'cfdelrio@gmail.com',
+    password: process.env.E2E_ADMIN_PASSWORD?.trim() || 'carlitos',
+    nombre:   'Admin',
+    authFile: AUTH_ADMIN,
+  },
   {
     key:      'lider',
     email:    process.env.E2E_LIDER_EMAIL?.trim()   || `cfdelrio.e2e.lider.${E2E_RUN_TIMESTAMP}@gmail.com`,
