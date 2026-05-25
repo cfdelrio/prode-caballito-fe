@@ -1,10 +1,8 @@
 /**
- * Championship auth setup — ensures test users exist (via API) then logs in
- * via browser and saves storage state for use in championship specs.
+ * Championship auth setup — creates test users via API (if needed) and
+ * injects their JWT tokens directly into localStorage. No browser login.
  *
- * Order matters: this project (championship-auth) runs BEFORE globalSetup
- * of the championship project. So we must create users here, not rely on
- * globalSetup to do it.
+ * This avoids rate limiting from multiple login attempts and is ~5x faster.
  */
 import { test as setup, expect } from '@playwright/test'
 import path from 'path'
@@ -41,7 +39,17 @@ const USERS = [
   },
 ]
 
-async function ensureUserExists(email: string, password: string, nombre: string) {
+interface AuthData {
+  token: string
+  refreshToken: string
+  user: Record<string, unknown>
+}
+
+async function loginOrRegisterViaAPI(
+  email: string,
+  password: string,
+  nombre: string,
+): Promise<AuthData> {
   // Try login first
   const loginRes = await fetch(`${API_BASE}/auth/login`, {
     method: 'POST',
@@ -49,7 +57,9 @@ async function ensureUserExists(email: string, password: string, nombre: string)
     body: JSON.stringify({ email, password }),
   })
   const loginData = await loginRes.json()
-  if (loginData.success) return // user already exists
+  if (loginData.success && loginData.data?.token) {
+    return loginData.data
+  }
 
   // Register if login failed
   const regRes = await fetch(`${API_BASE}/auth/register`, {
@@ -58,32 +68,36 @@ async function ensureUserExists(email: string, password: string, nombre: string)
     body: JSON.stringify({ email, password, nombre }),
   })
   const regData = await regRes.json()
-  if (!regData.success) {
+  if (!regData.success || !regData.data?.token) {
     throw new Error(`Could not create user ${email}: ${JSON.stringify(regData)}`)
   }
   console.log(`  ✓ Registered new test user: ${email}`)
+  return regData.data
 }
 
 for (const user of USERS) {
   setup(`authenticate ${user.key}`, async ({ page }) => {
-    // 1. Ensure user exists in DB (API — no browser needed)
-    await ensureUserExists(user.email, user.password, user.nombre)
+    // 1. Get auth data from API (login or register)
+    const authData = await loginOrRegisterViaAPI(user.email, user.password, user.nombre)
 
-    // 2. Browser login to capture full auth state (cookies + localStorage)
-    await page.goto('/login')
-    await page.waitForSelector('input[type="email"]', { timeout: 10_000 })
-    await page.fill('input[type="email"]', user.email)
-    await page.fill('input[type="password"]', user.password)
-    await page.click('button[type="submit"]')
+    // 2. Navigate to the app domain so we can write to its localStorage
+    await page.goto('/')
 
-    // 3. Wait until redirected away from login
-    await expect(page).not.toHaveURL(/\/login/, { timeout: 20_000 })
+    // 3. Inject auth tokens directly into localStorage (same keys as authStore.ts)
+    await page.evaluate((data) => {
+      localStorage.setItem('token', data.token)
+      localStorage.setItem('refreshToken', data.refreshToken)
+      localStorage.setItem('user', JSON.stringify(data.user))
+    }, authData)
 
-    // 4. Navigate to /apuestas to confirm auth is fully active in localStorage
+    // 4. Verify auth works — navigate to /apuestas and confirm we're NOT redirected to /login
     await page.goto('/apuestas')
     await expect(page).not.toHaveURL(/\/login/, { timeout: 15_000 })
 
-    // 5. Save auth state from /apuestas so specs start fully authenticated
+    // 5. Save storageState for use in championship specs
     await page.context().storageState({ path: user.authFile })
+
+    // Small delay to avoid rate limiting between users
+    await new Promise(r => setTimeout(r, 1000))
   })
 }
