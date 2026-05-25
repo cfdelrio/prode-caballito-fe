@@ -9,25 +9,38 @@ type VoiceEventType =
   | 'prode.cutoff_reminder'
   | 'prode.broadcast_manual'
 
-const EVENT_META: Record<VoiceEventType, { label: string; emoji: string; script: string; endpoint: string; supportsSkipWindow?: boolean; bodyField?: string }> = {
+interface EventMeta {
+  label: string
+  emoji: string
+  script: string
+  endpoint: string
+  supportsSkipWindow?: boolean
+  bodyField?: string
+  reminderType?: string
+}
+
+const EVENT_META: Record<VoiceEventType, EventMeta> = {
   'prode.voice_match_reminder': {
     label: 'Match reminder',
     emoji: '📣',
     script: 'En 30 min arranca {home} vs {away} y no cargaste tu resultado. Entrá ya.',
     endpoint: '/admin/voice-match-reminder-trigger',
     supportsSkipWindow: true,
+    reminderType: 'voice_match_reminder',
   },
   'prode.voice_5day_reminder': {
     label: 'Voice 5-day reminder',
     emoji: '🔔',
     script: 'Faltan 5 días para que cierre tu planilla. No pierdas tu racha.',
     endpoint: '/admin/voice-5day-trigger',
+    reminderType: 'voice_5day_reminder',
   },
   'prode.voice_survey_campeon': {
     label: 'Survey campeón',
     emoji: '🏆',
     script: '¿Quién sale campeón del mundial? Presioná 1 Argentina, 2 Brasil, 3 otro.',
     endpoint: '/admin/voice-campeon-survey',
+    reminderType: 'voice_campeon_survey',
   },
   'prode.cutoff_reminder': {
     label: 'Cutoff reminders',
@@ -35,6 +48,7 @@ const EVENT_META: Record<VoiceEventType, { label: string; emoji: string; script:
     script: 'Quedan pocos minutos para cargar tu pronóstico. ¡Entrá ya!',
     endpoint: '/admin/jobs/cutoff-reminders',
     supportsSkipWindow: true,
+    reminderType: 'cutoff_30min',
   },
   'prode.broadcast_manual': {
     label: 'Broadcast WhatsApp',
@@ -53,9 +67,26 @@ export function CampaignBuilder() {
   const [dryRun, setDryRun] = useState(true)
   const [skipWindow, setSkipWindow] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [resetting, setResetting] = useState(false)
   const [result, setResult] = useState<string | null>(null)
 
   const meta = EVENT_META[eventType]
+
+  const handleReset = async () => {
+    if (!meta.reminderType) return
+    setResetting(true)
+    try {
+      const { data } = await api.delete(`/admin/reset-reminder-sent?reminder_type=${meta.reminderType}`)
+      const deleted = data?.data?.deleted ?? 0
+      show(`Contadores reseteados: ${deleted} registros eliminados (${meta.reminderType})`, 'success')
+      setResult(`🔄 Reset: ${deleted} registros eliminados para ${meta.reminderType}`)
+    } catch (e: unknown) {
+      const msg = (e as { response?: { data?: { error?: string } } }).response?.data?.error || 'Error al resetear'
+      show(msg, 'error')
+    } finally {
+      setResetting(false)
+    }
+  }
 
   const handleFire = async () => {
     setLoading(true)
@@ -152,13 +183,26 @@ export function CampaignBuilder() {
         )}
       </div>
 
-      <button
-        onClick={handleFire}
-        disabled={loading}
-        className="bg-purple-600 text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-purple-700 disabled:opacity-50 w-full"
-      >
-        {loading ? 'Procesando...' : dryRun ? '🔍 Preview' : '📞 Disparar'}
-      </button>
+      <div className="flex gap-2">
+        <button
+          onClick={handleFire}
+          disabled={loading}
+          className="bg-purple-600 text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-purple-700 disabled:opacity-50 flex-1"
+        >
+          {loading ? 'Procesando...' : dryRun ? '🔍 Preview' : '📞 Disparar'}
+        </button>
+
+        {meta.reminderType && (
+          <button
+            onClick={handleReset}
+            disabled={resetting}
+            className="bg-orange-500 text-white text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-orange-600 disabled:opacity-50"
+            title={`Reset contadores de ${meta.reminderType}`}
+          >
+            {resetting ? '...' : '🔄 Reset'}
+          </button>
+        )}
+      </div>
 
       {result && (
         <pre className="mt-2 bg-gray-50 border border-gray-100 rounded-lg p-2 text-xs whitespace-pre-wrap break-all">{result}</pre>
