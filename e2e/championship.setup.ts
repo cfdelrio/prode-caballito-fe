@@ -7,6 +7,7 @@
  */
 import { test as setup, expect } from '@playwright/test'
 import path from 'path'
+import { E2E_RUN_TIMESTAMP } from './e2e/championship/helpers/timestamp'
 
 // Run all 3 auth tests one at a time (not in parallel)
 setup.describe.configure({ mode: 'serial' })
@@ -24,21 +25,21 @@ const API_TIMEOUT = 10_000
 const USERS = [
   {
     key:      'lider',
-    email:    process.env.E2E_LIDER_EMAIL?.trim()   || 'cfdelrio+lider@gmail.com',
+    email:    process.env.E2E_LIDER_EMAIL?.trim()   || `cfdelrio.e2e.lider.${E2E_RUN_TIMESTAMP}@gmail.com`,
     password: process.env.E2E_LIDER_PASS?.trim()    || 'e2etest2026',
     nombre:   'E2E Lider',
     authFile: AUTH_LIDER,
   },
   {
     key:      'rival',
-    email:    process.env.E2E_RIVAL_EMAIL?.trim()   || 'cfdelrio+rival@gmail.com',
+    email:    process.env.E2E_RIVAL_EMAIL?.trim()   || `cfdelrio.e2e.rival.${E2E_RUN_TIMESTAMP}@gmail.com`,
     password: process.env.E2E_RIVAL_PASS?.trim()    || 'e2etest2026',
     nombre:   'E2E Rival',
     authFile: AUTH_RIVAL,
   },
   {
     key:      'virtual',
-    email:    process.env.E2E_VIRTUAL_EMAIL?.trim() || 'cfdelrio+virtual@gmail.com',
+    email:    process.env.E2E_VIRTUAL_EMAIL?.trim() || `cfdelrio.e2e.virtual.${E2E_RUN_TIMESTAMP}@gmail.com`,
     password: process.env.E2E_VIRTUAL_PASS?.trim()  || 'e2etest2026',
     nombre:   'E2E Virtual',
     authFile: AUTH_VIRTUAL,
