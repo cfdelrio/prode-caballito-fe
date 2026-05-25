@@ -18,22 +18,22 @@ const API_BASE =
 const USERS = [
   {
     key:      'lider',
-    email:    process.env.E2E_LIDER_EMAIL?.trim()   || 'cfdelrio.e2e.lider@gmail.com',
-    password: process.env.E2E_LIDER_PASS?.trim()    || 'e2etest2026',
+    email:    process.env.E2E_LIDER_EMAIL?.trim()   || 'cfdelrio+lider@gmail.com',
+    password: process.env.E2E_LIDER_PASS?.trim()    || 'carlitos',
     nombre:   'E2E Lider',
     authFile: AUTH_LIDER,
   },
   {
     key:      'rival',
-    email:    process.env.E2E_RIVAL_EMAIL?.trim()   || 'cfdelrio.e2e.rival@gmail.com',
-    password: process.env.E2E_RIVAL_PASS?.trim()    || 'e2etest2026',
+    email:    process.env.E2E_RIVAL_EMAIL?.trim()   || 'cfdelrio+rival@gmail.com',
+    password: process.env.E2E_RIVAL_PASS?.trim()    || 'carlitos',
     nombre:   'E2E Rival',
     authFile: AUTH_RIVAL,
   },
   {
     key:      'virtual',
-    email:    process.env.E2E_VIRTUAL_EMAIL?.trim() || 'cfdelrio.e2e.virtual@gmail.com',
-    password: process.env.E2E_VIRTUAL_PASS?.trim()  || 'e2etest2026',
+    email:    process.env.E2E_VIRTUAL_EMAIL?.trim() || 'cfdelrio+virtual@gmail.com',
+    password: process.env.E2E_VIRTUAL_PASS?.trim()  || 'carlitos',
     nombre:   'E2E Virtual',
     authFile: AUTH_VIRTUAL,
   },
@@ -45,15 +45,20 @@ interface AuthData {
   user: Record<string, unknown>
 }
 
-async function loginViaAPI(email: string, password: string): Promise<AuthData | null> {
+interface LoginResult {
+  data: AuthData | null
+  error: string
+}
+
+async function loginViaAPI(email: string, password: string): Promise<LoginResult> {
   const res = await fetch(`${API_BASE}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
   })
-  const data = await res.json()
-  if (data.success && data.data?.token) return data.data
-  return null
+  const body = await res.json()
+  if (body.success && body.data?.token) return { data: body.data, error: '' }
+  return { data: null, error: body.error || JSON.stringify(body) }
 }
 
 async function loginOrRegisterViaAPI(
@@ -61,11 +66,21 @@ async function loginOrRegisterViaAPI(
   password: string,
   nombre: string,
 ): Promise<AuthData> {
-  // Try login
+  // Try login first
   const first = await loginViaAPI(email, password)
-  if (first) return first
+  if (first.data) return first.data
+  console.log(`  Login failed for ${email}: ${first.error}`)
 
-  // Login failed — register
+  // If rate-limited on login, wait and retry before trying register
+  if (first.error.includes('Demasiados')) {
+    console.log(`  Rate limited — waiting 60s...`)
+    await new Promise(r => setTimeout(r, 60_000))
+    const retry = await loginViaAPI(email, password)
+    if (retry.data) return retry.data
+    console.log(`  Retry after 60s failed: ${retry.error}`)
+  }
+
+  // Try register
   const regRes = await fetch(`${API_BASE}/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -76,14 +91,25 @@ async function loginOrRegisterViaAPI(
     console.log(`  ✓ Registered new test user: ${email}`)
     return regData.data
   }
+  console.log(`  Register failed for ${email}: ${regData.error}`)
 
-  // Register failed ("already registered" or rate limited) — retry login with delay
-  console.log(`  ⚠ Register failed (${regData.error}), retrying login after delay...`)
-  await new Promise(r => setTimeout(r, 3000))
-  const retry = await loginViaAPI(email, password)
-  if (retry) return retry
+  // User already exists but login failed → likely rate-limited; retry with backoff
+  const backoff = [10_000, 20_000, 30_000, 60_000]
+  for (const delay of backoff) {
+    console.log(`  Waiting ${delay / 1000}s before login retry...`)
+    await new Promise(r => setTimeout(r, delay))
+    const retry = await loginViaAPI(email, password)
+    if (retry.data) {
+      console.log(`  ✓ Login succeeded after ${delay / 1000}s wait`)
+      return retry.data
+    }
+    console.log(`  Still failing: ${retry.error}`)
+  }
 
-  throw new Error(`Could not authenticate ${email}. Login: failed, Register: ${JSON.stringify(regData)}`)
+  throw new Error(
+    `Could not authenticate ${email}. ` +
+    `Login: ${first.error} | Register: ${regData.error}`,
+  )
 }
 
 for (const user of USERS) {
@@ -108,7 +134,7 @@ for (const user of USERS) {
     // 5. Save storageState for use in championship specs
     await page.context().storageState({ path: user.authFile })
 
-    // Small delay to avoid rate limiting between users
-    await new Promise(r => setTimeout(r, 1000))
+    // Delay between users to avoid rate limiting
+    await new Promise(r => setTimeout(r, 2_000))
   })
 }
