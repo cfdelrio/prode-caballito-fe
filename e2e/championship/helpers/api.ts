@@ -17,10 +17,12 @@ export class ApiClient {
       body: JSON.stringify({ email, password }),
     })
     const data = await res.json()
-    if (!data.success || !data.token) {
+    // Auth responses are wrapped: { success, data: { token, user, refreshToken } }
+    const token = data.data?.token ?? data.token
+    if (!data.success || !token) {
       throw new Error(`Login failed for ${email}: ${JSON.stringify(data)}`)
     }
-    return new ApiClient(data.token)
+    return new ApiClient(token)
   }
 
   static async loginOrRegister(
@@ -35,10 +37,11 @@ export class ApiClient {
       body: JSON.stringify({ email, password }),
     })
     const loginData = await loginRes.json()
-    if (loginData.success && loginData.token) {
+    const loginToken = loginData.data?.token ?? loginData.token
+    if (loginData.success && loginToken) {
       return {
-        client: new ApiClient(loginData.token),
-        userId: loginData.user?.id ?? loginData.userId,
+        client: new ApiClient(loginToken),
+        userId: loginData.data?.user?.id ?? loginData.user?.id ?? loginData.userId,
       }
     }
     // Register
@@ -51,10 +54,9 @@ export class ApiClient {
     if (!regData.success) {
       throw new Error(`Register failed for ${email}: ${JSON.stringify(regData)}`)
     }
-    // Login after register
+    // Login after register to get a fresh token
     const client = await ApiClient.login(email, password)
-    const meRes = await client.get('/users/me').catch(() => null)
-    const userId = meRes?.data?.id ?? meRes?.id ?? regData.user?.id ?? regData.userId
+    const userId = regData.data?.user?.id ?? regData.user?.id ?? regData.userId
     return { client, userId }
   }
 
