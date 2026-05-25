@@ -15,6 +15,10 @@ const ADMIN_EMAIL    = process.env.E2E_ADMIN_EMAIL    ?? 'cfdelrio@gmail.com'
 const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD ?? 'qatar2022'
 
 async function globalTeardown() {
+  if (process.env.E2E_SKIP_TEARDOWN === 'true') {
+    console.log('\n⚠️  E2E_SKIP_TEARDOWN=true — skipping cleanup (data left in DB for inspection)')
+    return
+  }
   console.log('\n🧹 Championship globalTeardown starting...')
 
   let state
