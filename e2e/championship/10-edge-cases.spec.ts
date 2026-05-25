@@ -120,7 +120,7 @@ test.describe('Matrix shows all E2E planillas (Admin)', () => {
     await expect(page.getByText(PLANILLA_NAMES.lider)).toBeVisible({ timeout: 10_000 })
 
     // Click on Lider row to open drawer
-    await page.getByRole('row').filter({ hasText: PLANILLA_NAMES.lider }).click()
+    await page.locator('.row-entrance').filter({ hasText: PLANILLA_NAMES.lider }).click()
 
     // Click "Ver planilla completa"
     const verBtn = page
