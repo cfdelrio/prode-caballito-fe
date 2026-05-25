@@ -13,7 +13,10 @@
     "test:coverage": "vitest run --coverage --coverage.provider=istanbul",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "test:championship": "playwright test --project=championship --workers=1",
+    "test:championship:ui": "playwright test --project=championship --workers=1 --ui",
+    "test:championship:debug": "playwright test --project=championship --debug"
   },
   "dependencies": {
     "axios": "^1.15.0",
