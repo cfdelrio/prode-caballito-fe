@@ -36,10 +36,11 @@ const USERS = [
 for (const user of USERS) {
   setup(`authenticate ${user.key}`, async ({ page }) => {
     await page.goto('/login')
-    await page.getByPlaceholder(/email/i).fill(user.email)
-    await page.getByPlaceholder(/contraseña|password/i).fill(user.password)
-    await page.getByRole('button', { name: /ingresar|entrar|login/i }).click()
-    await expect(page).not.toHaveURL(/\/login/, { timeout: 10_000 })
+    await page.waitForSelector('input[type="email"]', { timeout: 10_000 })
+    await page.fill('input[type="email"]', user.email)
+    await page.fill('input[type="password"]', user.password)
+    await page.click('button:has-text("Iniciar Sesión"), button:has-text("Ingresar"), button:has-text("Entrar")')
+    await expect(page).not.toHaveURL(/\/login/, { timeout: 15_000 })
     await page.context().storageState({ path: user.authFile })
   })
 }
