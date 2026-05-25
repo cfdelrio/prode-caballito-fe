@@ -22,7 +22,7 @@ import { writeState } from './helpers/state'
 import { MATCHES, PLANILLA_NAMES } from './helpers/fixture'
 
 const ADMIN_EMAIL    = process.env.E2E_ADMIN_EMAIL?.trim()    || 'cfdelrio@gmail.com'
-const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD?.trim() || 'qatar2022'
+const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD?.trim() || 'carlitos'
 
 const USERS = {
   lider:   { email: process.env.E2E_LIDER_EMAIL?.trim()   || 'cfdelrio.e2e.lider@gmail.com',   password: 'e2etest2026', nombre: 'E2E Lider'   },

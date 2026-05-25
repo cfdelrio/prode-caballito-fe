@@ -12,7 +12,7 @@ import { ApiClient, lockPlanilla } from './helpers/api'
 import { readState } from './helpers/state'
 
 const ADMIN_EMAIL    = process.env.E2E_ADMIN_EMAIL?.trim()    || 'cfdelrio@gmail.com'
-const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD?.trim() || 'qatar2022'
+const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD?.trim() || 'carlitos'
 
 const LIDER_EMAIL   = process.env.E2E_LIDER_EMAIL?.trim()  || 'cfdelrio.e2e.lider@gmail.com'
 const LIDER_PASS    = process.env.E2E_LIDER_PASS?.trim()   || 'e2etest2026'
