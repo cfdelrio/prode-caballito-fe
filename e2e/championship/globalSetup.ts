@@ -8,6 +8,7 @@
  *   - 3 test users (lider, rival, virtual) — registers if not exist
  *   - 3 planillas, one per user — named with [E2E] prefix
  */
+import path from 'path'
 import {
   ApiClient,
   createTournament,
@@ -17,18 +18,13 @@ import {
   renamePlanilla,
   publishResult,
 } from './helpers/api'
-import { writeState } from './helpers/state'
+import { writeState, readAuthState } from './helpers/state'
 import { MATCHES, PLANILLA_NAMES } from './helpers/fixture'
-import { E2E_RUN_TIMESTAMP } from './helpers/timestamp'
 
 const ADMIN_EMAIL    = process.env.E2E_ADMIN_EMAIL?.trim()    || 'cfdelrio@gmail.com'
 const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD?.trim() || 'carlitos'
 
-const USERS = {
-  lider:   { email: process.env.E2E_LIDER_EMAIL?.trim()   || `cfdelrio.e2e.lider.${E2E_RUN_TIMESTAMP}@gmail.com`,   password: process.env.E2E_LIDER_PASS?.trim()   || 'e2etest2026', nombre: 'E2E Lider'   },
-  rival:   { email: process.env.E2E_RIVAL_EMAIL?.trim()   || `cfdelrio.e2e.rival.${E2E_RUN_TIMESTAMP}@gmail.com`,   password: process.env.E2E_RIVAL_PASS?.trim()   || 'e2etest2026', nombre: 'E2E Rival'   },
-  virtual: { email: process.env.E2E_VIRTUAL_EMAIL?.trim() || `cfdelrio.e2e.virtual.${E2E_RUN_TIMESTAMP}@gmail.com`, password: process.env.E2E_VIRTUAL_PASS?.trim() || 'e2etest2026', nombre: 'E2E Virtual' },
-}
+const AUTH_DIR = path.join(import.meta.dirname, '../.auth')
 
 async function globalSetup() {
   console.log('\n🏆 Championship globalSetup starting...')
@@ -42,33 +38,26 @@ async function globalSetup() {
   const tournamentId = await createTournament(admin, `[E2E] Copa Test ${ts}`)
   console.log(`  ✓ Tournament created: ${tournamentId}`)
 
-  // Step 3: Create all matches + register all users in parallel (independent)
-  const [matchEntries, userResults] = await Promise.all([
-    Promise.all(
-      Object.entries(MATCHES).map(async ([key, m]) => {
-        const id = key === 'mCutoff'
-          ? await createMatchPastCutoff(admin, { home_team: m.home, away_team: m.away })
-          : await createMatch(admin, { home_team: m.home, away_team: m.away, tournament_id: tournamentId, jornada: m.jornada })
-        return [key, id] as const
-      })
-    ),
-    Promise.all(
-      Object.entries(USERS).map(([key, u]) =>
-        ApiClient.loginOrRegister(u.email, u.password, u.nombre).then(r => [key, r] as const)
-      )
-    ),
-  ])
+  // Step 3a: Create all matches
+  const matchEntries = await Promise.all(
+    Object.entries(MATCHES).map(async ([key, m]) => {
+      const id = key === 'mCutoff'
+        ? await createMatchPastCutoff(admin, { home_team: m.home, away_team: m.away })
+        : await createMatch(admin, { home_team: m.home, away_team: m.away, tournament_id: tournamentId, jornada: m.jornada })
+      return [key, id] as const
+    })
+  )
 
   const matchIds: Record<string, string> = Object.fromEntries(matchEntries)
   console.log(`  ✓ ${Object.keys(matchIds).length} matches created`)
 
-  const userIds:    Record<string, string> = {}
-  const userTokens: Record<string, string> = {}
-  for (const [key, { client, userId }] of userResults) {
-    userIds[key]    = userId
-    userTokens[key] = client.token
-  }
-  console.log('  ✓ Test users ready')
+  // Step 3b: Read user tokens from .auth/*.json (championship-auth already saved them — no API re-auth)
+  const liderAuth   = readAuthState(path.join(AUTH_DIR, 'lider.json'))
+  const rivalAuth   = readAuthState(path.join(AUTH_DIR, 'rival.json'))
+  const virtualAuth = readAuthState(path.join(AUTH_DIR, 'virtual.json'))
+  const userIds    = { lider: liderAuth.userId,  rival: rivalAuth.userId,  virtual: virtualAuth.userId }
+  const userTokens = { lider: liderAuth.token,   rival: rivalAuth.token,   virtual: virtualAuth.token }
+  console.log('  ✓ User tokens read from auth files (no API re-auth)')
 
   // Step 4: Publish mCutoff + create planillas in parallel
   // - mCutoff must be 'finished' before planilla locking (spec 04).

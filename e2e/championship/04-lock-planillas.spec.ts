@@ -8,20 +8,16 @@
  * Also verifies that a planilla with missing bets cannot be locked.
  */
 import { test, expect } from '@playwright/test'
+import path from 'path'
 import { ApiClient, lockPlanilla } from './helpers/api'
-import { readState } from './helpers/state'
+import { readState, readToken } from './helpers/state'
 
 const ADMIN_EMAIL    = process.env.E2E_ADMIN_EMAIL?.trim()    || 'cfdelrio@gmail.com'
 const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD?.trim() || 'carlitos'
 
-const LIDER_EMAIL   = process.env.E2E_LIDER_EMAIL?.trim()  || 'cfdelrio+lider@gmail.com'
-const LIDER_PASS    = process.env.E2E_LIDER_PASS?.trim()   || 'e2etest2026'
-const RIVAL_EMAIL   = process.env.E2E_RIVAL_EMAIL?.trim()  || 'cfdelrio+rival@gmail.com'
-const RIVAL_PASS    = process.env.E2E_RIVAL_PASS?.trim()   || 'e2etest2026'
-
 test('Lider puede cerrar su planilla (todas las apuestas ya están colocadas)', async () => {
   const state  = readState()
-  const lider  = await ApiClient.login(LIDER_EMAIL, LIDER_PASS)
+  const lider  = new ApiClient(readToken(path.join(import.meta.dirname, '../.auth/lider.json')))
   await lockPlanilla(lider, state.planillaIds.lider)
   // Verify it's now paid by fetching planillas
   const data = await lider.get('/planillas')
@@ -32,7 +28,7 @@ test('Lider puede cerrar su planilla (todas las apuestas ya están colocadas)', 
 
 test('Rival puede cerrar su planilla', async () => {
   const state  = readState()
-  const rival  = await ApiClient.login(RIVAL_EMAIL, RIVAL_PASS)
+  const rival  = new ApiClient(readToken(path.join(import.meta.dirname, '../.auth/rival.json')))
   await lockPlanilla(rival, state.planillaIds.rival)
   const data = await rival.get('/planillas')
   const planilla = data.data?.find((p: any) => p.id === state.planillaIds.rival)
