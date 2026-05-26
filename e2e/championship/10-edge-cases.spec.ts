@@ -116,7 +116,7 @@ test.describe('Matrix shows all E2E planillas (Admin)', () => {
 
   test('/planilla del Lider es accesible desde /ranking (drawer → link)', async ({ page }) => {
     await page.goto('/ranking')
-    await page.waitForSelector('table, [class*="ranking"]', { timeout: 15_000 })
+    await page.waitForSelector('.row-entrance, [class*="ranking"]', { timeout: 15_000 })
     await expect(page.getByText(PLANILLA_NAMES.lider)).toBeVisible({ timeout: 10_000 })
 
     // Click on Lider row to open drawer
