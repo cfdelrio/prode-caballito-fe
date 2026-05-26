@@ -23,6 +23,7 @@ const Planilla   = lazy(() => import('@/pages/Planilla').then(m => ({ default: m
 const Tournaments = lazy(() => import('@/pages/Tournaments').then(m => ({ default: m.Tournaments })))
 const Fixture    = lazy(() => import('@/pages/Fixture').then(m => ({ default: m.Fixture })))
 const VozHinchada = lazy(() => import('@/pages/VozHinchada').then(m => ({ default: m.VozHinchada })))
+const Ganadas    = lazy(() => import('@/pages/Ganadas').then(m => ({ default: m.Ganadas })))
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { token } = useAuthStore()
@@ -110,6 +111,9 @@ export default function App() {
         } />
         <Route path="/hinchada" element={
           <AppLayout adSlot={null}><VozHinchada /></AppLayout>
+        } />
+        <Route path="/ganadas" element={
+          <RequireAuth><AppLayout adSlot={null}><Ganadas /></AppLayout></RequireAuth>
         } />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

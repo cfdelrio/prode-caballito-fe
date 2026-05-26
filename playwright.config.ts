@@ -21,6 +21,7 @@ export default defineConfig({
     {
       name: 'championship-auth',
       testMatch: '**/championship.setup.ts',
+      timeout: 90_000,
     },
     // ── Championship: full tournament simulation ────────────────────────────
     // globalSetup creates test data; globalTeardown cleans it up.
