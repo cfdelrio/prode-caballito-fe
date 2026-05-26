@@ -26,6 +26,7 @@ export default defineConfig({
     // ── Championship: full tournament simulation ────────────────────────────
     // globalSetup creates test data; globalTeardown cleans it up.
     // workers: 1 ensures specs run in lexicographic order (01-, 02-, …).
+    // retries: 0 — suite is stateful; retrying would re-place bets or re-publish results.
     {
       name: 'championship',
       use: { ...devices['Desktop Chrome'] },
@@ -34,6 +35,7 @@ export default defineConfig({
       globalTeardown: './e2e/championship/globalTeardown.ts',
       dependencies:   ['championship-auth'],
       timeout: 60_000,
+      retries: 0,
     },
   ],
 })

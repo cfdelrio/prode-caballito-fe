@@ -21,12 +21,13 @@ export function Navbar() {
   const { unreadCount } = useNotificationHistory()
 
   const navLinks: { to: string; label: string; icon: string; external?: boolean }[] = [
+    { to: '/reglamento',                label: t.nav.rules,   icon: '📖' },
     { to: '/',                          label: t.nav.home,    icon: '🏠' },
     { to: '/apuestas',                  label: t.nav.bets,    icon: '⚽' },
     { to: '/matriz',                    label: t.nav.matrix,  icon: '📊' },
     { to: '/ranking',                   label: t.nav.ranking, icon: '🏆' },
+    { to: '/ganadas',                   label: 'Ganadas',     icon: '🥇' },
     { to: '/fixture',                   label: t.nav.fixture, icon: '🗓️' },
-    { to: '/reglamento',                label: t.nav.rules,   icon: '📖' },
   ]
 
   const adminLinks = [

@@ -6,6 +6,22 @@
 import fs   from 'fs'
 import path from 'path'
 
+// ── Auth file readers (Playwright storageState → JWT) ────────────────────────
+
+export function readAuthState(authFile: string): { token: string; userId: string } {
+  const raw     = JSON.parse(fs.readFileSync(authFile, 'utf-8'))
+  const ls      = raw.origins?.[0]?.localStorage ?? []
+  const token   = ls.find((i: any) => i.name === 'token')?.value
+  const userStr = ls.find((i: any) => i.name === 'user')?.value
+  const userId  = userStr ? JSON.parse(userStr).id : undefined
+  if (!token || !userId) throw new Error(`No auth data in ${authFile}`)
+  return { token, userId }
+}
+
+export function readToken(authFile: string): string {
+  return readAuthState(authFile).token
+}
+
 export interface ChampState {
   tournamentId:  string
   matchIds:      Record<string, string>  // mA, mB, mC, mD, mCutoff → UUID
