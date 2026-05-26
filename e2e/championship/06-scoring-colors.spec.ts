@@ -129,7 +129,7 @@ test('Clic en celda del Lider mA abre popover con detalle del score', async ({ p
   const row  = getRow(page, PLANILLA_NAMES.lider)
   const cell = row.locator('[class*="sky-"],[class*="red-"],[class*="green-"],[class*="yellow-"],[class*="gray-"]').first()
   await cell.click()
-  // Popover should appear with score details
+  // BetPopover renders via createPortal with animate-pop class and inline position:fixed
   const popover = page.locator('[class*="animate-pop"]')
     .or(page.locator('[class*="rounded-2xl"][class*="shadow-2xl"]').filter({ hasText: /apuesta/i }))
     .first()
