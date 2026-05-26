@@ -67,7 +67,7 @@ async function globalSetup() {
   const [, planillaEntries] = await Promise.all([
     publishResult(admin, matchIds.mCutoff, 1, 0),
     Promise.all(
-      Object.keys(USERS).map(async key => {
+      Object.keys(userTokens).map(async key => {
         const userClient = new ApiClient(userTokens[key])
         const planillaId = await createPlanilla(userClient)
         await renamePlanilla(userClient, planillaId, PLANILLA_NAMES[key as keyof typeof PLANILLA_NAMES])
