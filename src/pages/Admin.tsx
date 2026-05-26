@@ -1153,6 +1153,7 @@ function JobsTab() {
   const [jobResult, setJobResult] = useState<{ id: string; text: string } | null>(null)
   const [confirmWeekly, setConfirmWeekly] = useState(false)
   const [confirmVoice5day, setConfirmVoice5day] = useState(false)
+  const [confirmReset, setConfirmReset] = useState(false)
 
   useEffect(() => {
     // GET /matchdays requires tournament_id → load all tournaments first, then matchdays per tournament
@@ -1492,6 +1493,36 @@ function JobsTab() {
         </div>
       </JobCard>
 
+      {/* ── Reset del Juego ─────────────────────────────────────────────── */}
+      <JobCard
+        title="♻️ Reset del Juego"
+        description="Borra resultados, puntos, ranking, ganadores, streaks y badges. Preserva planillas y pronósticos."
+      >
+        <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-2.5 text-xs text-red-700 space-y-1.5">
+          <p className="font-semibold">⚠️ Qué se borra:</p>
+          <ul className="list-disc list-inside space-y-0.5">
+            <li>Resultados de todos los partidos (vuelven a "pending")</li>
+            <li>Puntos de todas las apuestas y planillas</li>
+            <li>Tabla de ranking completa</li>
+            <li>Ganadores (activo e historial de jornadas)</li>
+            <li>Streaks y badges de todos los usuarios</li>
+          </ul>
+          <p className="font-semibold">✅ Qué se preserva:</p>
+          <ul className="list-disc list-inside space-y-0.5">
+            <li>Planillas y pronósticos (goles apostados)</li>
+            <li>Partidos (sin resultados), torneos y usuarios</li>
+          </ul>
+        </div>
+        <button
+          onClick={() => setConfirmReset(true)}
+          disabled={!!loading}
+          className="w-full bg-red-600 text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
+        >
+          {loading === 'reset' ? 'Reseteando...' : '♻️ Resetear juego'}
+        </button>
+        {jobResult?.id === 'reset' && <p className="text-xs text-green-600 font-medium">{jobResult.text}</p>}
+      </JobCard>
+
       <ConfirmModal
         open={confirmWeekly}
         title="Enviar email semanal"
@@ -1519,6 +1550,30 @@ function JobsTab() {
           })
         }}
         onCancel={() => setConfirmVoice5day(false)}
+      />
+
+      <ConfirmModal
+        open={confirmReset}
+        title="♻️ Reset del Juego"
+        message="Esto borrará TODOS los resultados, puntos, ranking, ganadores, streaks y badges. Las planillas y los pronósticos quedan intactos. Esta acción es IRREVERSIBLE."
+        requireText="RESET"
+        onConfirm={() => {
+          setConfirmReset(false)
+          runJob('reset', async () => {
+            const { data } = await api.post('/admin/jobs/reset-game', {})
+            const r = data.data
+            return [
+              `✓ ${r.matches} partidos reseteados`,
+              `✓ ${r.bets} apuestas limpiadas`,
+              `✓ ${r.planillas} planillas en 0`,
+              `✓ ${r.ranking_entries} filas de ranking borradas`,
+              `✓ ${r.winner_configs} configs de ganador borradas`,
+              `✓ ${r.streaks} streaks borrados`,
+              `✓ ${r.badges} badges borrados`,
+            ].join(' · ')
+          })
+        }}
+        onCancel={() => setConfirmReset(false)}
       />
     </div>
   )
