@@ -38,48 +38,19 @@ async function goToCompleteStep() {
   const { api } = await import('@/api/client')
 
   ;(api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-    data: { data: { pendingId: 'pending123' } },
+    data: { data: { userId: 'u1' } },
   })
   renderRegister()
   await user.type(screen.getByPlaceholderText('Tu nombre'), 'Carlos')
   await user.type(screen.getByPlaceholderText('tu@email.com'), 'carlos@test.com')
   await user.type(screen.getByPlaceholderText('Mínimo 6 caracteres'), 'pass123')
   await user.click(screen.getByRole('button', { name: /Continuar/i }))
-  await waitFor(() => expect(screen.getByPlaceholderText('000000')).toBeInTheDocument())
-
-  ;(api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-    data: { data: { userId: 'u1' } },
-  })
-  await user.type(screen.getByPlaceholderText('000000'), '123456')
-  await user.click(screen.getByRole('button', { name: /Verificar/i }))
-  await waitFor(() => expect(screen.getByText(/Email verificado/i)).toBeInTheDocument())
+  await waitFor(() => expect(screen.getByText(/Cuenta creada/i)).toBeInTheDocument())
 
   await user.type(screen.getByPlaceholderText('11 1234 5678'), '1155996222')
 
   return { user, api }
 }
-
-describe('Register — handleResend success', () => {
-  afterEach(() => vi.clearAllMocks())
-
-  it('reenviar código exitoso → toast de éxito', async () => {
-    const user = userEvent.setup()
-    const { api } = await import('@/api/client')
-    ;(api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      data: { data: { pendingId: 'pending123' } },
-    })
-    renderRegister()
-    await user.type(screen.getByPlaceholderText('Tu nombre'), 'C')
-    await user.type(screen.getByPlaceholderText('tu@email.com'), 'c@x.com')
-    await user.type(screen.getByPlaceholderText('Mínimo 6 caracteres'), 'pass123')
-    await user.click(screen.getByRole('button', { name: /Continuar/i }))
-    await waitFor(() => expect(screen.getByPlaceholderText('000000')).toBeInTheDocument())
-
-    ;(api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({})
-    await user.click(screen.getByText(/Reenviar código/i))
-    await waitFor(() => expect(mockShow).toHaveBeenCalledWith('Código reenviado ✓', 'success'))
-  })
-})
 
 describe('Register — handlePhotoSelect', () => {
   afterEach(() => vi.clearAllMocks())
@@ -200,21 +171,14 @@ describe('Register — handleAllowNotifications/Skip', () => {
     const { api } = await import('@/api/client')
 
     ;(api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      data: { data: { pendingId: 'p' } },
+      data: { data: { userId: 'u1' } },
     })
     renderRegister()
     await user.type(screen.getByPlaceholderText('Tu nombre'), 'C')
     await user.type(screen.getByPlaceholderText('tu@email.com'), 'c@x.com')
     await user.type(screen.getByPlaceholderText('Mínimo 6 caracteres'), 'pass123')
     await user.click(screen.getByRole('button', { name: /Continuar/i }))
-    await waitFor(() => expect(screen.getByPlaceholderText('000000')).toBeInTheDocument())
-
-    ;(api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      data: { data: { userId: 'u1' } },
-    })
-    await user.type(screen.getByPlaceholderText('000000'), '123456')
-    await user.click(screen.getByRole('button', { name: /Verificar/i }))
-    await waitFor(() => expect(screen.getByText(/Email verificado/i)).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByText(/Cuenta creada/i)).toBeInTheDocument())
 
     await user.type(screen.getByPlaceholderText('11 1234 5678'), '1155996222')
     ;(api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
