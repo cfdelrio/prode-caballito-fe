@@ -252,6 +252,38 @@ export function Reglamento({ showHomePromo = false }: { showHomePromo?: boolean 
         </div>
       </a>
 
+      {/* Notificaciones por WhatsApp (Twilio sandbox) */}
+      <div data-testid="whatsapp-notif" className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="px-4 py-3 flex items-center gap-2" style={{ background: '#128C7E' }}>
+          <span className="text-[10px] font-black text-white uppercase tracking-widest">🔔 Recibí notificaciones por WhatsApp</span>
+        </div>
+        <div className="p-5 flex flex-col items-center text-center gap-3">
+          <p className="text-sm text-gray-700 font-semibold">
+            Escaneá el QR con WhatsApp para recibir avisos de partidos, resultados y novedades directo en tu teléfono.
+          </p>
+          <div className="p-3 bg-white rounded-xl border border-gray-100">
+            <LazyQR
+              value="https://wa.me/14155238886?text=join%20sheep-edge"
+              size={192}
+              level="M"
+              marginSize={0}
+            />
+          </div>
+          <p className="text-[11px] text-gray-500">
+            Se abrirá WhatsApp listo para enviar el mensaje de activación.
+          </p>
+          <a
+            href="https://wa.me/14155238886?text=join%20sheep-edge"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-black text-sm py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all hover:brightness-105 active:scale-[0.98]"
+            style={{ background: '#128C7E', color: '#fff', boxShadow: '0 4px 16px rgba(18,140,126,0.35)' }}
+          >
+            💬 Activar notificaciones
+          </a>
+        </div>
+      </div>
+
       {/* Canal de WhatsApp — siempre al final */}
       <div data-testid="whatsapp-canal" className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="px-4 py-3 flex items-center gap-2" style={{ background: '#25D366' }}>
