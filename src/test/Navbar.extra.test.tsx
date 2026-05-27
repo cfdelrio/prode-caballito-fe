@@ -33,7 +33,11 @@ vi.mock('@/store/authStore', () => ({
 }))
 
 vi.mock('@/api/client', () => ({
-  api: { post: vi.fn().mockResolvedValue({}), put: vi.fn().mockResolvedValue({}) },
+  api: {
+    get: vi.fn().mockResolvedValue({ data: { data: { history: [] } } }),
+    post: vi.fn().mockResolvedValue({}),
+    put: vi.fn().mockResolvedValue({}),
+  },
 }))
 
 vi.mock('@/components/layout/GanadoresModal', () => ({
