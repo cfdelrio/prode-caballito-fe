@@ -37,21 +37,14 @@ async function goToCompleteStep() {
   const user = userEvent.setup()
   const { api } = await import('@/api/client')
   ;(api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-    data: { data: { pendingId: 'pending123' } },
+    data: { data: { userId: 'u1' } },
   })
   renderRegister()
   await user.type(screen.getByPlaceholderText('Tu nombre'), 'Carlos')
   await user.type(screen.getByPlaceholderText('tu@email.com'), 'carlos@test.com')
   await user.type(screen.getByPlaceholderText('Mínimo 6 caracteres'), 'pass123')
   await user.click(screen.getByRole('button', { name: /Continuar/i }))
-  await waitFor(() => expect(screen.getByPlaceholderText('000000')).toBeInTheDocument())
-
-  ;(api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-    data: { data: { userId: 'u1' } },
-  })
-  await user.type(screen.getByPlaceholderText('000000'), '123456')
-  await user.click(screen.getByRole('button', { name: /Verificar/i }))
-  await waitFor(() => expect(screen.getByText(/Email verificado/i)).toBeInTheDocument())
+  await waitFor(() => expect(screen.getByText(/Cuenta creada/i)).toBeInTheDocument())
   return { user, api }
 }
 
@@ -155,80 +148,23 @@ describe('Register — paso form: error handling', () => {
   })
 })
 
-// ───────────────────────────────────────────────────────────────
-describe('Register — paso verify: error handling', () => {
-  beforeEach(() => vi.clearAllMocks())
-
-  async function goToVerifyStep() {
-    const user = userEvent.setup()
-    const { api } = await import('@/api/client')
-    ;(api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      data: { data: { pendingId: 'pending123' } },
-    })
-    renderRegister()
-    await user.type(screen.getByPlaceholderText('Tu nombre'), 'Carlos')
-    await user.type(screen.getByPlaceholderText('tu@email.com'), 'carlos@test.com')
-    await user.type(screen.getByPlaceholderText('Mínimo 6 caracteres'), 'pass123')
-    await user.click(screen.getByRole('button', { name: /Continuar/i }))
-    await waitFor(() => expect(screen.getByPlaceholderText('000000')).toBeInTheDocument())
-    return { user, api }
-  }
-
-  it('código inválido → toast error con mensaje del servidor', async () => {
-    const { user, api } = await goToVerifyStep()
-    ;(api.post as ReturnType<typeof vi.fn>).mockRejectedValueOnce({
-      response: { data: { error: 'Código expirado' } },
-    })
-
-    await user.type(screen.getByPlaceholderText('000000'), '999999')
-    await user.click(screen.getByRole('button', { name: /Verificar/i }))
-
-    await waitFor(() => {
-      expect(mockShow).toHaveBeenCalledWith('Código expirado', 'error')
-    })
-  })
-
-  it('error sin mensaje → mensaje genérico "Código inválido"', async () => {
-    const { user, api } = await goToVerifyStep()
-    ;(api.post as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('net'))
-
-    await user.type(screen.getByPlaceholderText('000000'), '999999')
-    await user.click(screen.getByRole('button', { name: /Verificar/i }))
-
-    await waitFor(() => {
-      expect(mockShow).toHaveBeenCalledWith('Código inválido', 'error')
-    })
-  })
-
-  it('reenviar código con error → toast de error', async () => {
-    const { user, api } = await goToVerifyStep()
-    ;(api.post as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('net'))
-
-    await user.click(screen.getByText(/Reenviar código/i))
-    await waitFor(() => {
-      expect(mockShow).toHaveBeenCalledWith('Error al reenviar', 'error')
-    })
-  })
-})
 
 // ───────────────────────────────────────────────────────────────
 describe('Register — stepper visual', () => {
   beforeEach(() => vi.clearAllMocks())
 
-  it('muestra los 4 labels del stepper', () => {
+  it('muestra los 3 labels del stepper', () => {
     renderRegister()
     expect(screen.getByText('Cuenta')).toBeInTheDocument()
-    // "Email" aparece como label del input y del stepper — getAllByText
-    expect(screen.getAllByText('Email').length).toBeGreaterThan(0)
     expect(screen.getByText('Perfil')).toBeInTheDocument()
     expect(screen.getByText('Avisos')).toBeInTheDocument()
   })
 
-  it('avanza el stepper visual al pasar al step verify', async () => {
+  it('avanza el stepper visual al pasar al paso de perfil', async () => {
     const user = userEvent.setup()
     const { api } = await import('@/api/client')
     ;(api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      data: { data: { pendingId: 'pending123' } },
+      data: { data: { userId: 'u1' } },
     })
     renderRegister()
     await user.type(screen.getByPlaceholderText('Tu nombre'), 'Carlos')
@@ -236,8 +172,7 @@ describe('Register — stepper visual', () => {
     await user.type(screen.getByPlaceholderText('Mínimo 6 caracteres'), 'pass123')
     await user.click(screen.getByRole('button', { name: /Continuar/i }))
 
-    await waitFor(() => expect(screen.getByPlaceholderText('000000')).toBeInTheDocument())
-    // El check del step 1 (Cuenta) debe estar visible
+    await waitFor(() => expect(screen.getByText(/Cuenta creada/i)).toBeInTheDocument())
     expect(screen.getByText('✓')).toBeInTheDocument()
   })
 })
