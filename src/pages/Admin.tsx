@@ -982,7 +982,7 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
                 <td className="px-4 py-2 text-center">
                   <button onClick={() => handlePaid(String(p.id), Boolean(p.precio_pagado))}
                     className={`text-xs px-2 py-0.5 rounded-full font-medium ${p.precio_pagado ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-600'}`}>
-                    {p.precio_pagado ? 'Pagada' : 'Sin pagar'}
+                    {p.precio_pagado ? 'Pagada' : 'IMPAGO'}
                   </button>
                 </td>
               </tr>
@@ -1104,9 +1104,9 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
                                 </div>
                                 <div className="text-right shrink-0">
                                   <p className="text-sm font-black text-[#0042A5]">{String(p.puntos_totales || 0)} pts</p>
-                                  <p className={`text-xs font-medium mt-0.5 ${p.precio_pagado ? 'text-green-600' : 'text-orange-500'}`}>
-                                    {p.precio_pagado ? 'Pagada' : 'Sin pagar'}
-                                  </p>
+                                  {!p.precio_pagado && (
+                                    <span className="bg-orange-100 text-orange-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full mt-0.5 inline-block">IMPAGO</span>
+                                  )}
                                 </div>
                               </div>
                             </button>

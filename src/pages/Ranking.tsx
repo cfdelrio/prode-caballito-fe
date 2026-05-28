@@ -377,8 +377,8 @@ export function Ranking() {
                             </a>
                           )}
                         </div>
-                        <p className="text-xs text-gray-400 truncate">{r.nombre_planilla}
-                          {!r.precio_pagado && <span className="ml-1 text-orange-400 font-medium">· {t.ranking.noOfficial}</span>}
+                        <p className="text-xs text-gray-400 truncate flex items-center gap-1">{r.nombre_planilla}
+                          {!r.precio_pagado && <span className="bg-orange-100 text-orange-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0">IMPAGO</span>}
                         </p>
                       </div>
                     </div>

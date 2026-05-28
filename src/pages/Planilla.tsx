@@ -110,7 +110,7 @@ export function Planilla() {
           <h1 className="text-xl font-bold text-[#001A4B] truncate">{planilla.nombre_planilla}</h1>
           <div className="flex gap-2 mt-0.5">
             <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${planilla.precio_pagado ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-600'}`}>
-              {planilla.precio_pagado ? t.planilla.paid : t.planilla.unpaid}
+              {planilla.precio_pagado ? t.planilla.paid : 'IMPAGO'}
             </span>
             {!planilla.precio_pagado && (
               <span className="text-xs text-orange-500">{t.planilla.notInRanking}</span>
