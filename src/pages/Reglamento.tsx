@@ -1,8 +1,11 @@
+import { useEffect, useState } from 'react'
 import { POINT_COLORS } from '@/utils/scoring'
 import { Link } from 'react-router-dom'
 import { LazyQR } from '@/components/ui/LazyQR'
 import { useAuthStore } from '@/store/authStore'
 import { InviteFriendCTA } from '@/components/InviteFriendCTA'
+import { ComunidadCard } from '@/components/ComunidadCard'
+import { api } from '@/api/client'
 
 const examples = [
   {
@@ -57,6 +60,13 @@ const examples = [
 
 export function Reglamento({ showHomePromo = false }: { showHomePromo?: boolean } = {}) {
   const { token } = useAuthStore()
+  const [totalUsers, setTotalUsers] = useState<number | null>(null)
+
+  useEffect(() => {
+    api.get('/users/stats')
+      .then(r => setTotalUsers(r.data.data.total_users))
+      .catch(() => {})
+  }, [])
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-5 pb-20">
@@ -67,6 +77,9 @@ export function Reglamento({ showHomePromo = false }: { showHomePromo?: boolean 
         <h1 className="text-xl font-black">⚽ Vuelve el PRODE del MUNDIAL ⚽</h1>
         <p className="text-sm text-white/70">Instructivo oficial — leelo antes de arrancar</p>
       </div>
+
+      {/* Contador de jugadores */}
+      <ComunidadCard count={totalUsers} />
 
       {/* Invitar amigo — CTA principal */}
       <InviteFriendCTA />
