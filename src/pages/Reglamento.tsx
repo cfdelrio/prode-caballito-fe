@@ -64,7 +64,7 @@ export function Reglamento({ showHomePromo = false }: { showHomePromo?: boolean 
 
   useEffect(() => {
     api.get('/users/stats')
-      .then(r => setTotalUsers(r.data.data.total_users))
+      .then(r => setTotalUsers(r.data.data.total_users - 1))
       .catch(() => {})
   }, [])
 
