@@ -7,6 +7,7 @@ import { Navbar } from '@/components/layout/Navbar'
 import { ToastContainer } from '@/components/ui/Toast'
 import { GoogleAdUnit } from '@/components/ui/GoogleAdUnit'
 import { PageSpinner } from '@/components/ui/Spinner'
+import { PushPromptModal } from '@/components/PushPromptModal'
 
 const Login               = lazy(() => import('@/pages/Login').then(m => ({ default: m.Login })))
 const Register            = lazy(() => import('@/pages/Register').then(m => ({ default: m.Register })))
@@ -23,6 +24,7 @@ const Planilla   = lazy(() => import('@/pages/Planilla').then(m => ({ default: m
 const Tournaments = lazy(() => import('@/pages/Tournaments').then(m => ({ default: m.Tournaments })))
 const Fixture    = lazy(() => import('@/pages/Fixture').then(m => ({ default: m.Fixture })))
 const VozHinchada = lazy(() => import('@/pages/VozHinchada').then(m => ({ default: m.VozHinchada })))
+const Ganadas    = lazy(() => import('@/pages/Ganadas').then(m => ({ default: m.Ganadas })))
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { token } = useAuthStore()
@@ -48,6 +50,7 @@ function AppLayout({ children, adSlot = '4113004001' }: { children: React.ReactN
       <Navbar />
       {adSlot && <GoogleAdUnit slot={adSlot} />}
       <main className="pb-14 md:pb-0">{children}</main>
+      <PushPromptModal />
     </div>
   )
 }
@@ -110,6 +113,9 @@ export default function App() {
         } />
         <Route path="/hinchada" element={
           <AppLayout adSlot={null}><VozHinchada /></AppLayout>
+        } />
+        <Route path="/ganadas" element={
+          <RequireAuth><AppLayout adSlot={null}><Ganadas /></AppLayout></RequireAuth>
         } />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

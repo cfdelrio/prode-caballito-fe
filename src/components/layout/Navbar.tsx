@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
@@ -19,14 +19,24 @@ export function Navbar() {
   const [showGanadores, setShowGanadores] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
   const { unreadCount } = useNotificationHistory()
+  const [hasGanadas, setHasGanadas] = useState(false)
+
+  useEffect(() => {
+    if (!user?.id) return
+    api.get('/matchdays/me').then(res => {
+      const history: { is_winner: boolean }[] = res.data?.data?.history ?? []
+      setHasGanadas(history.some(m => m.is_winner))
+    }).catch(() => {})
+  }, [user?.id])
 
   const navLinks: { to: string; label: string; icon: string; external?: boolean }[] = [
+    { to: '/reglamento',                label: t.nav.rules,   icon: '📖' },
     { to: '/',                          label: t.nav.home,    icon: '🏠' },
     { to: '/apuestas',                  label: t.nav.bets,    icon: '⚽' },
     { to: '/matriz',                    label: t.nav.matrix,  icon: '📊' },
     { to: '/ranking',                   label: t.nav.ranking, icon: '🏆' },
+    ...(hasGanadas ? [{ to: '/ganadas', label: 'Ganadas',     icon: '🥇' }] : []),
     { to: '/fixture',                   label: t.nav.fixture, icon: '🗓️' },
-    { to: '/reglamento',                label: t.nav.rules,   icon: '📖' },
   ]
 
   const adminLinks = [

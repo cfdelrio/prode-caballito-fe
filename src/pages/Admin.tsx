@@ -12,6 +12,7 @@ import { useAuthStore } from '@/store/authStore'
 import type { Match, Tournament } from '@/types'
 import { CampaignBuilder } from '@/components/CampaignBuilder'
 import { CampaignLiveActivity } from '@/components/CampaignLiveActivity'
+import { EngageVerifyPanel } from '@/components/EngageVerifyPanel'
 
 type Tab = 'partidos' | 'planillas' | 'usuarios' | 'torneos' | 'broadcast' | 'jobs' | 'polls' | 'campanas'
 
@@ -1152,6 +1153,8 @@ function JobsTab() {
   const [jobResult, setJobResult] = useState<{ id: string; text: string } | null>(null)
   const [confirmWeekly, setConfirmWeekly] = useState(false)
   const [confirmVoice5day, setConfirmVoice5day] = useState(false)
+  const [confirmReset, setConfirmReset] = useState(false)
+  const [resetExtendHours, setResetExtendHours] = useState('')
 
   useEffect(() => {
     // GET /matchdays requires tournament_id → load all tournaments first, then matchdays per tournament
@@ -1491,6 +1494,54 @@ function JobsTab() {
         </div>
       </JobCard>
 
+      {/* ── Reset del Juego ─────────────────────────────────────────────── */}
+      <JobCard
+        title="♻️ Reset del Juego"
+        description="Borra resultados, puntos, ranking, ganadores, streaks y badges. Preserva planillas y pronósticos."
+      >
+        <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-2.5 text-xs text-red-700 space-y-1.5">
+          <p className="font-semibold">⚠️ Qué se borra:</p>
+          <ul className="list-disc list-inside space-y-0.5">
+            <li>Resultados de todos los partidos (vuelven a "pending")</li>
+            <li>Puntos de todas las apuestas y planillas</li>
+            <li>Tabla de ranking completa</li>
+            <li>Ganadores (activo e historial de jornadas)</li>
+            <li>Streaks y badges de todos los usuarios</li>
+          </ul>
+          <p className="font-semibold">✅ Qué se preserva:</p>
+          <ul className="list-disc list-inside space-y-0.5">
+            <li>Planillas y pronósticos (goles apostados)</li>
+            <li>Partidos (sin resultados), torneos y usuarios</li>
+          </ul>
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-1">
+            Extender fechas de partidos (opcional)
+          </label>
+          <div className="flex gap-2 items-center">
+            <input
+              type="number"
+              min="0"
+              max="8760"
+              value={resetExtendHours}
+              onChange={e => setResetExtendHours(e.target.value)}
+              placeholder="0 hs (no extiende)"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
+            />
+            <span className="text-xs text-gray-400 whitespace-nowrap">horas</span>
+          </div>
+          <p className="text-xs text-gray-400 mt-1">Re-abre el período de apuestas empujando los horarios de los partidos hacia adelante.</p>
+        </div>
+        <button
+          onClick={() => setConfirmReset(true)}
+          disabled={!!loading}
+          className="w-full bg-red-600 text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
+        >
+          {loading === 'reset' ? 'Reseteando...' : '♻️ Resetear juego'}
+        </button>
+        {jobResult?.id === 'reset' && <p className="text-xs text-green-600 font-medium">{jobResult.text}</p>}
+      </JobCard>
+
       <ConfirmModal
         open={confirmWeekly}
         title="Enviar email semanal"
@@ -1518,6 +1569,22 @@ function JobsTab() {
           })
         }}
         onCancel={() => setConfirmVoice5day(false)}
+      />
+
+      <ConfirmModal
+        open={confirmReset}
+        title="♻️ Reset del Juego"
+        message="Esto borrará TODOS los resultados, puntos, ranking y ganadores. Las planillas y los pronósticos quedan intactos. Esta acción es IRREVERSIBLE."
+        requireText="RESET"
+        onConfirm={() => {
+          setConfirmReset(false)
+          runJob('reset', async () => {
+            const extendHours = Number(resetExtendHours) || 0
+            const { data } = await api.post('/admin/jobs/reset-game', extendHours > 0 ? { extend_hours: extendHours } : {})
+            return data.message ?? 'Juego reseteado ✓'
+          })
+        }}
+        onCancel={() => setConfirmReset(false)}
       />
     </div>
   )
@@ -1731,9 +1798,12 @@ function PollsTab() {
 /* ── CampanasTab ─────────────────────────────────────────────────────── */
 function CampanasTab() {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <CampaignBuilder />
-      <CampaignLiveActivity />
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <CampaignBuilder />
+        <CampaignLiveActivity />
+      </div>
+      <EngageVerifyPanel />
     </div>
   )
 }

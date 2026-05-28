@@ -203,7 +203,7 @@ export function Planilla() {
           <MatchCard
             key={m.id}
             match={m}
-            bet={bets[m.id]}
+            bet={canEdit || Date.now() > new Date(m.time_cutoff).getTime() ? bets[m.id] : undefined}
             planillaId={canEdit ? planillaId : undefined}
             tournamentClosed={tournamentClosed}
             onBetSaved={refreshBets}

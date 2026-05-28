@@ -85,7 +85,7 @@ test('Favoritos: marcar Rival como favorito y filtrar', async ({ page }) => {
   await filterBtn.click()
 
   // Rival should still be visible in the filtered view
-  await expect(rivalRow).toBeVisible({ timeout: 5_000 })
+  await expect(page.locator('.row-entrance').filter({ hasText: PLANILLA_NAMES.rival })).toBeVisible({ timeout: 5_000 })
 
   // Clean up: unmark favorite and clear filter
   await favBtn.click()
