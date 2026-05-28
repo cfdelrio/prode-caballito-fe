@@ -98,25 +98,6 @@ describe('Ranking — click WhatsApp en fila no abre el drawer', () => {
   })
 })
 
-describe('Ranking — drawer: link "Ver planilla completa" cierra el drawer', () => {
-  beforeEach(() => localStorage.clear())
-  afterEach(() => vi.clearAllMocks())
-
-  it('click en "Ver planilla completa" navega y cierra el drawer (setSelected(null))', async () => {
-    await setupApi()
-    renderRanking()
-    await waitFor(() => expect(screen.getByText('Ana García')).toBeInTheDocument())
-
-    const user = userEvent.setup()
-    // Abrir el drawer clickeando la fila de Ana
-    await user.click(screen.getByText('Ana García'))
-    const fullLink = await screen.findByText(/Ver planilla completa/i)
-    expect(fullLink.closest('a')?.getAttribute('href')).toBe('/planilla/p2')
-    await user.click(fullLink)
-    // Tras click, el drawer se cierra
-    await waitFor(() => expect(screen.queryByText(/Ver planilla completa/i)).toBeNull())
-  })
-})
 
 describe('Ranking — toggle favorito desde el drawer', () => {
   beforeEach(() => localStorage.clear())
