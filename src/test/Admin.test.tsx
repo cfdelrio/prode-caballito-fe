@@ -99,9 +99,10 @@ function setupApi(overrides: {
         if (overrides.rejectTournaments) return Promise.reject(new Error('network'))
         return Promise.resolve({ data: { data: overrides.tournamentsAll ?? overrides.tournaments ?? [] } })
       }
-      if (url === '/users') {
+      if (url.startsWith('/users')) {
         if (overrides.rejectUsers) return Promise.reject(new Error('network'))
-        return Promise.resolve({ data: { data: { users: overrides.users ?? [] } } })
+        const users = overrides.users ?? []
+        return Promise.resolve({ data: { data: { users, pagination: { page: 1, limit: 20, total: users.length, pages: 1 } } } })
       }
       if (url === '/bets/unlock-requests') {
         return Promise.resolve({ data: { data: overrides.unlock ?? [] } })

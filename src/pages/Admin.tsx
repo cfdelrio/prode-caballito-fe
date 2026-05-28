@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
@@ -867,15 +867,22 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
   const [planillaTournamentFilter, setPlanillaTournamentFilter] = useState<string>('all')
   const [allPlanillas, setAllPlanillas] = useState<Record<string, unknown>[] | null>(null)
   const [confirmDeleteUser, setConfirmDeleteUser] = useState<{ id: string; name: string } | null>(null)
+  const USERS_PER_PAGE = 20
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalUsers, setTotalUsers] = useState(0)
 
   const loadTabData = useCallback(async () => {
     if (tab === 'usuarios') {
       const [uRes, urRes] = await Promise.allSettled([
-        api.get('/users'),
+        api.get(`/users?page=${page}&limit=${USERS_PER_PAGE}`),
         api.get('/bets/unlock-requests'),
       ])
-      if (uRes.status === 'fulfilled') setData(uRes.value.data.data.users || [])
-      else show('Error al cargar usuarios', 'error')
+      if (uRes.status === 'fulfilled') {
+        setData(uRes.value.data.data.users || [])
+        const pag = uRes.value.data.data.pagination
+        if (pag) { setTotalPages(pag.pages); setTotalUsers(pag.total) }
+      } else show('Error al cargar usuarios', 'error')
       if (urRes.status === 'fulfilled') {
         const counts: Record<string, number> = {}
         for (const r of (urRes.value.data.data || [])) {
@@ -888,7 +895,7 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
       const { data: d } = await api.get('/planillas/admin/all').catch(() => { show('Error al cargar', 'error'); return { data: { data: [] } } })
       setData(d.data)
     }
-  }, [tab, show])
+  }, [tab, show, page])
 
   useEffect(() => {
     setLoading(true)
@@ -896,6 +903,9 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
     const interval = setInterval(loadTabData, 30000)
     return () => clearInterval(interval)
   }, [loadTabData])
+
+  useEffect(() => { setExpandedUserId(null) }, [page])
+  useEffect(() => { setPage(1) }, [tab])
 
   const handleUserClick = useCallback(async (uid: string) => {
     if (expandedUserId === uid) { setExpandedUserId(null); return }
@@ -927,7 +937,11 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
     setConfirmDeleteUser(null)
     try {
       await api.delete(`/users/${userId}`)
-      setData(data.filter(u => String(u.id) !== userId))
+      setData(prev => {
+        const next = prev.filter(u => String(u.id) !== userId)
+        if (next.length === 0 && page > 1) setPage(p => p - 1)
+        return next
+      })
       show(`Usuario ${userName} eliminado completamente ✓`, 'success')
     } catch (e: unknown) {
       const msg = (e as { response?: { data?: { error?: string } } }).response?.data?.error || 'Error al eliminar usuario'
@@ -1006,8 +1020,8 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
             const reqCount = unlockCounts[uid] || 0
             const isExpanded = expandedUserId === uid
             return (
-              <>
-              <tr key={uid}
+              <React.Fragment key={uid}>
+              <tr
                 className={`border-b border-gray-50 cursor-pointer transition-colors ${isExpanded ? 'bg-blue-50' : 'hover:bg-gray-50/50'}`}
                 onClick={() => handleUserClick(uid)}
               >
@@ -1103,11 +1117,32 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
                   </td>
                 </tr>
               )}
-              </>
+              </React.Fragment>
             )
           })}
         </tbody>
       </table>
+      {tab === 'usuarios' && totalPages > 1 && (
+        <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 text-sm text-gray-500">
+          <span>{totalUsers} usuarios · página {page} de {totalPages}</span>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setPage(p => p - 1)}
+              disabled={page === 1}
+              className="px-3 py-1 rounded border border-gray-200 disabled:opacity-40 hover:bg-gray-50 transition-colors text-xs"
+            >
+              ← Anterior
+            </button>
+            <button
+              onClick={() => setPage(p => p + 1)}
+              disabled={page === totalPages}
+              className="px-3 py-1 rounded border border-gray-200 disabled:opacity-40 hover:bg-gray-50 transition-colors text-xs"
+            >
+              Siguiente →
+            </button>
+          </div>
+        </div>
+      )}
       <ConfirmModal
         open={!!confirmDeleteUser}
         title="⚠️ Eliminar usuario"
