@@ -1,5 +1,4 @@
 import { useEffect, useState, useCallback } from 'react'
-import { Link } from 'react-router-dom'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
@@ -484,13 +483,6 @@ export function Ranking() {
                 </div>
               )}
               <div className="flex gap-3 mt-5">
-                <Link
-                  to={`/planilla/${selected.planilla_id}`}
-                  className="flex-1 bg-[#001A4B] text-white text-sm font-bold py-3 rounded-xl text-center hover:bg-[#002870] transition-colors"
-                  onClick={() => setSelected(null)}
-                >
-                  {t.ranking.fullPlanilla}
-                </Link>
                 <button
                   onClick={() => handleShare(selected)}
                   className="flex-1 border-2 border-[#001A4B] text-[#001A4B] text-sm font-bold py-3 rounded-xl hover:bg-gray-50 transition-colors"
