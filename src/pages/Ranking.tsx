@@ -104,6 +104,10 @@ export function Ranking() {
     }).finally(() => setLoading(false))
   }, [])
 
+  useEffect(() => {
+    setShared(false)
+  }, [selected])
+
   // Filtro de favoritos aplicado sobre el ranking — siempre incluye las planillas propias
   const displayRanking = showOnlyFavorites
     ? ranking.filter(r => favorites.has(r.planilla_id) || r.user_id === user?.id)
