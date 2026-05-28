@@ -48,11 +48,11 @@ describe('Register — paso 1: formulario', () => {
     expect(screen.getByText(/Iniciá sesión/i)).toBeInTheDocument()
   })
 
-  it('submit exitoso → llama API y avanza al paso de verificación', async () => {
+  it('submit exitoso → llama API y avanza al paso de completar perfil', async () => {
     const user = userEvent.setup()
     const { api } = await import('@/api/client')
     ;(api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      data: { data: { pendingId: 'pending123' } },
+      data: { data: { userId: 'u1' } },
     })
 
     renderRegister()
@@ -66,9 +66,8 @@ describe('Register — paso 1: formulario', () => {
         nombre: 'Carlos', email: 'carlos@test.com',
       }))
     })
-    // Avanza al paso de verificación
     await waitFor(() => {
-      expect(screen.getByPlaceholderText('000000')).toBeInTheDocument()
+      expect(screen.getByText(/Cuenta creada/i)).toBeInTheDocument()
     })
   })
 
@@ -91,89 +90,23 @@ describe('Register — paso 1: formulario', () => {
   })
 })
 
-describe('Register — paso 2: verificación de email', () => {
-  afterEach(() => vi.clearAllMocks())
-
-  async function goToVerifyStep() {
-    const user = userEvent.setup()
-    const { api } = await import('@/api/client')
-    ;(api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      data: { data: { pendingId: 'pending123' } },
-    })
-    renderRegister()
-    await user.type(screen.getByPlaceholderText('Tu nombre'), 'Carlos')
-    await user.type(screen.getByPlaceholderText('tu@email.com'), 'carlos@test.com')
-    await user.type(screen.getByPlaceholderText('Mínimo 6 caracteres'), 'pass123')
-    await user.click(screen.getByRole('button', { name: /Continuar/i }))
-    await waitFor(() => expect(screen.getByPlaceholderText('000000')).toBeInTheDocument())
-    return { user, api }
-  }
-
-  it('muestra input de código de 6 dígitos', async () => {
-    await goToVerifyStep()
-    expect(screen.getByPlaceholderText('000000')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Verificar/i })).toBeInTheDocument()
-  })
-
-  it('reenviar código → llama API /auth/resend-code', async () => {
-    const { user, api } = await goToVerifyStep()
-    ;(api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({})
-
-    await user.click(screen.getByText(/Reenviar código/i))
-    await waitFor(() => {
-      expect(api.post).toHaveBeenCalledWith('/auth/resend-code', expect.objectContaining({ pendingId: 'pending123' }))
-    })
-  })
-
-  it('código correcto → avanza al paso de completar perfil', async () => {
-    const { user, api } = await goToVerifyStep()
-    ;(api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      data: { data: { userId: 'u1' } },
-    })
-
-    await user.type(screen.getByPlaceholderText('000000'), '123456')
-    await user.click(screen.getByRole('button', { name: /Verificar/i }))
-
-    await waitFor(() => {
-      expect(api.post).toHaveBeenCalledWith('/auth/verify-email', expect.objectContaining({ code: '123456' }))
-    })
-    // Paso 3: perfil completo
-    await waitFor(() => {
-      expect(screen.getByText(/Email verificado/i)).toBeInTheDocument()
-    })
-  })
-})
-
-// ─── Helper compartido para llegar al paso 3 ─────────────────────────────────
+// ─── Helper compartido para llegar al paso 2 (completar perfil) ──────────────
 
 async function goToCompleteStep() {
   const user = userEvent.setup()
   const { api } = await import('@/api/client')
 
   ;(api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-    data: { data: { pendingId: 'pending123' } },
+    data: { data: { userId: 'u1' } },
   })
   renderRegister()
   await user.type(screen.getByPlaceholderText('Tu nombre'), 'Carlos')
   await user.type(screen.getByPlaceholderText('tu@email.com'), 'carlos@test.com')
   await user.type(screen.getByPlaceholderText('Mínimo 6 caracteres'), 'pass123')
   await user.click(screen.getByRole('button', { name: /Continuar/i }))
-  await waitFor(() => expect(screen.getByPlaceholderText('000000')).toBeInTheDocument())
+  await waitFor(() => expect(screen.getByText(/Cuenta creada/i)).toBeInTheDocument())
 
-  ;(api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-    data: { data: { userId: 'u1' } },
-  })
-  await user.type(screen.getByPlaceholderText('000000'), '123456')
-  await user.click(screen.getByRole('button', { name: /Verificar/i }))
-  await waitFor(() => expect(screen.getByText(/Email verificado/i)).toBeInTheDocument())
-
-  // Ingresar teléfono y aceptar consentimiento (ahora obligatorio)
   await user.type(screen.getByPlaceholderText('11 1234 5678'), '1155996222')
-  const checkboxLabel = screen.getByText(/Acepto que mi número sea visible/)
-  const checkbox = checkboxLabel.closest('label')?.querySelector('input[type="checkbox"]')
-  if (checkbox && !checkbox.checked) {
-    await user.click(checkbox)
-  }
 
   return { user, api }
 }

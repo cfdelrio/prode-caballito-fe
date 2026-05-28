@@ -1154,6 +1154,7 @@ function JobsTab() {
   const [confirmWeekly, setConfirmWeekly] = useState(false)
   const [confirmVoice5day, setConfirmVoice5day] = useState(false)
   const [confirmReset, setConfirmReset] = useState(false)
+  const [resetExtendHours, setResetExtendHours] = useState('')
 
   useEffect(() => {
     // GET /matchdays requires tournament_id → load all tournaments first, then matchdays per tournament
@@ -1513,6 +1514,24 @@ function JobsTab() {
             <li>Partidos (sin resultados), torneos y usuarios</li>
           </ul>
         </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-1">
+            Extender fechas de partidos (opcional)
+          </label>
+          <div className="flex gap-2 items-center">
+            <input
+              type="number"
+              min="0"
+              max="8760"
+              value={resetExtendHours}
+              onChange={e => setResetExtendHours(e.target.value)}
+              placeholder="0 hs (no extiende)"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
+            />
+            <span className="text-xs text-gray-400 whitespace-nowrap">horas</span>
+          </div>
+          <p className="text-xs text-gray-400 mt-1">Re-abre el período de apuestas empujando los horarios de los partidos hacia adelante.</p>
+        </div>
         <button
           onClick={() => setConfirmReset(true)}
           disabled={!!loading}
@@ -1555,22 +1574,14 @@ function JobsTab() {
       <ConfirmModal
         open={confirmReset}
         title="♻️ Reset del Juego"
-        message="Esto borrará TODOS los resultados, puntos, ranking, ganadores, streaks y badges. Las planillas y los pronósticos quedan intactos. Esta acción es IRREVERSIBLE."
+        message="Esto borrará TODOS los resultados, puntos, ranking y ganadores. Las planillas y los pronósticos quedan intactos. Esta acción es IRREVERSIBLE."
         requireText="RESET"
         onConfirm={() => {
           setConfirmReset(false)
           runJob('reset', async () => {
-            const { data } = await api.post('/admin/jobs/reset-game', {})
-            const r = data.data
-            return [
-              `✓ ${r.matches} partidos reseteados`,
-              `✓ ${r.bets} apuestas limpiadas`,
-              `✓ ${r.planillas} planillas en 0`,
-              `✓ ${r.ranking_entries} filas de ranking borradas`,
-              `✓ ${r.winner_configs} configs de ganador borradas`,
-              `✓ ${r.streaks} streaks borrados`,
-              `✓ ${r.badges} badges borrados`,
-            ].join(' · ')
+            const extendHours = Number(resetExtendHours) || 0
+            const { data } = await api.post('/admin/jobs/reset-game', extendHours > 0 ? { extend_hours: extendHours } : {})
+            return data.message ?? 'Juego reseteado ✓'
           })
         }}
         onCancel={() => setConfirmReset(false)}
