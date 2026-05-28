@@ -452,11 +452,9 @@ export function Matriz() {
                           {r.nombre_planilla && (
                             <span className="block text-[10px] text-gray-400 truncate max-w-[90px]">{r.nombre_planilla}</span>
                           )}
-                          {isUnpaid && (
-                            <span className="inline-block mt-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-600 leading-none whitespace-nowrap">
-                              IMPAGO
-                            </span>
-                          )}
+                          <span className={`inline-block mt-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none whitespace-nowrap ${isUnpaid ? 'bg-orange-100 text-orange-600' : 'bg-green-100 text-green-700'}`}>
+                            {isUnpaid ? 'IMPAGO' : 'Pagó'}
+                          </span>
                         </div>
                         {r.whatsapp_number && (
                           <a
