@@ -453,8 +453,8 @@ export function Matriz() {
                             <span className="block text-[10px] text-gray-400 truncate max-w-[90px]">{r.nombre_planilla}</span>
                           )}
                           {isUnpaid && (
-                            <span className="inline-block mt-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-orange-500 text-white leading-none whitespace-nowrap">
-                              ⚠️ {t.ranking.noOfficial}
+                            <span className="inline-block mt-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-600 leading-none whitespace-nowrap">
+                              IMPAGO
                             </span>
                           )}
                         </div>
