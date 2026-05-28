@@ -485,7 +485,9 @@ export function Ranking() {
               <div className="flex gap-3 mt-5">
                 <button
                   onClick={() => handleShare(selected)}
-                  className="flex-1 border-2 border-[#001A4B] text-[#001A4B] text-sm font-bold py-3 rounded-xl hover:bg-gray-50 transition-colors"
+                  disabled={selected.user_id !== user?.id}
+                  className="flex-1 border-2 border-[#001A4B] text-[#001A4B] text-sm font-bold py-3 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
+                  title={selected.user_id !== user?.id ? 'Comparte tu propia planilla' : ''}
                 >
                   {shared ? t.ranking.copied : t.ranking.share}
                 </button>
