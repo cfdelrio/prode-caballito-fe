@@ -106,11 +106,11 @@ describe('Ranking — renderizado con datos', () => {
     })
   })
 
-  it('jugador impago muestra badge IMPAGA', async () => {
+  it('jugador impago muestra badge IMPAGO', async () => {
     await setupApi()
     renderRanking()
     await waitFor(() => {
-      expect(screen.getByText(/IMPAGA/i)).toBeInTheDocument()
+      expect(screen.getByText(/IMPAGO/i)).toBeInTheDocument()
     }, { timeout: 3000 })
   })
 })
