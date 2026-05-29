@@ -866,6 +866,40 @@ export function Home() {
         </div>
       </div>
 
+      {/* ── NOTIFICACIONES POR WHATSAPP ─────────────────────────── */}
+      <div className="px-4 mt-5 mb-4">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="px-4 py-3 flex items-center gap-2" style={{ background: '#25D366' }}>
+            <span className="text-[10px] font-black text-white uppercase tracking-widest">🔔 Recibir notificaciones</span>
+          </div>
+          <div className="p-5 flex flex-col items-center text-center gap-3">
+            <p className="text-sm text-gray-700 font-semibold">
+              Activá las notificaciones para recibir recordatorios de partidos, resultados y ranking directo en tu WhatsApp.
+            </p>
+            <div className="p-3 bg-white rounded-xl border border-gray-100">
+              <LazyQR
+                value="https://wa.me/14155238886?text=join%20sheep-edge"
+                size={192}
+                level="M"
+                marginSize={0}
+              />
+            </div>
+            <p className="text-[11px] text-gray-500">
+              Escaneá el código con tu cámara para enviar el mensaje de activación.
+            </p>
+            <a
+              href="https://wa.me/14155238886?text=join%20sheep-edge"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-black text-sm py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all hover:brightness-105 active:scale-[0.98]"
+              style={{ background: '#25D366', color: '#fff', boxShadow: '0 4px 16px rgba(37,211,102,0.35)' }}
+            >
+              💬 Activar notificaciones
+            </a>
+          </div>
+        </div>
+      </div>
+
       {/* ── AYUDA — 0800 ────────────────────────────────────────── */}
       <div className="px-4 mb-4">
         <a

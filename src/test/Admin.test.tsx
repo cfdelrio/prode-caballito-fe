@@ -99,9 +99,10 @@ function setupApi(overrides: {
         if (overrides.rejectTournaments) return Promise.reject(new Error('network'))
         return Promise.resolve({ data: { data: overrides.tournamentsAll ?? overrides.tournaments ?? [] } })
       }
-      if (url === '/users') {
+      if (url.startsWith('/users')) {
         if (overrides.rejectUsers) return Promise.reject(new Error('network'))
-        return Promise.resolve({ data: { data: { users: overrides.users ?? [] } } })
+        const users = overrides.users ?? []
+        return Promise.resolve({ data: { data: { users, pagination: { page: 1, limit: 20, total: users.length, pages: 1 } } } })
       }
       if (url === '/bets/unlock-requests') {
         return Promise.resolve({ data: { data: overrides.unlock ?? [] } })
@@ -502,7 +503,7 @@ describe('Admin — AdminSubTab Planillas', () => {
     await userEvent.click(screen.getByText(/📋 Planillas/))
     await waitFor(() => expect(screen.getByText('Mi planilla')).toBeInTheDocument())
     expect(screen.getByRole('button', { name: 'Pagada' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Sin pagar' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'IMPAGO' })).toBeInTheDocument()
   })
 
   it('toggle de pago: PUT /planillas/admin/:id', async () => {
@@ -510,9 +511,9 @@ describe('Admin — AdminSubTab Planillas', () => {
     await setupApi({ planillas })
     renderAdmin()
     await userEvent.click(screen.getByText(/📋 Planillas/))
-    await waitFor(() => expect(screen.getByText('Sin pagar')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByText('IMPAGO')).toBeInTheDocument())
     const { api } = await import('@/api/client')
-    await userEvent.click(screen.getByText('Sin pagar'))
+    await userEvent.click(screen.getByText('IMPAGO'))
     await waitFor(() => expect(api.put).toHaveBeenCalledWith('/planillas/admin/p1', { precio_pagado: true }))
     await waitFor(() => expect(mockShow).toHaveBeenCalledWith('Actualizado ✓', 'success'))
   })
@@ -524,7 +525,7 @@ describe('Admin — AdminSubTab Planillas', () => {
     ;(api.put as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('fail'))
     renderAdmin()
     await userEvent.click(screen.getByText(/📋 Planillas/))
-    await userEvent.click(await screen.findByText('Sin pagar'))
+    await userEvent.click(await screen.findByText('IMPAGO'))
     await waitFor(() => expect(mockShow).toHaveBeenCalledWith('Error', 'error'))
   })
 

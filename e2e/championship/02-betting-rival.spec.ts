@@ -3,21 +3,22 @@
  *
  * Logged in as: e2e.rival@prode.test
  * Rival bets differently from Lider — designed to produce lower scoring.
+ *
+ * Uses a shared browser page across all tests — navigates to /apuestas once.
  */
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 import path from 'path'
 import { BETS_RIVAL, MATCHES, PLANILLA_NAMES } from './helpers/fixture'
 
 const AUTH_FILE = path.join(import.meta.dirname, '../.auth/rival.json')
-test.use({ storageState: AUTH_FILE })
 
-async function selectPlanilla(page: any) {
+async function selectPlanilla(page: Page) {
   const select = page.locator('[data-tour="planilla-selector"] select')
   await select.waitFor({ state: 'attached', timeout: 15_000 })
   await select.selectOption({ label: PLANILLA_NAMES.rival })
 }
 
-async function placeBetInUI(page: any, homeTeam: string, awayTeam: string, score: string) {
+async function placeBetInUI(page: Page, homeTeam: string, awayTeam: string, score: string) {
   const matchList = page.locator('[data-tour="match-list"]')
   const card = matchList
     .locator('.t-surface, [class*="rounded"]')
@@ -33,25 +34,35 @@ async function placeBetInUI(page: any, homeTeam: string, awayTeam: string, score
   await expect(card.getByText(score)).toBeVisible({ timeout: 8_000 })
 }
 
-test.beforeEach(async ({ page }) => {
-  await page.goto('/apuestas')
-  await expect(page).not.toHaveURL(/\/login/, { timeout: 10_000 })
-  await page.waitForSelector('[data-tour="planilla-selector"]', { timeout: 30_000 })
-  await selectPlanilla(page)
-})
+test.describe.serial('Rival betting', () => {
+  let sharedPage: Page
 
-test('Rival apuesta mA: Argentina vs Brasil — 1-0', async ({ page }) => {
-  await placeBetInUI(page, MATCHES.mA.home, MATCHES.mA.away, BETS_RIVAL.mA)
-})
+  test.beforeAll(async ({ browser }) => {
+    const context = await browser.newContext({ storageState: AUTH_FILE })
+    sharedPage = await context.newPage()
+    await sharedPage.goto('/apuestas')
+    await expect(sharedPage).not.toHaveURL(/\/login/, { timeout: 10_000 })
+    await sharedPage.waitForSelector('[data-tour="planilla-selector"]', { timeout: 30_000 })
+    await selectPlanilla(sharedPage)
+  })
 
-test('Rival apuesta mB: Uruguay vs Chile — 1-1', async ({ page }) => {
-  await placeBetInUI(page, MATCHES.mB.home, MATCHES.mB.away, BETS_RIVAL.mB)
-})
+  test.afterAll(async () => {
+    await sharedPage.context().close()
+  })
 
-test('Rival apuesta mC: Argentina vs Uruguay — 2-0', async ({ page }) => {
-  await placeBetInUI(page, MATCHES.mC.home, MATCHES.mC.away, BETS_RIVAL.mC)
-})
+  test('Rival apuesta mA: Argentina vs Brasil — 1-0', async () => {
+    await placeBetInUI(sharedPage, MATCHES.mA.home, MATCHES.mA.away, BETS_RIVAL.mA)
+  })
 
-test('Rival apuesta mD: Brasil vs Chile — 0-0', async ({ page }) => {
-  await placeBetInUI(page, MATCHES.mD.home, MATCHES.mD.away, BETS_RIVAL.mD)
+  test('Rival apuesta mB: Uruguay vs Chile — 1-1', async () => {
+    await placeBetInUI(sharedPage, MATCHES.mB.home, MATCHES.mB.away, BETS_RIVAL.mB)
+  })
+
+  test('Rival apuesta mC: Argentina vs Uruguay — 2-0', async () => {
+    await placeBetInUI(sharedPage, MATCHES.mC.home, MATCHES.mC.away, BETS_RIVAL.mC)
+  })
+
+  test('Rival apuesta mD: Brasil vs Chile — 0-0', async () => {
+    await placeBetInUI(sharedPage, MATCHES.mD.home, MATCHES.mD.away, BETS_RIVAL.mD)
+  })
 })

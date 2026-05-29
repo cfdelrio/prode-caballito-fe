@@ -8,7 +8,7 @@ import { WhatsAppQRCard } from '@/components/WhatsAppQRCard'
 import { Button } from '@/components/ui/Button'
 import { Spinner } from '@/components/ui/Spinner'
 
-type Step = 'form' | 'verify' | 'complete' | 'notify'
+type Step = 'form' | 'complete' | 'notify'
 
 function compressImage(file: File, maxPx: number, quality: number): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -64,10 +64,8 @@ export function Register() {
 
   const [step, setStep] = useState<Step>('form')
   const [loading, setLoading] = useState(false)
-  const [pendingId, setPendingId] = useState('')
   const [userId, setUserId] = useState('')
   const [form, setForm] = useState({ nombre: '', email: '', password: '' })
-  const [code, setCode] = useState('')
   const [tema, setTema] = useState('neutral')
   const [countryCode, setCountryCode] = useState('+54')
   const [localPhone, setLocalPhone] = useState('')
@@ -81,38 +79,13 @@ export function Register() {
     setLoading(true)
     try {
       const { data } = await api.post('/auth/register-pending', form)
-      setPendingId(data.data.pendingId)
-      setStep('verify')
-      show('Código enviado a tu email', 'success')
+      setUserId(data.data.userId)
+      setStep('complete')
     } catch (e: unknown) {
       const msg = (e as { response?: { data?: { error?: string } } }).response?.data?.error || 'Error al registrarse'
       show(msg, 'error')
     } finally {
       setLoading(false)
-    }
-  }
-
-  const handleVerify = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    try {
-      const { data } = await api.post('/auth/verify-email', { pendingId, code })
-      setUserId(data.data.userId)
-      setStep('complete')
-    } catch (e: unknown) {
-      const msg = (e as { response?: { data?: { error?: string } } }).response?.data?.error || 'Código inválido'
-      show(msg, 'error')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleResend = async () => {
-    try {
-      await api.post('/auth/resend-code', { pendingId })
-      show('Código reenviado ✓', 'success')
-    } catch {
-      show('Error al reenviar', 'error')
     }
   }
 
@@ -215,7 +188,6 @@ export function Register() {
           {(() => {
             const STEPS = [
               { key: 'form',     label: 'Cuenta' },
-              { key: 'verify',   label: 'Email' },
               { key: 'complete', label: 'Perfil' },
               { key: 'notify',   label: 'Avisos' },
             ] as const
@@ -286,29 +258,9 @@ export function Register() {
             </form>
           )}
 
-          {step === 'verify' && (
-            <form onSubmit={handleVerify} className="space-y-4">
-              <p className="text-sm text-gray-600 text-center">
-                Enviamos un código de 6 dígitos a <strong>{form.email}</strong>
-              </p>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 text-center">Código de verificación</label>
-                <input type="text" value={code} onChange={(e) => setCode(e.target.value)}
-                  className="w-full border-2 border-[#0042A5] rounded-xl px-4 py-3 focus:outline-none text-2xl font-bold text-center tracking-widest"
-                  placeholder="000000" maxLength={6} required />
-              </div>
-              <Button type="submit" size="lg" fullWidth loading={loading}>
-                {loading ? 'Verificando...' : 'Verificar →'}
-              </Button>
-              <button type="button" onClick={handleResend} className="w-full text-sm text-gray-500 hover:text-[#0042A5]">
-                ¿No llegó? Reenviar código
-              </button>
-            </form>
-          )}
-
           {step === 'complete' && (
             <form onSubmit={handleComplete} className="space-y-5">
-              <p className="text-sm text-gray-600 text-center">¡Email verificado! Completá tu perfil:</p>
+              <p className="text-sm text-gray-600 text-center">¡Cuenta creada! Completá tu perfil:</p>
 
               {/* Foto de perfil */}
               <div className="flex flex-col items-center gap-2">

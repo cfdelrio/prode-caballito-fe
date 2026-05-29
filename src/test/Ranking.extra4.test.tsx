@@ -96,8 +96,9 @@ describe('Ranking — share con navigator.share disponible', () => {
   it('handleShare desde drawer usa navigator.share cuando está disponible', async () => {
     await loadRanking()
     const user = userEvent.setup()
-    // Abrir drawer de Ana
-    await user.click(screen.getByText('Ana García'))
+    // Abrir drawer del usuario logueado (Carlos)
+    const rows = screen.getAllByText('Carlos Foo')
+    await user.click(rows[0])
     // Botón "↗ Compartir" dentro del drawer
     const shareBtn = await screen.findByText(/↗ Compartir/i)
     await user.click(shareBtn)

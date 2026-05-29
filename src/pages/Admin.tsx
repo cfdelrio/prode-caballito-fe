@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
@@ -867,15 +867,22 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
   const [planillaTournamentFilter, setPlanillaTournamentFilter] = useState<string>('all')
   const [allPlanillas, setAllPlanillas] = useState<Record<string, unknown>[] | null>(null)
   const [confirmDeleteUser, setConfirmDeleteUser] = useState<{ id: string; name: string } | null>(null)
+  const USERS_PER_PAGE = 20
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalUsers, setTotalUsers] = useState(0)
 
   const loadTabData = useCallback(async () => {
     if (tab === 'usuarios') {
       const [uRes, urRes] = await Promise.allSettled([
-        api.get('/users'),
+        api.get(`/users?page=${page}&limit=${USERS_PER_PAGE}`),
         api.get('/bets/unlock-requests'),
       ])
-      if (uRes.status === 'fulfilled') setData(uRes.value.data.data.users || [])
-      else show('Error al cargar usuarios', 'error')
+      if (uRes.status === 'fulfilled') {
+        setData(uRes.value.data.data.users || [])
+        const pag = uRes.value.data.data.pagination
+        if (pag) { setTotalPages(pag.pages); setTotalUsers(pag.total) }
+      } else show('Error al cargar usuarios', 'error')
       if (urRes.status === 'fulfilled') {
         const counts: Record<string, number> = {}
         for (const r of (urRes.value.data.data || [])) {
@@ -888,7 +895,7 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
       const { data: d } = await api.get('/planillas/admin/all').catch(() => { show('Error al cargar', 'error'); return { data: { data: [] } } })
       setData(d.data)
     }
-  }, [tab, show])
+  }, [tab, show, page])
 
   useEffect(() => {
     setLoading(true)
@@ -896,6 +903,9 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
     const interval = setInterval(loadTabData, 30000)
     return () => clearInterval(interval)
   }, [loadTabData])
+
+  useEffect(() => { setExpandedUserId(null) }, [page])
+  useEffect(() => { setPage(1) }, [tab])
 
   const handleUserClick = useCallback(async (uid: string) => {
     if (expandedUserId === uid) { setExpandedUserId(null); return }
@@ -927,7 +937,11 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
     setConfirmDeleteUser(null)
     try {
       await api.delete(`/users/${userId}`)
-      setData(data.filter(u => String(u.id) !== userId))
+      setData(prev => {
+        const next = prev.filter(u => String(u.id) !== userId)
+        if (next.length === 0 && page > 1) setPage(p => p - 1)
+        return next
+      })
       show(`Usuario ${userName} eliminado completamente ✓`, 'success')
     } catch (e: unknown) {
       const msg = (e as { response?: { data?: { error?: string } } }).response?.data?.error || 'Error al eliminar usuario'
@@ -968,7 +982,7 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
                 <td className="px-4 py-2 text-center">
                   <button onClick={() => handlePaid(String(p.id), Boolean(p.precio_pagado))}
                     className={`text-xs px-2 py-0.5 rounded-full font-medium ${p.precio_pagado ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-600'}`}>
-                    {p.precio_pagado ? 'Pagada' : 'Sin pagar'}
+                    {p.precio_pagado ? 'Pagada' : 'IMPAGO'}
                   </button>
                 </td>
               </tr>
@@ -1006,8 +1020,8 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
             const reqCount = unlockCounts[uid] || 0
             const isExpanded = expandedUserId === uid
             return (
-              <>
-              <tr key={uid}
+              <React.Fragment key={uid}>
+              <tr
                 className={`border-b border-gray-50 cursor-pointer transition-colors ${isExpanded ? 'bg-blue-50' : 'hover:bg-gray-50/50'}`}
                 onClick={() => handleUserClick(uid)}
               >
@@ -1090,9 +1104,9 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
                                 </div>
                                 <div className="text-right shrink-0">
                                   <p className="text-sm font-black text-[#0042A5]">{String(p.puntos_totales || 0)} pts</p>
-                                  <p className={`text-xs font-medium mt-0.5 ${p.precio_pagado ? 'text-green-600' : 'text-orange-500'}`}>
-                                    {p.precio_pagado ? 'Pagada' : 'Sin pagar'}
-                                  </p>
+                                  {!p.precio_pagado && (
+                                    <span className="bg-orange-100 text-orange-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full mt-0.5 inline-block">IMPAGO</span>
+                                  )}
                                 </div>
                               </div>
                             </button>
@@ -1103,11 +1117,32 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
                   </td>
                 </tr>
               )}
-              </>
+              </React.Fragment>
             )
           })}
         </tbody>
       </table>
+      {tab === 'usuarios' && totalPages > 1 && (
+        <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 text-sm text-gray-500">
+          <span>{totalUsers} usuarios · página {page} de {totalPages}</span>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setPage(p => p - 1)}
+              disabled={page === 1}
+              className="px-3 py-1 rounded border border-gray-200 disabled:opacity-40 hover:bg-gray-50 transition-colors text-xs"
+            >
+              ← Anterior
+            </button>
+            <button
+              onClick={() => setPage(p => p + 1)}
+              disabled={page === totalPages}
+              className="px-3 py-1 rounded border border-gray-200 disabled:opacity-40 hover:bg-gray-50 transition-colors text-xs"
+            >
+              Siguiente →
+            </button>
+          </div>
+        </div>
+      )}
       <ConfirmModal
         open={!!confirmDeleteUser}
         title="⚠️ Eliminar usuario"
@@ -1154,6 +1189,7 @@ function JobsTab() {
   const [confirmWeekly, setConfirmWeekly] = useState(false)
   const [confirmVoice5day, setConfirmVoice5day] = useState(false)
   const [confirmReset, setConfirmReset] = useState(false)
+  const [resetExtendHours, setResetExtendHours] = useState('')
 
   useEffect(() => {
     // GET /matchdays requires tournament_id → load all tournaments first, then matchdays per tournament
@@ -1513,6 +1549,24 @@ function JobsTab() {
             <li>Partidos (sin resultados), torneos y usuarios</li>
           </ul>
         </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-1">
+            Extender fechas de partidos (opcional)
+          </label>
+          <div className="flex gap-2 items-center">
+            <input
+              type="number"
+              min="0"
+              max="8760"
+              value={resetExtendHours}
+              onChange={e => setResetExtendHours(e.target.value)}
+              placeholder="0 hs (no extiende)"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
+            />
+            <span className="text-xs text-gray-400 whitespace-nowrap">horas</span>
+          </div>
+          <p className="text-xs text-gray-400 mt-1">Re-abre el período de apuestas empujando los horarios de los partidos hacia adelante.</p>
+        </div>
         <button
           onClick={() => setConfirmReset(true)}
           disabled={!!loading}
@@ -1555,22 +1609,14 @@ function JobsTab() {
       <ConfirmModal
         open={confirmReset}
         title="♻️ Reset del Juego"
-        message="Esto borrará TODOS los resultados, puntos, ranking, ganadores, streaks y badges. Las planillas y los pronósticos quedan intactos. Esta acción es IRREVERSIBLE."
+        message="Esto borrará TODOS los resultados, puntos, ranking y ganadores. Las planillas y los pronósticos quedan intactos. Esta acción es IRREVERSIBLE."
         requireText="RESET"
         onConfirm={() => {
           setConfirmReset(false)
           runJob('reset', async () => {
-            const { data } = await api.post('/admin/jobs/reset-game', {})
-            const r = data.data
-            return [
-              `✓ ${r.matches} partidos reseteados`,
-              `✓ ${r.bets} apuestas limpiadas`,
-              `✓ ${r.planillas} planillas en 0`,
-              `✓ ${r.ranking_entries} filas de ranking borradas`,
-              `✓ ${r.winner_configs} configs de ganador borradas`,
-              `✓ ${r.streaks} streaks borrados`,
-              `✓ ${r.badges} badges borrados`,
-            ].join(' · ')
+            const extendHours = Number(resetExtendHours) || 0
+            const { data } = await api.post('/admin/jobs/reset-game', extendHours > 0 ? { extend_hours: extendHours } : {})
+            return data.message ?? 'Juego reseteado ✓'
           })
         }}
         onCancel={() => setConfirmReset(false)}

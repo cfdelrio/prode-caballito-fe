@@ -17,17 +17,15 @@ test.use({ storageState: AUTH_FILE })
 const ADMIN_EMAIL    = process.env.E2E_ADMIN_EMAIL?.trim()    || 'cfdelrio@gmail.com'
 const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD?.trim() || 'carlitos'
 
-// Publish all 4 results before browser assertions
+// Publish all 4 results before browser assertions — in parallel (independent operations)
 test.beforeAll(async () => {
   const state = readState()
   const admin = await ApiClient.login(ADMIN_EMAIL, ADMIN_PASSWORD)
-  for (const [key, result] of Object.entries(RESULTS)) {
-    const matchId = state.matchIds[key]
-    if (!matchId) continue
-    await publishResult(admin, matchId, result.local, result.visitante)
-    // Small delay between publishes to avoid race conditions
-    await new Promise(r => setTimeout(r, 500))
-  }
+  await Promise.all(
+    Object.entries(RESULTS)
+      .filter(([key]) => state.matchIds[key])
+      .map(([key, result]) => publishResult(admin, state.matchIds[key], result.local, result.visitante))
+  )
 })
 
 test('Partido mA aparece como "finalizado" en /apuestas después del resultado', async ({ page }) => {

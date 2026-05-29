@@ -62,20 +62,6 @@ describe('Ranking — drawer de jugador', () => {
     })
   })
 
-  it('drawer tiene link a planilla del jugador', async () => {
-    const user = userEvent.setup()
-    await setupApi()
-    renderRanking()
-
-    await waitFor(() => expect(screen.getByText('Ana García')).toBeInTheDocument(), { timeout: 3000 })
-    await user.click(screen.getByText('Ana García'))
-
-    await waitFor(() => {
-      const link = screen.getByRole('link', { name: /planilla/i })
-      expect(link).toHaveAttribute('href', '/planilla/p2')
-    })
-  })
-
   it('cerrar backdrop cierra el drawer', async () => {
     const user = userEvent.setup()
     await setupApi()

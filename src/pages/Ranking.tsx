@@ -1,5 +1,4 @@
 import { useEffect, useState, useCallback } from 'react'
-import { Link } from 'react-router-dom'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { api } from '@/api/client'
 import { useAuthStore } from '@/store/authStore'
@@ -104,6 +103,10 @@ export function Ranking() {
       if (fRes.status === 'fulfilled') setFavorites(new Set(fRes.value.data.data || []))
     }).finally(() => setLoading(false))
   }, [])
+
+  useEffect(() => {
+    setShared(false)
+  }, [selected])
 
   // Filtro de favoritos aplicado sobre el ranking — siempre incluye las planillas propias
   const displayRanking = showOnlyFavorites
@@ -374,8 +377,8 @@ export function Ranking() {
                             </a>
                           )}
                         </div>
-                        <p className="text-xs text-gray-400 truncate">{r.nombre_planilla}
-                          {!r.precio_pagado && <span className="ml-1 text-orange-400 font-medium">· {t.ranking.noOfficial}</span>}
+                        <p className="text-xs text-gray-400 truncate flex items-center gap-1">{r.nombre_planilla}
+                          {!r.precio_pagado && <span className="bg-orange-100 text-orange-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0">IMPAGO</span>}
                         </p>
                       </div>
                     </div>
@@ -484,16 +487,11 @@ export function Ranking() {
                 </div>
               )}
               <div className="flex gap-3 mt-5">
-                <Link
-                  to={`/planilla/${selected.planilla_id}`}
-                  className="flex-1 bg-[#001A4B] text-white text-sm font-bold py-3 rounded-xl text-center hover:bg-[#002870] transition-colors"
-                  onClick={() => setSelected(null)}
-                >
-                  {t.ranking.fullPlanilla}
-                </Link>
                 <button
                   onClick={() => handleShare(selected)}
-                  className="flex-1 border-2 border-[#001A4B] text-[#001A4B] text-sm font-bold py-3 rounded-xl hover:bg-gray-50 transition-colors"
+                  disabled={selected.user_id !== user?.id}
+                  className="flex-1 border-2 border-[#001A4B] text-[#001A4B] text-sm font-bold py-3 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
+                  title={selected.user_id !== user?.id ? 'Comparte tu propia planilla' : ''}
                 >
                   {shared ? t.ranking.copied : t.ranking.share}
                 </button>

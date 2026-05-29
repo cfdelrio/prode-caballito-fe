@@ -15,6 +15,7 @@ export class ApiClient {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
+      signal: AbortSignal.timeout(15_000),
     })
     const data = await res.json()
     // Auth responses are wrapped: { success, data: { token, user, refreshToken } }
@@ -35,13 +36,15 @@ export class ApiClient {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
+      signal: AbortSignal.timeout(15_000),
     })
     const loginData = await loginRes.json()
     const loginToken = loginData.data?.token ?? loginData.token
-    if (loginData.success && loginToken) {
+    const loginUserId = loginData.data?.user?.id
+    if (loginData.success && loginToken && loginUserId) {
       return {
         client: new ApiClient(loginToken),
-        userId: loginData.data?.user?.id ?? loginData.user?.id ?? loginData.userId,
+        userId: loginUserId,
       }
     }
     // Register
@@ -49,6 +52,7 @@ export class ApiClient {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password, nombre }),
+      signal: AbortSignal.timeout(15_000),
     })
     const regData = await regRes.json()
     if (!regData.success) {
@@ -56,7 +60,16 @@ export class ApiClient {
     }
     // Login after register to get a fresh token
     const client = await ApiClient.login(email, password)
-    const userId = regData.data?.user?.id ?? regData.user?.id ?? regData.userId
+    const loginAfterRegRes = await fetch(`${API_BASE}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    })
+    const loginAfterRegData = await loginAfterRegRes.json()
+    const userId = loginAfterRegData.data?.user?.id
+    if (!userId) {
+      throw new Error(`Could not extract userId after register for ${email}`)
+    }
     return { client, userId }
   }
 
@@ -68,6 +81,7 @@ export class ApiClient {
         Authorization: `Bearer ${this.token}`,
       },
       body: body ? JSON.stringify(body) : undefined,
+      signal: AbortSignal.timeout(15_000),
     })
     const data = await res.json()
     return data

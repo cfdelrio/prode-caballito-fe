@@ -394,13 +394,13 @@ describe('Matriz — modal de período de veda', () => {
 describe('Matriz — rendering de filas', () => {
   afterEach(() => vi.clearAllMocks())
 
-  it('planilla no pagada muestra badge "IMPAGA"', async () => {
+  it('planilla no pagada muestra badge IMPAGO', async () => {
     await setupApi({ ranking: [ROW_ME, ROW_UNPAID] })
     renderMatriz()
     await waitForLoad()
 
     await waitFor(() => expect(screen.getByText('Bob')).toBeInTheDocument())
-    expect(screen.getByText(/IMPAGA/)).toBeInTheDocument()
+    expect(screen.getByText(/IMPAGO/)).toBeInTheDocument()
   })
 
   it('nombre_planilla se muestra cuando está definido', async () => {
