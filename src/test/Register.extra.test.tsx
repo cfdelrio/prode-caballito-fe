@@ -40,7 +40,7 @@ async function goToCompleteStep() {
     data: { data: { userId: 'u1' } },
   })
   renderRegister()
-  await user.type(screen.getByPlaceholderText('Tu nombre'), 'Carlos')
+  await user.type(screen.getByPlaceholderText('Tu nombre y apellido'), 'Carlos')
   await user.type(screen.getByPlaceholderText('tu@email.com'), 'carlos@test.com')
   await user.type(screen.getByPlaceholderText('Mínimo 6 caracteres'), 'pass123')
   await user.click(screen.getByRole('button', { name: /Continuar/i }))
@@ -137,7 +137,7 @@ describe('Register — paso form: error handling', () => {
     ;(api.post as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('network'))
 
     renderRegister()
-    await user.type(screen.getByPlaceholderText('Tu nombre'), 'Carlos')
+    await user.type(screen.getByPlaceholderText('Tu nombre y apellido'), 'Carlos')
     await user.type(screen.getByPlaceholderText('tu@email.com'), 'carlos@test.com')
     await user.type(screen.getByPlaceholderText('Mínimo 6 caracteres'), 'pass123')
     await user.click(screen.getByRole('button', { name: /Continuar/i }))
@@ -167,7 +167,7 @@ describe('Register — stepper visual', () => {
       data: { data: { userId: 'u1' } },
     })
     renderRegister()
-    await user.type(screen.getByPlaceholderText('Tu nombre'), 'Carlos')
+    await user.type(screen.getByPlaceholderText('Tu nombre y apellido'), 'Carlos')
     await user.type(screen.getByPlaceholderText('tu@email.com'), 'carlos@test.com')
     await user.type(screen.getByPlaceholderText('Mínimo 6 caracteres'), 'pass123')
     await user.click(screen.getByRole('button', { name: /Continuar/i }))

@@ -231,10 +231,10 @@ export function Register() {
             <form onSubmit={handleRegister} className="space-y-4">
               <p className="text-sm text-gray-500 text-center mb-2">Ingresá tus datos para crear tu cuenta</p>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nombre y apellido</label>
                 <input type="text" value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })}
                   className="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0042A5] text-sm"
-                  placeholder="Tu nombre" required />
+                  placeholder="Tu nombre y apellido" required />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
