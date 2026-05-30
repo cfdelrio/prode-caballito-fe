@@ -41,7 +41,7 @@ async function goToCompleteStep() {
     data: { data: { userId: 'u1' } },
   })
   renderRegister()
-  await user.type(screen.getByPlaceholderText('Tu nombre'), 'Carlos')
+  await user.type(screen.getByPlaceholderText('Tu nombre y apellido'), 'Carlos')
   await user.type(screen.getByPlaceholderText('tu@email.com'), 'carlos@test.com')
   await user.type(screen.getByPlaceholderText('Mínimo 6 caracteres'), 'pass123')
   await user.click(screen.getByRole('button', { name: /Continuar/i }))
@@ -174,7 +174,7 @@ describe('Register — handleAllowNotifications/Skip', () => {
       data: { data: { userId: 'u1' } },
     })
     renderRegister()
-    await user.type(screen.getByPlaceholderText('Tu nombre'), 'C')
+    await user.type(screen.getByPlaceholderText('Tu nombre y apellido'), 'C')
     await user.type(screen.getByPlaceholderText('tu@email.com'), 'c@x.com')
     await user.type(screen.getByPlaceholderText('Mínimo 6 caracteres'), 'pass123')
     await user.click(screen.getByRole('button', { name: /Continuar/i }))

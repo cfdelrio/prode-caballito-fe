@@ -33,7 +33,7 @@ describe('Register — paso 1: formulario', () => {
 
   it('renderiza los campos nombre, email y contraseña', () => {
     renderRegister()
-    expect(screen.getByPlaceholderText('Tu nombre')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Tu nombre y apellido')).toBeInTheDocument()
     expect(screen.getByPlaceholderText('tu@email.com')).toBeInTheDocument()
     expect(screen.getByPlaceholderText('Mínimo 6 caracteres')).toBeInTheDocument()
   })
@@ -56,7 +56,7 @@ describe('Register — paso 1: formulario', () => {
     })
 
     renderRegister()
-    await user.type(screen.getByPlaceholderText('Tu nombre'), 'Carlos')
+    await user.type(screen.getByPlaceholderText('Tu nombre y apellido'), 'Carlos')
     await user.type(screen.getByPlaceholderText('tu@email.com'), 'carlos@test.com')
     await user.type(screen.getByPlaceholderText('Mínimo 6 caracteres'), 'pass123')
     await user.click(screen.getByRole('button', { name: /Continuar/i }))
@@ -79,7 +79,7 @@ describe('Register — paso 1: formulario', () => {
     })
 
     renderRegister()
-    await user.type(screen.getByPlaceholderText('Tu nombre'), 'Carlos')
+    await user.type(screen.getByPlaceholderText('Tu nombre y apellido'), 'Carlos')
     await user.type(screen.getByPlaceholderText('tu@email.com'), 'carlos@test.com')
     await user.type(screen.getByPlaceholderText('Mínimo 6 caracteres'), 'pass123')
     await user.click(screen.getByRole('button', { name: /Continuar/i }))
@@ -100,7 +100,7 @@ async function goToCompleteStep() {
     data: { data: { userId: 'u1' } },
   })
   renderRegister()
-  await user.type(screen.getByPlaceholderText('Tu nombre'), 'Carlos')
+  await user.type(screen.getByPlaceholderText('Tu nombre y apellido'), 'Carlos')
   await user.type(screen.getByPlaceholderText('tu@email.com'), 'carlos@test.com')
   await user.type(screen.getByPlaceholderText('Mínimo 6 caracteres'), 'pass123')
   await user.click(screen.getByRole('button', { name: /Continuar/i }))
