@@ -7,7 +7,7 @@ import { Navbar } from '@/components/layout/Navbar'
 import { ToastContainer } from '@/components/ui/Toast'
 import { GoogleAdUnit } from '@/components/ui/GoogleAdUnit'
 import { PageSpinner } from '@/components/ui/Spinner'
-import { PushPromptModal } from '@/components/PushPromptModal'
+
 
 const Login               = lazy(() => import('@/pages/Login').then(m => ({ default: m.Login })))
 const Register            = lazy(() => import('@/pages/Register').then(m => ({ default: m.Register })))
@@ -50,7 +50,6 @@ function AppLayout({ children, adSlot = '4113004001' }: { children: React.ReactN
       <Navbar />
       {adSlot && <GoogleAdUnit slot={adSlot} />}
       <main className="pb-14 md:pb-0">{children}</main>
-      <PushPromptModal />
     </div>
   )
 }
