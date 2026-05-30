@@ -157,6 +157,7 @@ export function Matriz() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set())
   const [togglingFav, setTogglingFav] = useState<string | null>(null)
   const [showVedaModal, setShowVedaModal] = useState(false)
+  const [avatarFullscreen, setAvatarFullscreen] = useState<{ avatar: string; name: string } | null>(null)
   const tableRef = useRef<HTMLDivElement>(null)
   const headerInnerRef = useRef<HTMLDivElement>(null)
   const bodyJugadorRef = useRef<HTMLTableCellElement>(null)
@@ -440,7 +441,12 @@ export function Matriz() {
                           {pos}
                         </span>
                         {r.user_avatar
-                          ? <img src={r.user_avatar} alt="" className="w-6 h-6 rounded-full object-cover shrink-0 border border-gray-100" />
+                          ? <img
+                              src={r.user_avatar}
+                              alt=""
+                              className="w-6 h-6 rounded-full object-cover shrink-0 border border-gray-100 cursor-pointer hover:ring-2 hover:ring-[#0042A5] hover:ring-offset-1 transition-all"
+                              onClick={e => { e.stopPropagation(); setAvatarFullscreen({ avatar: r.user_avatar!, name: r.user_name }) }}
+                            />
                           : <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${isMe ? 'bg-[#0042A5] text-white' : 'bg-gray-300 text-gray-600'}`}>
                               {r.user_name[0].toUpperCase()}
                             </div>
@@ -594,6 +600,27 @@ export function Matriz() {
         </>
       )}
 
+      {/* Avatar fullscreen */}
+      {avatarFullscreen && (
+        <div
+          className="fixed inset-0 bg-black/85 z-[60] flex items-center justify-center backdrop-blur-sm"
+          onClick={() => setAvatarFullscreen(null)}
+        >
+          <img
+            src={avatarFullscreen.avatar}
+            alt={avatarFullscreen.name}
+            className="max-w-[88vw] max-h-[88vh] rounded-2xl object-contain shadow-2xl"
+            onClick={e => e.stopPropagation()}
+          />
+          <button
+            onClick={() => setAvatarFullscreen(null)}
+            className="absolute top-5 right-5 w-9 h-9 flex items-center justify-center rounded-full bg-black/50 text-white text-xl hover:bg-black/70 transition-colors"
+            aria-label="Cerrar"
+          >
+            ×
+          </button>
+        </div>
+      )}
     </div>
   )
 }
