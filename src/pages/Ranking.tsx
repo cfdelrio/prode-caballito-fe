@@ -80,6 +80,7 @@ export function Ranking() {
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState<RankingEntry | null>(null)
   const [shared, setShared] = useState(false)
+  const [avatarFullscreen, setAvatarFullscreen] = useState(false)
 
   // Favoritos
   const [favorites, setFavorites] = useState<Set<string>>(new Set())
@@ -106,6 +107,7 @@ export function Ranking() {
 
   useEffect(() => {
     setShared(false)
+    setAvatarFullscreen(false)
   }, [selected])
 
   // Filtro de favoritos aplicado sobre el ranking — siempre incluye las planillas propias
@@ -418,12 +420,19 @@ export function Ranking() {
             </div>
             <div className="px-6 pt-2 pb-5">
               <div className="flex flex-col items-center gap-2 mb-4">
-                {selected.user_avatar
-                  ? <img src={selected.user_avatar} alt="" className="w-24 h-24 rounded-full object-cover border-4 border-[#0042A5]/20 shadow-md" />
-                  : <div className="w-24 h-24 rounded-full bg-[#0042A5] flex items-center justify-center text-4xl font-black text-white shadow-md">
-                      {selected.user_name[0].toUpperCase()}
-                    </div>
-                }
+                <button
+                  onClick={() => selected.user_avatar && setAvatarFullscreen(true)}
+                  disabled={!selected.user_avatar}
+                  className={`rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0042A5] focus-visible:ring-offset-2 ${selected.user_avatar ? 'cursor-pointer active:scale-95 transition-transform' : 'cursor-default'}`}
+                  aria-label={selected.user_avatar ? 'Ver foto completa' : undefined}
+                >
+                  {selected.user_avatar
+                    ? <img src={selected.user_avatar} alt="" className="w-24 h-24 rounded-full object-cover border-4 border-[#0042A5]/20 shadow-md" />
+                    : <div className="w-24 h-24 rounded-full bg-[#0042A5] flex items-center justify-center text-4xl font-black text-white shadow-md">
+                        {selected.user_name[0].toUpperCase()}
+                      </div>
+                  }
+                </button>
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-2">
                     <span className="text-lg font-black">
@@ -497,6 +506,28 @@ export function Ranking() {
               </div>
             </div>
           </div>
+
+          {/* Foto fullscreen */}
+          {avatarFullscreen && selected.user_avatar && (
+            <div
+              className="fixed inset-0 bg-black/85 z-[60] flex items-center justify-center backdrop-blur-sm"
+              onClick={() => setAvatarFullscreen(false)}
+            >
+              <img
+                src={selected.user_avatar}
+                alt={selected.user_name}
+                className="max-w-[88vw] max-h-[88vh] rounded-2xl object-contain shadow-2xl"
+                onClick={e => e.stopPropagation()}
+              />
+              <button
+                onClick={() => setAvatarFullscreen(false)}
+                className="absolute top-5 right-5 w-9 h-9 flex items-center justify-center rounded-full bg-black/50 text-white text-xl hover:bg-black/70 transition-colors"
+                aria-label="Cerrar"
+              >
+                ×
+              </button>
+            </div>
+          )}
         </>
       )}
     </div>
