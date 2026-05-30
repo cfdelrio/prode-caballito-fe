@@ -416,32 +416,31 @@ export function Ranking() {
             <div className="flex justify-center pt-3 pb-1">
               <div className="w-10 h-1 rounded-full bg-gray-200" />
             </div>
-            <div className="px-6 pt-3 pb-5">
-              <div className="flex items-center gap-4">
+            <div className="px-6 pt-2 pb-5">
+              <div className="flex flex-col items-center gap-2 mb-4">
                 {selected.user_avatar
-                  ? <img src={selected.user_avatar} alt="" className="w-16 h-16 rounded-full object-cover border-4 border-[#0042A5]/20 shrink-0" />
-                  : <div className="w-16 h-16 rounded-full bg-[#0042A5] flex items-center justify-center text-2xl font-black text-white shrink-0">
+                  ? <img src={selected.user_avatar} alt="" className="w-24 h-24 rounded-full object-cover border-4 border-[#0042A5]/20 shadow-md" />
+                  : <div className="w-24 h-24 rounded-full bg-[#0042A5] flex items-center justify-center text-4xl font-black text-white shadow-md">
                       {selected.user_name[0].toUpperCase()}
                     </div>
                 }
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-2">
                     <span className="text-lg font-black">
                       {selected.position <= 3 ? MEDAL[selected.position - 1] : `#${selected.position}`}
                     </span>
-                    <h2 className="text-base font-bold text-[#001A4B] truncate">{selected.user_name}</h2>
+                    <h2 className="text-lg font-bold text-[#001A4B]">{selected.user_name}</h2>
                   </div>
-                  <p className="text-xs text-gray-400 mt-0.5 truncate">{selected.nombre_planilla}</p>
+                  <p className="text-xs text-gray-400 mt-0.5 truncate max-w-[220px]">{selected.nombre_planilla}</p>
                   {!selected.precio_pagado && (
-                    <span className="text-[10px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded-full font-medium ml-1">{t.ranking.noOfficial}</span>
+                    <span className="text-[10px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded-full font-medium">{t.ranking.noOfficial}</span>
                   )}
                 </div>
-                <div className="flex flex-col items-end gap-2 shrink-0">
-                  <div className="text-right">
+                <div className="flex items-center gap-4">
+                  <div className="text-center">
                     <p className="text-3xl font-black text-[#0042A5]">{selected.puntos_totales}</p>
                     <p className="text-xs text-gray-400">{t.ranking.points}</p>
                   </div>
-                  {/* Favorito desde el drawer */}
                   {selected.user_id !== user?.id && (
                     <button
                       onClick={(e) => handleToggleFavorite(selected.planilla_id, e)}
