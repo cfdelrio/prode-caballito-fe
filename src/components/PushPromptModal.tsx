@@ -4,7 +4,6 @@ import { usePushNotifications } from '@/hooks/usePushNotifications'
 
 const STORAGE_KEY = 'push_prompt_snoozed_until'
 const SNOOZE_MS = 7 * 24 * 60 * 60 * 1000 // 7 days
-const DELAY_MS = 30_000                     // show after 30s of navigation
 
 function isSnoozed(): boolean {
   try {
@@ -19,7 +18,7 @@ function snooze() {
 
 type Status = 'idle' | 'requesting' | 'granted' | 'denied'
 
-export function PushPromptModal() {
+export function PushPromptModal({ delayMs = 30_000 }: { delayMs?: number }) {
   const { user } = useAuthStore()
   const { state, subscribe, loading } = usePushNotifications()
   const [visible, setVisible] = useState(false)
@@ -31,9 +30,9 @@ export function PushPromptModal() {
     if (!('Notification' in window) || Notification.permission !== 'default') return
     if (isSnoozed()) return
 
-    const timer = setTimeout(() => setVisible(true), DELAY_MS)
+    const timer = setTimeout(() => setVisible(true), delayMs)
     return () => clearTimeout(timer)
-  }, [user, state])
+  }, [user, state, delayMs])
 
   const handleAccept = async () => {
     setStatus('requesting')

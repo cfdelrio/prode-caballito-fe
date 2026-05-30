@@ -8,6 +8,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { OnboardingTour, hasSeenOnboarding } from '@/components/onboarding/Tour'
 import { InviteFriendCTA } from '@/components/InviteFriendCTA'
 import { PushOptInBanner } from '@/components/PushOptInBanner'
+import { PushPromptModal } from '@/components/PushPromptModal'
 import { useToastStore } from '@/store/toastStore'
 import { teamFlag } from '@/utils/teamFlags'
 
@@ -414,6 +415,7 @@ export function Apuestas() {
       </div>
 
       <OnboardingTour run={runTour} onFinish={() => setRunTour(false)} />
+      <PushPromptModal delayMs={800} />
     </div>
   )
 }
