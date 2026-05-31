@@ -151,7 +151,7 @@ export function Apuestas() {
     setLockingPlanilla(true)
     try {
       await api.put(`/planillas/${selectedPlanilla}/lock`)
-      setPlanillas(prev => prev.map(p => p.id === selectedPlanilla ? { ...p, precio_pagado: true } : p))
+      setPlanillas(prev => prev.map(p => p.id === selectedPlanilla ? { ...p, locked: true } : p))
       setShowConfirmModal(false)
       show(t.bets.planillaLocked, 'success')
     } catch {
@@ -301,7 +301,7 @@ export function Apuestas() {
       )}
 
       {/* Botón confirmar planilla */}
-      {selectedPlanillaObj && !selectedPlanillaObj.precio_pagado && (() => {
+      {selectedPlanillaObj && !selectedPlanillaObj.locked && !selectedPlanillaObj.precio_pagado && (() => {
         const missing = pendingMatches.filter(m => !bets[m.id]).length
         const allDone = missing === 0 && pendingMatches.length > 0
         return (
@@ -382,7 +382,7 @@ export function Apuestas() {
               match={m}
               bet={bets[m.id]}
               planillaId={selectedPlanilla || undefined}
-              planillaLocked={selectedPlanillaObj?.precio_pagado}
+              planillaLocked={selectedPlanillaObj?.locked || selectedPlanillaObj?.precio_pagado}
               tournamentClosed={isTournamentClosed}
               onBetSaved={() => loadBets(selectedPlanilla)}
               onBetDeleted={(mid) => { const nb = { ...bets }; delete nb[mid]; setBets(nb) }}
@@ -404,7 +404,7 @@ export function Apuestas() {
               match={m}
               bet={bets[m.id]}
               planillaId={selectedPlanilla || undefined}
-              planillaLocked={selectedPlanillaObj?.precio_pagado}
+              planillaLocked={selectedPlanillaObj?.locked || selectedPlanillaObj?.precio_pagado}
               tournamentClosed={isTournamentClosed}
               onBetSaved={() => loadBets(selectedPlanilla)}
               onBetDeleted={(mid) => { const nb = { ...bets }; delete nb[mid]; setBets(nb) }}
