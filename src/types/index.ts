@@ -63,6 +63,7 @@ export interface Planilla {
   user_id: string
   nombre_planilla: string
   precio_pagado: boolean
+  locked: boolean
   puntos_totales?: number
   exactos_count?: number
   total_bets?: number
