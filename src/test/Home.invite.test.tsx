@@ -131,18 +131,18 @@ describe('Home — botón reintentar tras error', () => {
   })
 })
 
-// ─── inviteVia: WhatsApp directo desde el hero ───────────────────────────────
+// ─── inviteVia: WhatsApp directo desde InviteFriendCard ─────────────────────
 
-describe('Home — inviteVia (WhatsApp directo desde hero)', () => {
+describe('Home — inviteVia (WhatsApp desde InviteFriendCard)', () => {
   beforeEach(() => setupBrowserMocks())
   afterEach(() => { restoreBrowserMocks(); vi.clearAllMocks() })
 
-  it('click en "💬 Invitar a un amigo" abre wa.me en nueva pestaña', async () => {
+  it('click en "💬 WhatsApp" abre wa.me en nueva pestaña', async () => {
     const user = userEvent.setup()
     await setupApi()
     renderHome()
 
-    const btn = await screen.findByText(/💬 Invitar a un amigo/i, undefined, { timeout: 3000 })
+    const btn = await screen.findByText(/💬 WhatsApp/i, undefined, { timeout: 3000 })
     await user.click(btn)
 
     expect(openSpy).toHaveBeenCalledWith(
@@ -163,7 +163,7 @@ describe('Home — modal de invitación multi-canal', () => {
     await setupApi()
     renderHome()
 
-    const personalize = await screen.findByText(/Personalizar mensaje u otro canal/i, undefined, { timeout: 3000 })
+    const personalize = await screen.findByText('✏️ Personalizar', undefined, { timeout: 3000 })
     await user.click(personalize)
 
     await waitFor(() => {
@@ -276,70 +276,6 @@ describe('Home — modal de invitación multi-canal', () => {
     await waitFor(() => {
       expect(screen.queryByRole('dialog')).toBeNull()
     })
-  })
-})
-
-// ─── PWA install (estado prompt) ─────────────────────────────────────────────
-
-describe('Home — PWA install prompt', () => {
-  beforeEach(() => { mockPwaState.current = { type: 'prompt' } })
-  afterEach(() => { mockPwaState.current = { type: 'unavailable' }; vi.clearAllMocks() })
-
-  it('click en "Instalar app" llama a pwaInstall', async () => {
-    const user = userEvent.setup()
-    await setupApi()
-    renderHome()
-
-    const installBtn = await screen.findByText(/agregar acceso directo/i, undefined, { timeout: 3000 })
-    await user.click(installBtn)
-    expect(mockPwaInstall).toHaveBeenCalled()
-  })
-})
-
-// ─── PWA install (estado iOS) → modal iOS ────────────────────────────────────
-
-describe('Home — modal de instalación iOS', () => {
-  beforeEach(() => { mockPwaState.current = { type: 'ios' } })
-  afterEach(() => { mockPwaState.current = { type: 'unavailable' }; vi.clearAllMocks() })
-
-  it('click en "Agregar acceso directo" abre el modal iOS con los pasos', async () => {
-    const user = userEvent.setup()
-    await setupApi()
-    renderHome()
-
-    const btn = await screen.findByText(/agregar acceso directo/i, undefined, { timeout: 3000 })
-    await user.click(btn)
-    await waitFor(() => {
-      expect(screen.getByText(/Tocá el botón Compartir/i)).toBeInTheDocument()
-    })
-  })
-
-  it('click en "¡Entendido!" cierra el modal iOS', async () => {
-    const user = userEvent.setup()
-    await setupApi()
-    renderHome()
-
-    await user.click(await screen.findByText(/agregar acceso directo/i, undefined, { timeout: 3000 }))
-    await waitFor(() => expect(screen.getByText(/Tocá el botón Compartir/i)).toBeInTheDocument())
-
-    await user.click(screen.getByRole('button', { name: /Entendido/i }))
-    await waitFor(() => {
-      expect(screen.queryByText(/Tocá el botón Compartir/i)).toBeNull()
-    })
-  })
-
-  it('click en backdrop del modal iOS lo cierra', async () => {
-    const user = userEvent.setup()
-    await setupApi()
-    renderHome()
-
-    await user.click(await screen.findByText(/agregar acceso directo/i, undefined, { timeout: 3000 }))
-    await waitFor(() => expect(screen.getByText(/Tocá el botón Compartir/i)).toBeInTheDocument())
-
-    const backdrop = document.querySelector('.fixed.inset-0.bg-black\\/50')
-    expect(backdrop).not.toBeNull()
-    fireEvent.click(backdrop!)
-    await waitFor(() => expect(screen.queryByText(/Tocá el botón Compartir/i)).toBeNull())
   })
 })
 

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { Home } from '@/pages/Home'
@@ -72,59 +72,12 @@ function renderHome() {
   return render(<MemoryRouter><Home /></MemoryRouter>)
 }
 
-// ─── Feature flag OFF (default) ───────────────────────────────────────────────
+afterEach(() => vi.clearAllMocks())
 
-describe('Home — hero con feature flag OFF (ff_pozo_hero no seteado)', () => {
-  beforeEach(() => { localStorage.removeItem('ff_pozo_hero') })
-  afterEach(() => vi.clearAllMocks())
+// ─── PozoHeroCard — siempre activo ────────────────────────────────────────────
 
-  it('muestra el hero original "EL MUNDIAL"', async () => {
-    await setupApi()
-    renderHome()
-    await waitFor(() => {
-      // The h1 has multiple text nodes: "EL MUNDIAL", "SE JUEGA ACÁ", "TAMBIÉN"
-      // Use getByRole('heading') to target the h1 directly
-      const heading = screen.getByRole('heading', { level: 1 })
-      expect(heading.textContent).toMatch(/EL MUNDIAL/i)
-    })
-  })
-
-  it('no muestra "EL PREMIO CRECE"', async () => {
-    await setupApi()
-    renderHome()
-    await waitFor(() => {
-      expect(screen.queryByText(/EL PREMIO CRECE/i)).not.toBeInTheDocument()
-    })
-  })
-
-  it('muestra CTA "Jugar ahora" o "Completar mi prode"', async () => {
-    await setupApi()
-    renderHome()
-    await waitFor(() => {
-      const links = screen.getAllByRole('link')
-      const apuestasLink = links.some(l => /jugar ahora|completar mi prode/i.test(l.textContent ?? ''))
-      expect(apuestasLink).toBe(true)
-    })
-  })
-
-  it('llama al ranking con límite 200', async () => {
-    await setupApi()
-    const { api } = await import('@/api/client')
-    renderHome()
-    await waitFor(() => {
-      const calls = (api.get as ReturnType<typeof vi.fn>).mock.calls.map((c: any[]) => c[0])
-      expect(calls.some((url: string) => url.includes('/ranking') && url.includes('200'))).toBe(true)
-    })
-  })
-})
-
-// ─── Feature flag ON ──────────────────────────────────────────────────────────
-
-describe('Home — hero con feature flag ON (ff_pozo_hero = "true")', () => {
-  beforeEach(() => { localStorage.setItem('ff_pozo_hero', 'true') })
-  afterEach(() => { localStorage.removeItem('ff_pozo_hero'); vi.clearAllMocks() })
-
-  it('muestra "EL PREMIO CRECE" en lugar del hero original', async () => {
+describe('Home — PozoHeroCard (showPozoHero = true)', () => {
+  it('muestra "EL PREMIO CRECE"', async () => {
     await setupApi()
     renderHome()
     await waitFor(() => {
@@ -169,6 +122,16 @@ describe('Home — hero con feature flag ON (ff_pozo_hero = "true")', () => {
     renderHome()
     await waitFor(() => {
       expect(screen.getByText(/PRODE 2026/i)).toBeInTheDocument()
+    })
+  })
+
+  it('llama al ranking con límite 200', async () => {
+    await setupApi()
+    const { api } = await import('@/api/client')
+    renderHome()
+    await waitFor(() => {
+      const calls = (api.get as ReturnType<typeof vi.fn>).mock.calls.map((c: any[]) => c[0])
+      expect(calls.some((url: string) => url.includes('/ranking') && url.includes('200'))).toBe(true)
     })
   })
 })
