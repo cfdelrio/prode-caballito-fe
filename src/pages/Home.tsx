@@ -17,6 +17,7 @@ import { POINT_COLORS } from '@/utils/scoring'
 import { PollWidget } from '@/components/PollWidget'
 import { useGamification } from '@/hooks/useGamification'
 import { PozoHeroCard } from '@/components/PozoHeroCard'
+import { IncompleteProdeHero } from '@/components/IncompleteProdeHero'
 import type { Match, Bet, Planilla, RankingEntry } from '@/types'
 
 /* ── Flip clock animation (defined in index.css) ─────────────────────── */
@@ -371,7 +372,6 @@ export function Home() {
   const { show: showToast } = useToastStore()
   const { data: gamification } = useGamification(user?.id ?? null)
   const myStreak = gamification.streaks[0]?.current_streak ?? 0
-  const showPozoHero = true
 
   useEffect(() => {
     const interval = setInterval(() => setNow(new Date()), 60000)
@@ -443,6 +443,11 @@ export function Home() {
   const totalBetsMade = matches.filter(m => m.estado !== 'finished' && bets[m.id]).length
   const pct = totalPendingMatches > 0 ? Math.round((totalBetsMade / totalPendingMatches) * 100) : 0
   const urgentUnbet = closingSoon.filter(m => !bets[m.id]).length
+
+  const heroVariant: 'pozo' | 'incomplete' | 'classic' =
+    !planilla?.precio_pagado ? 'pozo' :
+    totalUnbet > 0           ? 'incomplete' :
+                               'classic'
 
   const myEntry = ranking.find(r => r.user_id === user?.id)
 
@@ -524,9 +529,11 @@ export function Home() {
       {/* ── HERO + PRÓXIMO PARTIDO (desktop side-by-side) ─────── */}
       <div className="-mx-4 md:mx-0 md:rounded-2xl md:overflow-hidden md:shadow-2xl md:flex mb-5">
 
-        {/* Hero — conmutado por feature flag ff_pozo_hero */}
-        {showPozoHero ? (
+        {/* Hero — 3 variantes según estado de pago y pronósticos */}
+        {heroVariant === 'pozo' ? (
           <PozoHeroCard ranking={ranking} now={now} />
+        ) : heroVariant === 'incomplete' ? (
+          <IncompleteProdeHero totalUnbet={totalUnbet} urgentUnbet={urgentUnbet} now={now} userName={user?.nombre} />
         ) : (
           <div className="text-white overflow-hidden relative md:flex-[3]" style={{ minHeight: 300, background: '#001A4B' }}>
             <div
