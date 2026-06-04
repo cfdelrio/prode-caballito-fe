@@ -16,7 +16,6 @@ import { LeaderHome } from '@/pages/LeaderHome'
 import { POINT_COLORS } from '@/utils/scoring'
 import { PollWidget } from '@/components/PollWidget'
 import { useGamification } from '@/hooks/useGamification'
-import { useABTest } from '@/hooks/useABTest'
 import { PozoHeroCard } from '@/components/PozoHeroCard'
 import type { Match, Bet, Planilla, RankingEntry } from '@/types'
 
@@ -372,7 +371,7 @@ export function Home() {
   const { show: showToast } = useToastStore()
   const { data: gamification } = useGamification(user?.id ?? null)
   const myStreak = gamification.streaks[0]?.current_streak ?? 0
-  const showPozoHero = useABTest('pozo_hero', user?.id ?? null) === 'test'
+  const showPozoHero = true
 
   useEffect(() => {
     const interval = setInterval(() => setNow(new Date()), 60000)

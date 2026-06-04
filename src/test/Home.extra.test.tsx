@@ -46,11 +46,6 @@ vi.mock('@/api/client', () => ({
   api: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn() },
 }))
 
-vi.mock('@/hooks/useABTest', () => ({
-  useABTest: vi.fn(() => 'control' as const),
-  getABVariant: vi.fn(() => 'control' as const),
-}))
-
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const PLANILLA = { id: 'p1', user_id: 'u1', nombre_planilla: 'Mi planilla', precio_pagado: true }
@@ -171,18 +166,6 @@ describe('Home — reglamento inline', () => {
 describe('Home — ranking y hero', () => {
   afterEach(() => vi.clearAllMocks())
 
-  it('muestra posición y puntos del usuario en el hero cuando tiene ranking', async () => {
-    const ranking = [
-      { planilla_id: 'p2', user_id: 'u2', user_name: 'Ana García', puntos_totales: 50, position: 1 },
-      { planilla_id: 'p1', user_id: 'u1', user_name: 'Carlos Foo', puntos_totales: 30, position: 2 },
-    ]
-    await setupApi({ ranking })
-    renderHome()
-    await waitFor(() => {
-      expect(screen.getByText(/30\s*pts/)).toBeInTheDocument()
-    }, { timeout: 3000 })
-  })
-
   it('muestra LeaderHome cuando el usuario está en posición 1', async () => {
     const ranking = [
       { planilla_id: 'p1', user_id: 'u1', user_name: 'Carlos Foo', puntos_totales: 50, position: 1 },
@@ -209,14 +192,6 @@ describe('Home — partidos y apuestas', () => {
 
 describe('Home — invitar a un amigo', () => {
   afterEach(() => vi.clearAllMocks())
-
-  it('muestra botón "Invitar a un amigo" en el hero', async () => {
-    await setupApi({ ranking: [] })
-    renderHome()
-    await waitFor(() => {
-      expect(screen.getByText(/Invitar a un amigo/i)).toBeInTheDocument()
-    }, { timeout: 3000 })
-  })
 
   it('muestra card de invitación con botones WhatsApp y Personalizar', async () => {
     await setupApi({ ranking: [] })

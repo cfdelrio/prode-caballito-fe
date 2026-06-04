@@ -46,11 +46,6 @@ vi.mock('@/api/client', () => ({
   api: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn() },
 }))
 
-vi.mock('@/hooks/useABTest', () => ({
-  useABTest: vi.fn(() => 'control' as const),
-  getABVariant: vi.fn(() => 'control' as const),
-}))
-
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function futureCutoff(hoursFromNow = 72) {
