@@ -16,6 +16,8 @@ import { LeaderHome } from '@/pages/LeaderHome'
 import { POINT_COLORS } from '@/utils/scoring'
 import { PollWidget } from '@/components/PollWidget'
 import { useGamification } from '@/hooks/useGamification'
+import { useFeatureFlag } from '@/hooks/useFeatureFlag'
+import { PozoHeroCard } from '@/components/PozoHeroCard'
 import type { Match, Bet, Planilla, RankingEntry } from '@/types'
 
 /* ── Flip clock animation (defined in index.css) ─────────────────────── */
@@ -370,6 +372,7 @@ export function Home() {
   const { show: showToast } = useToastStore()
   const { data: gamification } = useGamification(user?.id ?? null)
   const myStreak = gamification.streaks[0]?.current_streak ?? 0
+  const showPozoHero = useFeatureFlag('pozo_hero')
 
   useEffect(() => {
     const interval = setInterval(() => setNow(new Date()), 60000)
@@ -386,7 +389,7 @@ export function Home() {
       const [matchRes, planillaRes, rankRes] = await Promise.all([
         api.get('/matches?limit=200'),
         api.get('/planillas'),
-        api.get('/ranking?limit=50'),
+        api.get('/ranking?limit=200'),
       ])
       setMatches(matchRes.data.data.matches)
       setRanking(rankRes.data.data.ranking)
@@ -522,109 +525,113 @@ export function Home() {
       {/* ── HERO + PRÓXIMO PARTIDO (desktop side-by-side) ─────── */}
       <div className="-mx-4 md:mx-0 md:rounded-2xl md:overflow-hidden md:shadow-2xl md:flex mb-5">
 
-        {/* Hero */}
-        <div className="text-white overflow-hidden relative md:flex-[3]" style={{ minHeight: 300, background: '#001A4B' }}>
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              backgroundImage: "url('https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?auto=format&fit=crop&w=1200&q=80')",
-              backgroundSize: 'cover', backgroundPosition: 'center top', opacity: 0.22,
-            }}
-          />
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{ background: 'linear-gradient(135deg, rgba(0,26,75,0.97) 0%, rgba(0,26,75,0.82) 60%, rgba(0,26,75,0.55) 100%)' }}
-          />
-
-          <div className="relative px-5 py-6">
+        {/* Hero — conmutado por feature flag ff_pozo_hero */}
+        {showPozoHero ? (
+          <PozoHeroCard ranking={ranking} now={now} />
+        ) : (
+          <div className="text-white overflow-hidden relative md:flex-[3]" style={{ minHeight: 300, background: '#001A4B' }}>
             <div
-              className="inline-flex items-center gap-2 mb-4"
-              style={{ background: 'rgba(255,223,0,0.12)', border: '1px solid rgba(255,223,0,0.35)', borderRadius: 99, padding: '5px 14px' }}
-            >
-              <span style={{ fontSize: 11, fontWeight: 700, color: '#FFDF00', letterSpacing: '0.06em' }}>
-                ✨ MUNDIAL 2026
-              </span>
-            </div>
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                backgroundImage: "url('https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?auto=format&fit=crop&w=1200&q=80')",
+                backgroundSize: 'cover', backgroundPosition: 'center top', opacity: 0.22,
+              }}
+            />
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{ background: 'linear-gradient(135deg, rgba(0,26,75,0.97) 0%, rgba(0,26,75,0.82) 60%, rgba(0,26,75,0.55) 100%)' }}
+            />
 
-            <h1
-              className="font-black text-white leading-none mb-2"
-              style={{ fontSize: 'clamp(28px, 6vw, 44px)', fontFamily: "'Arial Black', Arial, sans-serif", lineHeight: 0.95 }}
-            >
-              EL MUNDIAL<br />SE JUEGA ACÁ<br />
-              <em style={{ color: '#FFDF00', fontStyle: 'italic' }}>TAMBIÉN</em>
-            </h1>
-
-            <p className="text-white/50 text-xs mt-2 mb-2">
-              {getGreeting(now)}, {user?.nombre?.split(' ')[0] || 'jugador'}
-              {myEntry && (
-                <>
-                  {' · '}
-                  <span className="text-white/70 font-semibold">#{myEntry.position}</span>
-                  {' · '}
-                  <span style={{ color: '#FFDF00' }}>{myEntry.puntos_totales}pts</span>
-                </>
-              )}
-            </p>
-
-            {myStreak >= 3 && (
+            <div className="relative px-5 py-6">
               <div
-                className="inline-flex items-center gap-2 mb-4 px-3 py-1.5 rounded-full font-bold text-xs"
-                style={{ background: 'rgba(255,165,0,0.15)', color: '#FFB84D', border: '1px solid rgba(255,165,0,0.35)' }}
+                className="inline-flex items-center gap-2 mb-4"
+                style={{ background: 'rgba(255,223,0,0.12)', border: '1px solid rgba(255,223,0,0.35)', borderRadius: 99, padding: '5px 14px' }}
               >
-                <span>🔥</span>
-                <span>Llevás {myStreak} exactos seguidos · ¡no la rompas!</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#FFDF00', letterSpacing: '0.06em' }}>
+                  ✨ MUNDIAL 2026
+                </span>
               </div>
-            )}
 
-            <div className="flex flex-col gap-2.5">
-              {urgentUnbet > 0 ? (
-                <Link
-                  to="/apuestas"
-                  className="inline-flex items-center gap-2 font-black text-sm px-5 py-3 rounded-xl w-fit transition-all hover:brightness-110 active:scale-95 hover:scale-105 group"
-                  style={{ background: '#ef4444', color: '#fff', boxShadow: '0 4px 16px rgba(239,68,68,0.4)', animation: 'glow 2s ease-in-out infinite' }}
+              <h1
+                className="font-black text-white leading-none mb-2"
+                style={{ fontSize: 'clamp(28px, 6vw, 44px)', fontFamily: "'Arial Black', Arial, sans-serif", lineHeight: 0.95 }}
+              >
+                EL MUNDIAL<br />SE JUEGA ACÁ<br />
+                <em style={{ color: '#FFDF00', fontStyle: 'italic' }}>TAMBIÉN</em>
+              </h1>
+
+              <p className="text-white/50 text-xs mt-2 mb-2">
+                {getGreeting(now)}, {user?.nombre?.split(' ')[0] || 'jugador'}
+                {myEntry && (
+                  <>
+                    {' · '}
+                    <span className="text-white/70 font-semibold">#{myEntry.position}</span>
+                    {' · '}
+                    <span style={{ color: '#FFDF00' }}>{myEntry.puntos_totales}pts</span>
+                  </>
+                )}
+              </p>
+
+              {myStreak >= 3 && (
+                <div
+                  className="inline-flex items-center gap-2 mb-4 px-3 py-1.5 rounded-full font-bold text-xs"
+                  style={{ background: 'rgba(255,165,0,0.15)', color: '#FFB84D', border: '1px solid rgba(255,165,0,0.35)' }}
                 >
-                  ⚠️ {urgentUnbet} urgentes — Apostar ahora
-                </Link>
-              ) : (
-                <Link
-                  to="/apuestas"
-                  className="inline-flex items-center gap-2 font-black text-sm px-5 py-3 rounded-xl w-fit transition-all hover:brightness-110 active:scale-95 hover:scale-105"
-                  style={{ background: '#FFDF00', color: '#001A4B', boxShadow: '0 4px 20px rgba(255,223,0,0.5)' }}
-                >
-                  ⚽ {totalUnbet > 0 ? `Completar mi prode (${totalUnbet})` : 'Jugar ahora'}
-                </Link>
+                  <span>🔥</span>
+                  <span>Llevás {myStreak} exactos seguidos · ¡no la rompas!</span>
+                </div>
               )}
 
-              {/* CTA secundario: invitar amigo por WhatsApp (directo) */}
-              <button
-                onClick={() => inviteVia('whatsapp')}
-                className="inline-flex items-center gap-2 font-black text-sm px-5 py-3 rounded-xl w-fit transition-all hover:brightness-110 active:scale-95 hover:scale-105"
-                style={{ background: '#25D366', color: '#fff', boxShadow: '0 4px 16px rgba(37,211,102,0.4)' }}
-              >
-                💬 Invitar a un amigo
-              </button>
-              <button
-                onClick={openInviteModal}
-                className="self-start text-[11px] font-semibold text-white/55 hover:text-white/85 transition-colors -mt-0.5"
-              >
-                ✏️ Personalizar mensaje u otro canal →
-              </button>
+              <div className="flex flex-col gap-2.5">
+                {urgentUnbet > 0 ? (
+                  <Link
+                    to="/apuestas"
+                    className="inline-flex items-center gap-2 font-black text-sm px-5 py-3 rounded-xl w-fit transition-all hover:brightness-110 active:scale-95 hover:scale-105 group"
+                    style={{ background: '#ef4444', color: '#fff', boxShadow: '0 4px 16px rgba(239,68,68,0.4)', animation: 'glow 2s ease-in-out infinite' }}
+                  >
+                    ⚠️ {urgentUnbet} urgentes — Apostar ahora
+                  </Link>
+                ) : (
+                  <Link
+                    to="/apuestas"
+                    className="inline-flex items-center gap-2 font-black text-sm px-5 py-3 rounded-xl w-fit transition-all hover:brightness-110 active:scale-95 hover:scale-105"
+                    style={{ background: '#FFDF00', color: '#001A4B', boxShadow: '0 4px 20px rgba(255,223,0,0.5)' }}
+                  >
+                    ⚽ {totalUnbet > 0 ? `Completar mi prode (${totalUnbet})` : 'Jugar ahora'}
+                  </Link>
+                )}
+
+                {/* CTA secundario: invitar amigo por WhatsApp (directo) */}
+                <button
+                  onClick={() => inviteVia('whatsapp')}
+                  className="inline-flex items-center gap-2 font-black text-sm px-5 py-3 rounded-xl w-fit transition-all hover:brightness-110 active:scale-95 hover:scale-105"
+                  style={{ background: '#25D366', color: '#fff', boxShadow: '0 4px 16px rgba(37,211,102,0.4)' }}
+                >
+                  💬 Invitar a un amigo
+                </button>
+                <button
+                  onClick={openInviteModal}
+                  className="self-start text-[11px] font-semibold text-white/55 hover:text-white/85 transition-colors -mt-0.5"
+                >
+                  ✏️ Personalizar mensaje u otro canal →
+                </button>
+              </div>
+
+              <p className="text-white/25 text-[10px] mt-4 tracking-wider font-semibold uppercase">
+                {format(now, "EEEE, d MMM yyyy", { locale: esLocale })}
+              </p>
+
+              {pwaState.type !== 'installed' && pwaState.type !== 'unavailable' && (
+                <button
+                  onClick={() => pwaState.type === 'ios' ? setShowIOSGuide(true) : pwaInstall()}
+                  className="block text-white/20 text-[9px] mt-1.5 hover:text-white/45 transition-colors"
+                >
+                  📲 {t.home.installApp}
+                </button>
+              )}
             </div>
-
-            <p className="text-white/25 text-[10px] mt-4 tracking-wider font-semibold uppercase">
-              {format(now, "EEEE, d MMM yyyy", { locale: esLocale })}
-            </p>
-
-            {pwaState.type !== 'installed' && pwaState.type !== 'unavailable' && (
-              <button
-                onClick={() => pwaState.type === 'ios' ? setShowIOSGuide(true) : pwaInstall()}
-                className="block text-white/20 text-[9px] mt-1.5 hover:text-white/45 transition-colors"
-              >
-                📲 {t.home.installApp}
-              </button>
-            )}
           </div>
-        </div>
+        )}
 
         <NextMatchDesktopPanel matches={matches} bets={bets} />
       </div>
