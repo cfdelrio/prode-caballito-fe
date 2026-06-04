@@ -146,8 +146,8 @@ describe('PozoHeroCard', () => {
   it('renders the main title', () => {
     render(<PozoHeroCard ranking={ranking} now={NOW} />)
     const heading = screen.getByRole('heading', { level: 1 })
-    expect(heading.textContent).toMatch(/ESTADO DEL/i)
-    expect(heading.textContent).toMatch(/POZO/i)
+    expect(heading.textContent).toMatch(/EL PREMIO/i)
+    expect(heading.textContent).toMatch(/POR EXPLOTAR/i)
   })
 
   it('renders the main social proof line', () => {
