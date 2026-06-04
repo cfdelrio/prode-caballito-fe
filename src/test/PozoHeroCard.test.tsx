@@ -133,9 +133,9 @@ describe('PozoHeroCard', () => {
   const unpaidEntry2 = makeEntry({ planilla_id: 'p3', precio_pagado: false })
   const ranking = [paidEntry, unpaidEntry1, unpaidEntry2]
 
-  it('renders "ESTADO DEL POZO" badge', () => {
+  it('renders "EL PREMIO CRECE" badge', () => {
     render(<PozoHeroCard ranking={ranking} now={NOW} />)
-    expect(screen.getByText(/ESTADO DEL POZO/i)).toBeInTheDocument()
+    expect(screen.getByText(/EL PREMIO CRECE/i)).toBeInTheDocument()
   })
 
   it('renders "PRODE 2026" badge', () => {
@@ -150,9 +150,29 @@ describe('PozoHeroCard', () => {
     expect(heading.textContent).toMatch(/POZO/i)
   })
 
-  it('renders the subtitle', () => {
+  it('renders the main social proof line', () => {
     render(<PozoHeroCard ranking={ranking} now={NOW} />)
-    expect(screen.getByText(/Cuanto más somos, más grande se pone el premio/i)).toBeInTheDocument()
+    expect(screen.getByText(/1 de 3 jugadores ya están adentro/i)).toBeInTheDocument()
+  })
+
+  it('renders the prize potential line', () => {
+    render(<PozoHeroCard ranking={ranking} now={NOW} />)
+    expect(screen.getByText(/El premio potencial ya alcanza los/i)).toBeInTheDocument()
+  })
+
+  it('renders the remaining players line when not all paid', () => {
+    render(<PozoHeroCard ranking={ranking} now={NOW} />)
+    // 3 total - 1 paid = 2 remaining
+    expect(screen.getByText(/Todavía faltan 2 para completar el premio máximo/i)).toBeInTheDocument()
+  })
+
+  it('does not render remaining line when all players paid', () => {
+    const allPaid = [
+      makeEntry({ precio_pagado: true }),
+      makeEntry({ planilla_id: 'p2', precio_pagado: true }),
+    ]
+    render(<PozoHeroCard ranking={allPaid} now={NOW} />)
+    expect(screen.queryByText(/Todavía faltan/i)).not.toBeInTheDocument()
   })
 
   it('shows correct paidPlayers count (1 of 3)', () => {
@@ -161,9 +181,10 @@ describe('PozoHeroCard', () => {
     expect(label).toBeInTheDocument()
   })
 
-  it('shows "de 3 jugadores" total', () => {
+  it('shows "de 3 jugadores" in the paid players block', () => {
     render(<PozoHeroCard ranking={ranking} now={NOW} />)
-    expect(screen.getByText(/de 3 jugadores/i)).toBeInTheDocument()
+    // The exact small label inside bloque 1: "de 3 jugadores"
+    expect(screen.getAllByText(/de 3 jugadores/i).length).toBeGreaterThanOrEqual(1)
   })
 
   it('shows 33% paidPct', () => {
@@ -209,8 +230,8 @@ describe('PozoHeroCard', () => {
 
   it('renders correctly with empty ranking (zero state)', () => {
     render(<PozoHeroCard ranking={[]} now={NOW} />)
-    expect(screen.getByText(/ESTADO DEL POZO/i)).toBeInTheDocument()
-    expect(screen.getByText(/de 0 jugadores/i)).toBeInTheDocument()
+    expect(screen.getByText(/EL PREMIO CRECE/i)).toBeInTheDocument()
+    expect(screen.getByText(/0 de 0 jugadores ya están adentro/i)).toBeInTheDocument()
     expect(screen.getByText('0%')).toBeInTheDocument()
   })
 
