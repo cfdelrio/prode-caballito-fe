@@ -5,6 +5,11 @@ import { Home } from '@/pages/Home'
 
 // ─── Mocks ────────────────────────────────────────────────────────────────────
 
+vi.mock('@/hooks/useABTest', () => ({
+  useABTest: vi.fn(() => 'control' as const),
+  getABVariant: vi.fn(() => 'control' as const),
+}))
+
 vi.mock('@/store/authStore', () => ({
   useAuthStore: vi.fn((selector?: (s: any) => any) => {
     const store = { user: { id: 'u1', nombre: 'Carlos', idioma_pref: 'es', rol: 'user' } }
@@ -72,18 +77,19 @@ function renderHome() {
   return render(<MemoryRouter><Home /></MemoryRouter>)
 }
 
-// ─── Feature flag OFF (default) ───────────────────────────────────────────────
+// ─── A/B variant = control (default) ─────────────────────────────────────────
 
-describe('Home — hero con feature flag OFF (ff_pozo_hero no seteado)', () => {
-  beforeEach(() => { localStorage.removeItem('ff_pozo_hero') })
+describe('Home — hero con A/B variant "control"', () => {
+  beforeEach(async () => {
+    const { useABTest } = await import('@/hooks/useABTest')
+    vi.mocked(useABTest).mockReturnValue('control')
+  })
   afterEach(() => vi.clearAllMocks())
 
   it('muestra el hero original "EL MUNDIAL"', async () => {
     await setupApi()
     renderHome()
     await waitFor(() => {
-      // The h1 has multiple text nodes: "EL MUNDIAL", "SE JUEGA ACÁ", "TAMBIÉN"
-      // Use getByRole('heading') to target the h1 directly
       const heading = screen.getByRole('heading', { level: 1 })
       expect(heading.textContent).toMatch(/EL MUNDIAL/i)
     })
@@ -118,11 +124,14 @@ describe('Home — hero con feature flag OFF (ff_pozo_hero no seteado)', () => {
   })
 })
 
-// ─── Feature flag ON ──────────────────────────────────────────────────────────
+// ─── A/B variant = test ───────────────────────────────────────────────────────
 
-describe('Home — hero con feature flag ON (ff_pozo_hero = "true")', () => {
-  beforeEach(() => { localStorage.setItem('ff_pozo_hero', 'true') })
-  afterEach(() => { localStorage.removeItem('ff_pozo_hero'); vi.clearAllMocks() })
+describe('Home — hero con A/B variant "test"', () => {
+  beforeEach(async () => {
+    const { useABTest } = await import('@/hooks/useABTest')
+    vi.mocked(useABTest).mockReturnValue('test')
+  })
+  afterEach(() => vi.clearAllMocks())
 
   it('muestra "EL PREMIO CRECE" en lugar del hero original', async () => {
     await setupApi()
