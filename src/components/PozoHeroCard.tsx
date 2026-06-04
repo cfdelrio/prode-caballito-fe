@@ -92,7 +92,7 @@ export function PozoHeroCard({ ranking, now }: PozoHeroCardProps) {
             }}
           >
             EL PREMIO<br />
-            <span style={{ color: '#FFD600' }}>POR EXPLOTAR</span>
+            <span style={{ color: '#FFD600' }}>ESTA X EXPLOTAR</span>
           </h1>
           <p className="font-semibold text-white text-sm mt-2 leading-snug">
             {paidPlayers} de {totalPlayers} jugadores ya están adentro.
