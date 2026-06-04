@@ -89,11 +89,11 @@ describe('Home — hero con feature flag OFF (ff_pozo_hero no seteado)', () => {
     })
   })
 
-  it('no muestra "ESTADO DEL POZO"', async () => {
+  it('no muestra "EL PREMIO CRECE"', async () => {
     await setupApi()
     renderHome()
     await waitFor(() => {
-      expect(screen.queryByText(/ESTADO DEL POZO/i)).not.toBeInTheDocument()
+      expect(screen.queryByText(/EL PREMIO CRECE/i)).not.toBeInTheDocument()
     })
   })
 
@@ -124,11 +124,11 @@ describe('Home — hero con feature flag ON (ff_pozo_hero = "true")', () => {
   beforeEach(() => { localStorage.setItem('ff_pozo_hero', 'true') })
   afterEach(() => { localStorage.removeItem('ff_pozo_hero'); vi.clearAllMocks() })
 
-  it('muestra "ESTADO DEL POZO" en lugar del hero original', async () => {
+  it('muestra "EL PREMIO CRECE" en lugar del hero original', async () => {
     await setupApi()
     renderHome()
     await waitFor(() => {
-      expect(screen.getByText(/ESTADO DEL POZO/i)).toBeInTheDocument()
+      expect(screen.getByText(/EL PREMIO CRECE/i)).toBeInTheDocument()
     })
   })
 

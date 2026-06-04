@@ -64,7 +64,7 @@ export function PozoHeroCard({ ranking, now }: PozoHeroCardProps) {
             }}
           >
             <span style={{ fontSize: 11, fontWeight: 700, color: '#FFD600', letterSpacing: '0.06em' }}>
-              ⚡ ESTADO DEL POZO
+              🔥 EL PREMIO CRECE
             </span>
           </div>
           <div
@@ -94,9 +94,17 @@ export function PozoHeroCard({ ranking, now }: PozoHeroCardProps) {
             ESTADO DEL<br />
             <span style={{ color: '#FFD600' }}>POZO</span>
           </h1>
-          <p className="text-white/60 text-xs mt-2">
-            ⚽ Cuanto más somos, más grande se pone el premio.
+          <p className="font-semibold text-white text-sm mt-2 leading-snug">
+            {paidPlayers} de {totalPlayers} jugadores ya están adentro.
           </p>
+          <p className="text-xs mt-1 leading-snug" style={{ color: 'rgba(255,255,255,0.75)' }}>
+            El premio potencial ya alcanza los {formatMoney(pozoTotal)}.
+          </p>
+          {totalPlayers - paidPlayers > 0 && (
+            <p className="text-xs mt-0.5 leading-snug" style={{ color: 'rgba(255,255,255,0.45)' }}>
+              Todavía faltan {totalPlayers - paidPlayers} para completar el premio máximo.
+            </p>
+          )}
         </div>
 
         {/* Métricas: 1 col en mobile → 3 col en ≥sm */}
