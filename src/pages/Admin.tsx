@@ -867,6 +867,7 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
   const [planillaTournamentFilter, setPlanillaTournamentFilter] = useState<string>('all')
   const [allPlanillas, setAllPlanillas] = useState<Record<string, unknown>[] | null>(null)
   const [confirmDeleteUser, setConfirmDeleteUser] = useState<{ id: string; name: string } | null>(null)
+  const [confirmDeletePlanilla, setConfirmDeletePlanilla] = useState<{ id: string; nombre: string; userName: string } | null>(null)
   const USERS_PER_PAGE = 20
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
@@ -949,6 +950,20 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
     }
   }
 
+  const handleDeletePlanilla = async () => {
+    if (!confirmDeletePlanilla) return
+    const { id, nombre, userName } = confirmDeletePlanilla
+    setConfirmDeletePlanilla(null)
+    try {
+      await api.delete(`/planillas/admin/${id}`)
+      setData(prev => prev.filter(p => String(p.id) !== id))
+      show(`Planilla "${nombre}" de ${userName} eliminada ✓`, 'success')
+    } catch (e: unknown) {
+      const msg = (e as { response?: { data?: { error?: string } } }).response?.data?.error || 'Error al eliminar planilla'
+      show(msg, 'error')
+    }
+  }
+
   const handlePaid = async (id: string, current: boolean) => {
     try {
       await api.put(`/planillas/admin/${id}`, { precio_pagado: !current })
@@ -963,6 +978,7 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
 
   if (tab === 'planillas') {
     return (
+      <>
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <table className="w-full text-sm">
           <thead>
@@ -971,6 +987,7 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
               <th className="text-left px-4 py-2 font-semibold">Planilla</th>
               <th className="text-center px-4 py-2 font-semibold">Pts</th>
               <th className="text-center px-4 py-2 font-semibold">Pagada</th>
+              <th className="text-center px-4 py-2 font-semibold">Eliminar</th>
             </tr>
           </thead>
           <tbody>
@@ -985,11 +1002,28 @@ function AdminSubTab({ tab }: { tab: 'planillas' | 'usuarios' }) {
                     {p.precio_pagado ? 'Pagada' : 'IMPAGO'}
                   </button>
                 </td>
+                <td className="px-4 py-2 text-center">
+                  <button
+                    onClick={() => setConfirmDeletePlanilla({ id: String(p.id), nombre: String(p.nombre_planilla || ''), userName: String(p.user_name || '') })}
+                    className="text-red-400 hover:text-red-600 transition-colors text-base"
+                    title="Eliminar planilla"
+                  >
+                    🗑️
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      <ConfirmModal
+        open={!!confirmDeletePlanilla}
+        title="Eliminar planilla"
+        message={`¿Eliminar la planilla "${confirmDeletePlanilla?.nombre}" de ${confirmDeletePlanilla?.userName}? Se borrarán todos sus pronósticos y puntajes. El usuario recibirá un email de notificación.`}
+        onConfirm={handleDeletePlanilla}
+        onCancel={() => setConfirmDeletePlanilla(null)}
+      />
+    </>
     )
   }
 
