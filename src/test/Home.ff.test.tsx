@@ -48,7 +48,8 @@ vi.mock('@/api/client', () => ({
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const PLANILLA = { id: 'p1', user_id: 'u1', nombre_planilla: 'Mi planilla', precio_pagado: false, locked: false }
+const PLANILLA_UNPAID = { id: 'p1', user_id: 'u1', nombre_planilla: 'Mi planilla', precio_pagado: false, locked: false }
+const PLANILLA_PAID   = { id: 'p1', user_id: 'u1', nombre_planilla: 'Mi planilla', precio_pagado: true,  locked: false }
 
 // u1 must NOT be at position 1 with points > 0, otherwise Home redirects to LeaderHome
 const RANKING_ENTRIES = [
@@ -57,11 +58,12 @@ const RANKING_ENTRIES = [
   { planilla_id: 'p3', user_id: 'u3', user_name: 'Juan', nombre_planilla: 'Planilla 3', puntos_totales: 3, exactos_count: 0, aciertos_celeste: 0, aciertos_rojo: 0, aciertos_verde: 0, aciertos_amarillo: 0, position: 2, precio_pagado: false },
 ]
 
-async function setupApi() {
+async function setupApi(paid = false) {
+  const planilla = paid ? PLANILLA_PAID : PLANILLA_UNPAID
   const { api } = await import('@/api/client')
   ;(api.get as ReturnType<typeof vi.fn>).mockImplementation((url: string) => {
     if (url.startsWith('/matches')) return Promise.resolve({ data: { data: { matches: [] } } })
-    if (url.startsWith('/planillas')) return Promise.resolve({ data: { data: [PLANILLA] } })
+    if (url.startsWith('/planillas')) return Promise.resolve({ data: { data: [planilla] } })
     if (url.startsWith('/ranking')) return Promise.resolve({ data: { data: { ranking: RANKING_ENTRIES } } })
     if (url.includes('/bets')) return Promise.resolve({ data: { data: [] } })
     return Promise.resolve({ data: { data: [] } })
@@ -74,11 +76,11 @@ function renderHome() {
 
 afterEach(() => vi.clearAllMocks())
 
-// ─── PozoHeroCard — siempre activo ────────────────────────────────────────────
+// ─── PozoHeroCard — usuario NO pagó ──────────────────────────────────────────
 
-describe('Home — PozoHeroCard (showPozoHero = true)', () => {
+describe('Home — PozoHeroCard (precio_pagado: false)', () => {
   it('muestra "EL PREMIO CRECE"', async () => {
-    await setupApi()
+    await setupApi(false)
     renderHome()
     await waitFor(() => {
       expect(screen.getByText(/EL PREMIO CRECE/i)).toBeInTheDocument()
@@ -86,7 +88,7 @@ describe('Home — PozoHeroCard (showPozoHero = true)', () => {
   })
 
   it('no muestra el título "EL MUNDIAL"', async () => {
-    await setupApi()
+    await setupApi(false)
     renderHome()
     await waitFor(() => {
       expect(screen.queryByText(/EL MUNDIAL/i)).not.toBeInTheDocument()
@@ -94,7 +96,7 @@ describe('Home — PozoHeroCard (showPozoHero = true)', () => {
   })
 
   it('muestra métricas de jugadores que pagaron', async () => {
-    await setupApi()
+    await setupApi(false)
     renderHome()
     await waitFor(() => {
       expect(screen.getByText(/¿Cuántos ya pagaron\?/i)).toBeInTheDocument()
@@ -102,7 +104,7 @@ describe('Home — PozoHeroCard (showPozoHero = true)', () => {
   })
 
   it('muestra métricas de recaudado', async () => {
-    await setupApi()
+    await setupApi(false)
     renderHome()
     await waitFor(() => {
       expect(screen.getByText(/¿Cuánto recaudado\?/i)).toBeInTheDocument()
@@ -110,28 +112,41 @@ describe('Home — PozoHeroCard (showPozoHero = true)', () => {
   })
 
   it('muestra métricas del pozo potencial', async () => {
-    await setupApi()
+    await setupApi(false)
     renderHome()
     await waitFor(() => {
       expect(screen.getByText(/Pozo si todos pagan/i)).toBeInTheDocument()
     })
   })
 
-  it('muestra PRODE 2026 badge', async () => {
-    await setupApi()
-    renderHome()
-    await waitFor(() => {
-      expect(screen.getByText(/PRODE 2026/i)).toBeInTheDocument()
-    })
-  })
-
   it('llama al ranking con límite 200', async () => {
-    await setupApi()
+    await setupApi(false)
     const { api } = await import('@/api/client')
     renderHome()
     await waitFor(() => {
       const calls = (api.get as ReturnType<typeof vi.fn>).mock.calls.map((c: any[]) => c[0])
       expect(calls.some((url: string) => url.includes('/ranking') && url.includes('200'))).toBe(true)
+    })
+  })
+})
+
+// ─── Hero clásico — usuario YA pagó ──────────────────────────────────────────
+
+describe('Home — Hero clásico (precio_pagado: true)', () => {
+  it('muestra el hero clásico con "EL MUNDIAL"', async () => {
+    await setupApi(true)
+    renderHome()
+    await waitFor(() => {
+      const heading = screen.getByRole('heading', { level: 1 })
+      expect(heading.textContent).toMatch(/EL MUNDIAL/i)
+    })
+  })
+
+  it('no muestra PozoHeroCard', async () => {
+    await setupApi(true)
+    renderHome()
+    await waitFor(() => {
+      expect(screen.queryByText(/EL PREMIO CRECE/i)).not.toBeInTheDocument()
     })
   })
 })

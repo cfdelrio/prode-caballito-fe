@@ -371,7 +371,7 @@ export function Home() {
   const { show: showToast } = useToastStore()
   const { data: gamification } = useGamification(user?.id ?? null)
   const myStreak = gamification.streaks[0]?.current_streak ?? 0
-  const showPozoHero = true
+  const showPozoHero = !planilla?.precio_pagado
 
   useEffect(() => {
     const interval = setInterval(() => setNow(new Date()), 60000)
