@@ -101,7 +101,9 @@ describe('Home — hero con feature flag OFF (ff_pozo_hero no seteado)', () => {
     await setupApi()
     renderHome()
     await waitFor(() => {
-      expect(screen.getByText(/jugar ahora|completar mi prode/i)).toBeInTheDocument()
+      const links = screen.getAllByRole('link')
+      const apuestasLink = links.some(l => /jugar ahora|completar mi prode/i.test(l.textContent ?? ''))
+      expect(apuestasLink).toBe(true)
     })
   })
 
