@@ -301,7 +301,7 @@ export function Apuestas() {
       )}
 
       {/* Botón confirmar planilla */}
-      {selectedPlanillaObj && !selectedPlanillaObj.locked && !selectedPlanillaObj.precio_pagado && (() => {
+      {selectedPlanillaObj && !selectedPlanillaObj.locked && (() => {
         const missing = pendingMatches.filter(m => !bets[m.id]).length
         const allDone = missing === 0 && pendingMatches.length > 0
         return (
@@ -382,7 +382,7 @@ export function Apuestas() {
               match={m}
               bet={bets[m.id]}
               planillaId={selectedPlanilla || undefined}
-              planillaLocked={selectedPlanillaObj?.locked || selectedPlanillaObj?.precio_pagado}
+              planillaLocked={selectedPlanillaObj?.locked}
               tournamentClosed={isTournamentClosed}
               onBetSaved={() => loadBets(selectedPlanilla)}
               onBetDeleted={(mid) => { const nb = { ...bets }; delete nb[mid]; setBets(nb) }}
@@ -404,7 +404,7 @@ export function Apuestas() {
               match={m}
               bet={bets[m.id]}
               planillaId={selectedPlanilla || undefined}
-              planillaLocked={selectedPlanillaObj?.locked || selectedPlanillaObj?.precio_pagado}
+              planillaLocked={selectedPlanillaObj?.locked}
               tournamentClosed={isTournamentClosed}
               onBetSaved={() => loadBets(selectedPlanilla)}
               onBetDeleted={(mid) => { const nb = { ...bets }; delete nb[mid]; setBets(nb) }}
