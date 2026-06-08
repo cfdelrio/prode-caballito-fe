@@ -23,6 +23,7 @@ const COUNTRY_CODES = [
   { code: '+58', flag: '🇻🇪', name: 'Venezuela' },
   { code: '+52', flag: '🇲🇽', name: 'México' },
   { code: '+34', flag: '🇪🇸', name: 'España' },
+  { code: '+212', flag: '🇲🇦', name: 'Marruecos' },
   { code: '+1', flag: '🇺🇸', name: 'EE.UU.' },
 ]
 
