@@ -202,7 +202,7 @@ describe('Admin — PartidosTab', () => {
     expect(screen.getByText('+ Nuevo partido')).toBeInTheDocument()
     expect(screen.getByText('Homem1')).toBeInTheDocument()
     expect(screen.getByText('Homem2')).toBeInTheDocument()
-    expect(screen.getByText('1-0')).toBeInTheDocument()
+    expect(screen.getAllByText('1-0')).toHaveLength(2)
     // Volver
     await userEvent.click(screen.getByText('← Torneos'))
     expect(screen.queryByText('+ Nuevo partido')).toBeNull()
@@ -212,7 +212,7 @@ describe('Admin — PartidosTab', () => {
     await setupApi({ tournaments: [T_FUTURE], matches: [] })
     renderAdmin()
     await userEvent.click(await screen.findByText('Mundial 2026'))
-    expect(screen.getByText(/No hay partidos en este torneo/i)).toBeInTheDocument()
+    expect(screen.getAllByText(/No hay partidos en este torneo/i)[0]).toBeInTheDocument()
   })
 
   it('abre y cierra modal "Nuevo partido"', async () => {
@@ -291,7 +291,7 @@ describe('Admin — PartidosTab', () => {
     await setupApi({ tournaments: [T_FUTURE], matches: [makeMatch('m1')] })
     renderAdmin()
     await userEvent.click(await screen.findByText('Mundial 2026'))
-    await userEvent.click(screen.getByRole('button', { name: 'Resultado' }))
+    await userEvent.click(screen.getAllByRole('button', { name: 'Resultado' })[0])
     expect(screen.getByText(/Resultado: Homem1 vs Awaym1/)).toBeInTheDocument()
     const numInputs = document.querySelectorAll('input[type="number"]')
     await userEvent.type(numInputs[0] as HTMLInputElement, '3')
@@ -306,7 +306,7 @@ describe('Admin — PartidosTab', () => {
     await setupApi({ tournaments: [T_FUTURE], matches: [makeMatch('m1', { estado: 'finished' })] })
     renderAdmin()
     await userEvent.click(await screen.findByText('Mundial 2026'))
-    expect(screen.getByText('Corregir')).toBeInTheDocument()
+    expect(screen.getAllByText('Corregir')[0]).toBeInTheDocument()
   })
 
   it('guardar partido: error de API → muestra toast', async () => {
@@ -326,7 +326,7 @@ describe('Admin — PartidosTab', () => {
     ;(api.post as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('fail'))
     renderAdmin()
     await userEvent.click(await screen.findByText('Mundial 2026'))
-    await userEvent.click(screen.getByRole('button', { name: 'Resultado' }))
+    await userEvent.click(screen.getAllByRole('button', { name: 'Resultado' })[0])
     const numInputs = document.querySelectorAll('input[type="number"]')
     await userEvent.type(numInputs[0] as HTMLInputElement, '1')
     await userEvent.type(numInputs[1] as HTMLInputElement, '0')
