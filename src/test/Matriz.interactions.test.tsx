@@ -321,73 +321,18 @@ describe('Matriz — celdas de partidos pendientes', () => {
     })
   })
 
-  it('otro jugador con apuesta en partido aún vedado → muestra 🔒', async () => {
+  it('otro jugador con apuesta en partido pendiente → ahora ve la apuesta (sin veda)', async () => {
     await setupApi({ bets: BETS_WITH_PENDING_LOCK })
     renderMatriz()
     await waitForLoad()
 
+    // Ana ahora ve su apuesta en mp1 (0-2) sin restricción
     await waitFor(() => {
-      expect(screen.getAllByTitle('Período de veda activo').length).toBeGreaterThan(0)
+      expect(screen.getByText('0-2')).toBeInTheDocument()
     })
   })
 })
 
-// ─── Modal de veda ────────────────────────────────────────────────────────────
-
-describe('Matriz — modal de período de veda', () => {
-  afterEach(() => vi.clearAllMocks())
-
-  it('click en 🔒 abre el modal de veda', async () => {
-    await setupApi({ bets: BETS_WITH_PENDING_LOCK })
-    renderMatriz()
-    await waitForLoad()
-
-    await waitFor(() =>
-      expect(screen.getAllByTitle('Período de veda activo').length).toBeGreaterThan(0)
-    )
-    fireEvent.click(screen.getAllByTitle('Período de veda activo')[0])
-
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: /Entendido/i })).toBeInTheDocument()
-    })
-  })
-
-  it('click "Entendido" cierra el modal', async () => {
-    await setupApi({ bets: BETS_WITH_PENDING_LOCK })
-    renderMatriz()
-    await waitForLoad()
-
-    await waitFor(() =>
-      expect(screen.getAllByTitle('Período de veda activo').length).toBeGreaterThan(0)
-    )
-    fireEvent.click(screen.getAllByTitle('Período de veda activo')[0])
-    await waitFor(() => expect(screen.getByRole('button', { name: /Entendido/i })).toBeInTheDocument())
-
-    fireEvent.click(screen.getByRole('button', { name: /Entendido/i }))
-    await waitFor(() => {
-      expect(screen.queryByRole('button', { name: /Entendido/i })).toBeNull()
-    })
-  })
-
-  it('click en backdrop cierra el modal de veda', async () => {
-    await setupApi({ bets: BETS_WITH_PENDING_LOCK })
-    const { container } = renderMatriz()
-    await waitForLoad()
-
-    await waitFor(() =>
-      expect(screen.getAllByTitle('Período de veda activo').length).toBeGreaterThan(0)
-    )
-    fireEvent.click(screen.getAllByTitle('Período de veda activo')[0])
-    await waitFor(() => expect(screen.getByRole('button', { name: /Entendido/i })).toBeInTheDocument())
-
-    const backdrop = container.querySelector('.fixed.inset-0.bg-black\\/40')
-    expect(backdrop).not.toBeNull()
-    fireEvent.click(backdrop!)
-    await waitFor(() => {
-      expect(screen.queryByRole('button', { name: /Entendido/i })).toBeNull()
-    })
-  })
-})
 
 // ─── Rendering de filas ───────────────────────────────────────────────────────
 

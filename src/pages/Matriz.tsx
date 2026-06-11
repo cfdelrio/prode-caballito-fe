@@ -4,7 +4,6 @@ import { api } from '@/api/client'
 import { useT } from '@/hooks/useT'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Sk, SkMatrizRow } from '@/components/ui/Skeleton'
-import { Button } from '@/components/ui/Button'
 import { calcularPuntaje, POINT_COLORS } from '@/utils/scoring'
 import { teamFlag } from '@/utils/teamFlags'
 import { useAuthStore } from '@/store/authStore'
@@ -156,7 +155,6 @@ export function Matriz() {
   })
   const [favorites, setFavorites] = useState<Set<string>>(new Set())
   const [togglingFav, setTogglingFav] = useState<string | null>(null)
-  const [showVedaModal, setShowVedaModal] = useState(false)
   const [avatarFullscreen, setAvatarFullscreen] = useState<{ avatar: string; name: string } | null>(null)
   const tableRef = useRef<HTMLDivElement>(null)
   const headerInnerRef = useRef<HTMLDivElement>(null)
@@ -492,7 +490,6 @@ export function Matriz() {
                     <td className="px-2 py-1.5 text-center font-black text-[#0042A5]">{pts}</td>
                     {allMatches.map((m) => {
                       const b = playerBets[m.id]
-                      const isCutoffPassed = new Date() > new Date(m.time_cutoff)
 
                       if (m.estado === 'finished' && m.resultado_local !== undefined) {
                         if (!b) return <td key={m.id} className="px-1 py-1.5 text-center text-gray-300">—</td>
@@ -527,35 +524,11 @@ export function Matriz() {
                         )
                       }
 
-                      // Partido pendiente: solo el propio usuario ve su apuesta (o si el cutoff ya pasó)
-                      if (isMe || isCutoffPassed) {
-                        if (!b) return <td key={m.id} className="px-1 py-1.5 text-center text-gray-300">—</td>
-                        return (
-                          <td key={m.id} className="px-1 py-1.5 text-center text-gray-500 font-medium">
-                            {b.home}-{b.away}
-                          </td>
-                        )
-                      }
-
+                      // Partido pendiente: mostrar apuesta de todos los jugadores
+                      if (!b) return <td key={m.id} className="px-1 py-1.5 text-center text-gray-300">—</td>
                       return (
-                        <td key={m.id} className="px-1 py-1.5 text-center">
-                          {b
-                            ? <span
-                                role="button"
-                                tabIndex={0}
-                                onClick={(e) => { e.stopPropagation(); setShowVedaModal(true) }}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter' || e.key === ' ') {
-                                    e.preventDefault()
-                                    setShowVedaModal(true)
-                                  }
-                                }}
-                                aria-label="Período de veda activo"
-                                className="inline-block text-[13px] cursor-pointer select-none opacity-50 hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-[#0042A5] rounded"
-                                title="Período de veda activo"
-                              >🔒</span>
-                            : <span className="text-gray-200">—</span>
-                          }
+                        <td key={m.id} className="px-1 py-1.5 text-center text-gray-500 font-medium">
+                          {b.home}-{b.away}
                         </td>
                       )
                     })}
@@ -565,38 +538,6 @@ export function Matriz() {
             </tbody>
           </table>
         </div>
-        </>
-      )}
-
-      {/* Modal: período de veda */}
-      {showVedaModal && (
-        <>
-          <div className="fixed inset-0 bg-black/40 z-40 backdrop-blur-sm" onClick={() => setShowVedaModal(false)} />
-          <div className="fixed inset-0 z-50 flex items-center justify-center px-6 pointer-events-none">
-            <div
-              className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 pointer-events-auto"
-              style={{ animation: 'pop 0.2s ease-out both' }}
-            >
-              <div className="text-center space-y-3">
-                <div className="text-4xl">🔒</div>
-                <h3 className="font-bold text-[#001A4B] text-base">Período de veda activo</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">
-                  Las apuestas de otros jugadores no se pueden ver hasta que finalice el período de veda de este partido.
-                </p>
-                <p className="text-xs text-gray-400 leading-relaxed">
-                  Una vez que comience el partido, podrás ver todos los pronósticos.
-                </p>
-                <Button
-                  variant="dark"
-                  fullWidth
-                  onClick={() => setShowVedaModal(false)}
-                  className="mt-2"
-                >
-                  Entendido
-                </Button>
-              </div>
-            </div>
-          </div>
         </>
       )}
 
