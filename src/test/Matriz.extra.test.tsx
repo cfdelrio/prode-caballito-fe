@@ -57,6 +57,9 @@ async function setupApi(overrides: { planillas?: unknown[]; matches?: unknown[];
     if (url.includes('/matches')) {
       return Promise.resolve({ data: { data: { matches: overrides.matches ?? [MATCH_FINISHED, MATCH_PENDING] } } })
     }
+    if (url.includes('/bets/all-for-matrix')) {
+      return Promise.resolve({ data: { data: overrides.bets ?? defaultBets } })
+    }
     if (url.includes('/matriz')) {
       return Promise.resolve({ data: { data: { bets: overrides.bets ?? defaultBets, ranking: [PLANILLA_MINE, PLANILLA_OTHER] } } })
     }
@@ -68,14 +71,14 @@ function renderMatriz() {
   return render(<MemoryRouter><Matriz /></MemoryRouter>)
 }
 
-describe('Matriz — modal de veda', () => {
+describe('Matriz — apuestas pendientes sin veda', () => {
   afterEach(() => vi.clearAllMocks())
 
-  it('click en 🔒 abre modal de período de veda', async () => {
+  it('apuesta de otro jugador en partido pendiente se ve directamente (sin veda)', async () => {
     await setupApi({
       bets: {
         p1: { mf1: { home: 2, away: 1 }, mp1: { home: 1, away: 0 } },
-        p2: { mf1: { home: 1, away: 1 }, mp1: { home: 0, away: 0 } }, // Ana tiene apuesta pending → se ve como 🔒
+        p2: { mf1: { home: 1, away: 1 }, mp1: { home: 0, away: 0 } }, // Ana tiene apuesta pending → se ve directamente
       },
     })
     renderMatriz()
@@ -84,19 +87,8 @@ describe('Matriz — modal de veda', () => {
       expect(screen.getByText('Carlos')).toBeInTheDocument()
     }, { timeout: 3000 })
 
-    const lockIcons = screen.queryAllByTitle('Período de veda activo')
-    if (lockIcons.length > 0) {
-      fireEvent.click(lockIcons[0])
-      await waitFor(() => {
-        expect(screen.getByText(/período de veda/i)).toBeInTheDocument()
-      })
-
-      // Cerrar el modal con "Entendido"
-      fireEvent.click(screen.getByRole('button', { name: /Entendido/i }))
-      await waitFor(() => {
-        expect(screen.queryByRole('button', { name: /Entendido/i })).toBeNull()
-      })
-    }
+    // Ahora Ana's apuesta (0-0) se ve sin candado
+    expect(screen.getByText('0-0')).toBeInTheDocument()
   })
 })
 
