@@ -294,6 +294,29 @@ export function Matriz() {
           0%   { background-position: -200% center; }
           100% { background-position: 200% center; }
         }
+
+        /* Columna Pts sticky en scroll horizontal */
+        td.sticky-pts {
+          position: sticky;
+          left: 140px;
+          z-index: 5;
+        }
+        @media (min-width: 640px) {
+          td.sticky-pts {
+            left: 180px;
+          }
+        }
+
+        th.sticky-pts-header {
+          position: sticky;
+          left: 140px;
+          z-index: 20;
+        }
+        @media (min-width: 640px) {
+          th.sticky-pts-header {
+            left: 180px;
+          }
+        }
       `}</style>
 
       <div className="max-w-7xl mx-auto px-2 flex items-start justify-between flex-wrap gap-3">
@@ -375,7 +398,7 @@ export function Matriz() {
                   <th ref={headerJugadorRef} className="sticky left-0 bg-[#001A4B] px-2 py-2 text-left font-semibold z-30 min-w-[140px] sm:min-w-[180px]">
                     {t.ranking.player}
                   </th>
-                  <th className="px-2 py-2 text-center font-semibold w-14 bg-[#001A4B] sticky left-[140px] sm:left-[180px] z-20">{t.ranking.pts}</th>
+                  <th className="sticky-pts-header px-2 py-2 text-center font-semibold w-14 bg-[#001A4B]">{t.ranking.pts}</th>
                   {allMatches.map((m) => (
                     <th
                       key={m.id}
@@ -487,7 +510,7 @@ export function Matriz() {
                         )}
                       </div>
                     </td>
-                    <td className={`px-2 py-1.5 text-center font-black text-[#0042A5] sticky left-[140px] sm:left-[180px] z-[5] border-r border-gray-100 ${rowBg}`}>{pts}</td>
+                    <td className={`sticky-pts px-2 py-1.5 text-center font-black text-[#0042A5] border-r border-gray-100 ${rowBg}`}>{pts}</td>
                     {allMatches.map((m) => {
                       const b = playerBets[m.id]
 
