@@ -434,10 +434,52 @@ function PartidosTab({ matches, tournaments, loading, onNewMatch, onEdit, onResu
         </button>
       </div>
 
-      {/* Tabla */}
+      {/* Tabla / Tarjetas */}
       {loading ? <Spinner /> : (
         <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-          <table className="w-full text-sm">
+
+          {/* ── Mobile: tarjetas con botones visibles ── */}
+          {filtered.length === 0 ? (
+            <EmptyState icon="⚽" message="No hay partidos en este torneo" />
+          ) : (
+            <div className="md:hidden divide-y divide-gray-50">
+              {filtered.map((m) => (
+                <div key={m.id} className="px-4 py-3 space-y-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="font-medium text-[#001A4B] text-sm leading-tight">
+                        {m.home_team} <span className="text-gray-400 font-normal">vs</span> {m.away_team}
+                      </p>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        {format(new Date(m.start_time), "d MMM HH:mm", { locale: es })}
+                        {m.estado === 'finished' && (
+                          <span className="ml-2 font-mono font-bold text-gray-600">{m.resultado_local}-{m.resultado_visitante}</span>
+                        )}
+                      </p>
+                    </div>
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${
+                      m.estado === 'finished' ? 'bg-green-100 text-green-700' :
+                      m.estado === 'live' ? 'bg-red-100 text-red-600 animate-pulse' :
+                      'bg-blue-100 text-blue-700'
+                    }`}>
+                      {m.estado}
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={() => onEdit(m)} className="text-xs bg-blue-50 text-blue-600 font-semibold px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors">Editar</button>
+                    {m.estado !== 'finished'
+                      ? <button onClick={() => onResult(m)} className="text-xs bg-green-50 text-green-600 font-semibold px-3 py-1.5 rounded-lg hover:bg-green-100 transition-colors">Resultado</button>
+                      : <button onClick={() => onResult(m)} className="text-xs bg-orange-50 text-orange-500 font-semibold px-3 py-1.5 rounded-lg hover:bg-orange-100 transition-colors">Corregir</button>
+                    }
+                    <button onClick={() => onDelete(m.id)} className="text-xs bg-red-50 text-red-400 font-semibold px-3 py-1.5 rounded-lg hover:bg-red-100 transition-colors ml-auto">Eliminar</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* ── Desktop: tabla ── */}
+          <table className="hidden md:table w-full text-sm">
             <thead>
               <tr className="bg-gray-50 text-xs text-gray-500 border-b">
                 <th className="text-left px-4 py-2 font-semibold">Partido</th>
