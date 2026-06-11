@@ -169,6 +169,7 @@ export function Matriz() {
 
   // Sincroniza el ancho de la columna "Jugador" entre el header y el body.
   // Son dos <table> separadas, entonces el browser las dimensiona independientemente.
+  // También establece la CSS variable --jugador-width para que Pts pueda usarla como offset.
   useLayoutEffect(() => {
     const sync = () => {
       if (!bodyJugadorRef.current || !headerJugadorRef.current) return
@@ -176,6 +177,8 @@ export function Matriz() {
       if (w > 0) {
         headerJugadorRef.current.style.minWidth = `${w}px`
         headerJugadorRef.current.style.width = `${w}px`
+        // Establece la CSS variable para que el sticky de Pts use el offset correcto
+        document.documentElement.style.setProperty('--jugador-width', `${w}px`)
       }
     }
     sync()
@@ -298,13 +301,8 @@ export function Matriz() {
         /* Columna Pts sticky en scroll horizontal */
         td.sticky-pts {
           position: sticky;
-          left: 140px;
+          left: var(--jugador-width, 140px);
           z-index: 5;
-        }
-        @media (min-width: 640px) {
-          td.sticky-pts {
-            left: 180px;
-          }
         }
 
         th.sticky-pts-header {
