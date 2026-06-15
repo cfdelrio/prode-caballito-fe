@@ -23,8 +23,8 @@ Cuando se invoca este skill, cargás todo el conocimiento acumulado del proyecto
 | **Frontend** | `github.com/cfdelrio/prode-caballito-fe` | `main` |
 | **Backend** | `github.com/cfdelrio/prode-caballito-be` | `main` |
 
-- Working dir habitual del FE: `/tmp/prode-caballito-fe`
-- Working dir habitual del BE (fuente compilada): `/tmp/prode-api-src`
+- Working dir habitual del FE: `/home/user/prode-caballito-fe`
+- Working dir habitual del BE (fuente compilada): `/home/user/prode-caballito-be`
 
 ---
 
@@ -118,8 +118,8 @@ const res = await api.get('/matches?limit=200')
 
 ### Toasts
 ```typescript
-const { addToast } = useToastStore()
-addToast('Mensaje ✓', 'success')  // tipos: success | error | warning | info
+const { show } = useToastStore()
+show('Mensaje ✓', 'success')  // tipos: success | error | warning | info
 ```
 
 ### Temas visuales
@@ -194,8 +194,10 @@ GET  /planillas           → planillas del usuario autenticado
 POST /planillas
 DELETE /planillas/:id
 
-GET  /ranking?limit=N&tournament_id=X
-GET  /matriz?planilla_id=X&tournament_id=X
+GET  /ranking?limit=N&tournament_id=X&include_unpaid=true
+GET  /bets/all-for-matrix        → { [planilla_id]: { [match_id]: { home, away } } }
+GET  /ranking/favorites          → string[] (planilla_ids favoritas del usuario)
+POST /ranking/favorites/:id      → { action: 'added' | 'removed' }
 
 GET  /users/:id
 PUT  /users/:id           → acepta: nombre, foto_url, tema_equipo, idioma_pref, whatsapp_number, whatsapp_consent
@@ -238,11 +240,23 @@ Los archivos de `src/test/` están excluidos de `tsconfig.app.json` (`"exclude":
 ### Idioma por defecto
 Si el navegador no tiene idioma configurado → castellano. Las landing pages usan `detectLang()` con `return 'es'` como fallback.
 
-### Filtros Matriz (multi-select)
+### Filtros Matriz (multi-select por color)
 Estado: `filterColors: Set<string>`. Lógica: `filterColors.size > 0 && !filterColors.has(res.color)` → celda invisible. Un Set vacío = sin filtro = todo visible.
 
-### WhatsApp en Matriz
-Solo se muestra el ícono WhatsApp junto al nombre cuando `whatsapp_number` es no-null en la API (el backend filtra por `whatsapp_consent = true` antes de devolver el número).
+### Buscador de jugadores en Matriz (multi-select)
+Estado: `selectedPlayers: Set<string>` (por `planilla_id`). Derivado: `filteredRows = selectedPlayers.size > 0 ? rows.filter(...) : rows`. El panel de búsqueda (chips + dropdown) se muestra cuando `searchOpen === true`. Botón activo si `searchOpen || selectedPlayers.size > 0`.
+
+### Compartir en Matriz
+- Botón "↗ Compartir": Web Share API nativa (mobile) → fallback clipboard (desktop), muestra "✓ Copiado" 2.5s.
+- Botón "💬 WhatsApp": abre `https://wa.me/?text=encodeURIComponent(texto)` en nueva pestaña.
+- Ambos comparten top 10 del ranking con nombre + puntos + URL de la página.
+- Botón "📥 Descargar": `window.print()`. CSS `@media print` oculta clases `no-print`, normaliza sticky y overflow.
+
+### Apuestas en Matriz — sin veda
+Todas las apuestas de todos los jugadores son visibles siempre, incluyendo partidos pendientes. Se eliminó la condición `isCutoffPassed` (PR #149). No hay modal de "período de veda".
+
+### WhatsApp en Matriz (link por jugador)
+Solo se muestra el ícono WhatsApp junto al nombre cuando `whatsapp_number` es no-null en la API (el backend filtra por `whatsapp_consent = true` antes de devolver el número). Diferente al botón "Compartir por WhatsApp" del toolbar (que comparte el top 10).
 
 ---
 
@@ -250,10 +264,12 @@ Solo se muestra el ícono WhatsApp junto al nombre cuando `whatsapp_number` es n
 
 ### Unit/componente (vitest)
 ```bash
-# En /tmp/prode-caballito-fe
-node ./node_modules/vitest/vitest.mjs run
+# En /home/user/prode-caballito-fe
+npx vitest run
+# O con verbose:
+npx vitest run --reporter=verbose
 ```
-Archivos: `src/test/formatCountdown.test.ts`, `src/test/Home.cta.test.tsx`, `src/test/Matriz.filter.test.tsx`
+79 archivos de test, 804 tests totales. Principales: `src/test/Matriz.interactions.test.tsx`, `src/test/Matriz.extra.test.tsx`, `src/test/Matriz.filter.test.tsx`, `src/test/Home.cta.test.tsx`, `src/test/formatCountdown.test.ts`.
 
 ### E2E (Playwright) — correr localmente
 ```bash
@@ -282,7 +298,7 @@ aws cloudfront create-invalidation --distribution-id <ID> --paths "/*"
 
 ### Backend (Lambda)
 ```bash
-cd /tmp/prode-api-src
+cd /home/user/prode-caballito-be
 zip -r ../prode-api-new.zip .
 aws lambda update-function-code \
   --function-name prode-api \
