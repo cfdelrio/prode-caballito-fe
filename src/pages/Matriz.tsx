@@ -338,6 +338,16 @@ export function Matriz() {
     }
   }
 
+  const handleShareWhatsApp = () => {
+    const top10 = rows.slice(0, 10)
+    const lines = top10
+      .map((r, i) => `${i + 1}. ${r.user_name} — ${tournamentPts.get(r.planilla_id) ?? 0} pts`)
+      .join('\n')
+    const text = `🏆 Planilla General — Prode Caballito\n\n${lines}\n\n¿Quién gana? ${window.location.href}`
+    const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`
+    window.open(waUrl, '_blank')
+  }
+
   const getBetsForRow = (r: RankingEntry) => bets[r.planilla_id] || {}
 
   return (
@@ -408,6 +418,11 @@ export function Matriz() {
             }`}>
             <span>{shared ? '✓' : '↗'}</span>
             <span className="hidden sm:inline">{shared ? 'Copiado' : 'Compartir'}</span>
+          </button>
+          <button onClick={handleShareWhatsApp} title="Compartir en WhatsApp"
+            className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all">
+            <span>💬</span>
+            <span className="hidden sm:inline">WhatsApp</span>
           </button>
           <button onClick={handleDownload} title="Descargar planilla"
             className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all">

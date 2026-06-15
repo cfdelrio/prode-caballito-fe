@@ -374,7 +374,7 @@ describe('Matriz — rendering de filas', () => {
     renderMatriz()
     await waitForLoad()
 
-    const waLink = await screen.findByTitle(/WhatsApp/)
+    const waLink = await screen.findByTitle(/WhatsApp a/)
     expect(waLink.getAttribute('href')).toContain('wa.me/5491155554444')
   })
 
