@@ -160,6 +160,9 @@ export function Matriz() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedPlayers, setSelectedPlayers] = useState<Set<string>>(new Set())
   const [shared, setShared] = useState(false)
+  const [showFavorites, setShowFavorites] = useState(() => {
+    try { return localStorage.getItem('matriz.showFavorites') === 'true' } catch { return false }
+  })
   const searchInputRef = useRef<HTMLInputElement>(null)
   const tableRef = useRef<HTMLDivElement>(null)
   const headerInnerRef = useRef<HTMLDivElement>(null)
@@ -223,6 +226,13 @@ export function Matriz() {
       // Storage no disponible (Safari privado, cuota, etc.) — no es crítico
     }
   }, [filterColors])
+
+  useEffect(() => {
+    try {
+      if (showFavorites) localStorage.setItem('matriz.showFavorites', 'true')
+      else localStorage.removeItem('matriz.showFavorites')
+    } catch {}
+  }, [showFavorites])
 
   const handleToggleFavorite = useCallback(async (planillaId: string, e: React.MouseEvent) => {
     e.stopPropagation()
@@ -296,7 +306,9 @@ export function Matriz() {
 
   const filteredRows = selectedPlayers.size > 0
     ? rows.filter(r => selectedPlayers.has(r.planilla_id))
-    : rows
+    : showFavorites
+      ? rows.filter(r => favorites.has(r.planilla_id) || r.user_id === user?.id)
+      : rows
 
   const handleSearchToggle = () => {
     if (searchOpen && selectedPlayers.size === 0) {
@@ -412,6 +424,20 @@ export function Matriz() {
 
         {/* Botones de acción */}
         <div className="flex items-center gap-1.5 shrink-0 no-print">
+          <button
+            onClick={() => setShowFavorites(v => !v)}
+            title={showFavorites ? 'Ver todos los jugadores' : 'Ver solo mis favoritos'}
+            className={`relative flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              showFavorites ? 'bg-yellow-400 text-yellow-900' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}>
+            <span>{showFavorites ? '⭐' : '☆'}</span>
+            <span className="hidden sm:inline">Mi grupo</span>
+            {favorites.size > 0 && !showFavorites && (
+              <span className="absolute -top-1 -right-1 bg-yellow-500 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">
+                {favorites.size}
+              </span>
+            )}
+          </button>
           <button onClick={handleShare} title="Compartir planilla"
             className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               shared ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
