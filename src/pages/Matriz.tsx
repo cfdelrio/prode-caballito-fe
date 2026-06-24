@@ -8,7 +8,7 @@ import { calcularPuntaje, POINT_COLORS } from '@/utils/scoring'
 import { teamFlag } from '@/utils/teamFlags'
 import { useAuthStore } from '@/store/authStore'
 import { useToastStore } from '@/store/toastStore'
-import type { Match, RankingEntry } from '@/types'
+import type { Match, RankingEntry, Tournament } from '@/types'
 
 type BetMap = Record<string, Record<string, { home: number; away: number }>>
 
@@ -140,6 +140,8 @@ export function Matriz() {
   const [bets, setBets] = useState<BetMap>({})
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
+  const [tournaments, setTournaments] = useState<Tournament[]>([])
+  const [selectedTournamentId, setSelectedTournamentId] = useState<string>('')
   const [activeCell, setActiveCell] = useState<ActiveCell | null>(null)
   const [filterColors, setFilterColors] = useState<Set<string>>(() => {
     try {
@@ -197,16 +199,20 @@ export function Matriz() {
   const loadMatrizData = useCallback(async () => {
     setRefreshing(true)
     try {
-      const [mRes, rRes, bRes, favRes] = await Promise.all([
+      const [mRes, rRes, bRes, favRes, tourRes] = await Promise.all([
         api.get('/matches?limit=200'),
         api.get('/ranking?limit=200&include_unpaid=true'),
         api.get('/bets/all-for-matrix'),
         api.get('/ranking/favorites').catch(() => ({ data: { data: [] } })),
+        api.get('/tournaments').catch(() => ({ data: { data: [] } })),
       ])
       setMatches(mRes.data.data.matches)
       setRanking(rRes.data.data.ranking)
       setBets(bRes.data.data)
       setFavorites(new Set(favRes.data.data || []))
+      const tourList: Tournament[] = tourRes.data.data || []
+      setTournaments(tourList)
+      setSelectedTournamentId(prev => prev || (tourList.length > 0 ? tourList[0].id : ''))
     } finally {
       setRefreshing(false)
     }
@@ -269,10 +275,12 @@ export function Matriz() {
   }, [activeCell])
 
 
-  const filteredMatches = matches
-  const finishedMatches = filteredMatches.filter(m => m.estado === 'finished')
-  const pendingMatches  = filteredMatches.filter(m => m.estado !== 'finished')
-  const hasLiveMatch    = filteredMatches.some(m => m.estado === 'live')
+  const tournamentMatches = selectedTournamentId
+    ? matches.filter(m => m.tournament_id === selectedTournamentId)
+    : matches
+  const finishedMatches = tournamentMatches.filter(m => m.estado === 'finished')
+  const pendingMatches  = tournamentMatches.filter(m => m.estado !== 'finished')
+  const hasLiveMatch    = tournamentMatches.some(m => m.estado === 'live')
   const allMatches = [...finishedMatches, ...pendingMatches]
 
   if (loading) return <MatrizSkeleton />
@@ -520,6 +528,25 @@ export function Matriz() {
               </ul>
             )}
           </div>
+        </div>
+      )}
+
+      {/* Filtro por torneo — solo visible si hay 2+ torneos */}
+      {tournaments.length > 1 && (
+        <div className="max-w-7xl mx-auto px-2 flex gap-2 flex-wrap no-print">
+          {tournaments.map(tour => (
+            <button
+              key={tour.id}
+              onClick={() => setSelectedTournamentId(tour.id)}
+              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
+                selectedTournamentId === tour.id
+                  ? 't-bg-primary t-text-on-primary'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              {tour.name}
+            </button>
+          ))}
         </div>
       )}
 

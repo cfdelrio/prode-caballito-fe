@@ -98,6 +98,25 @@ export const es = {
     planillaLocked: 'Planilla cerrada ✓',
     errorLock: 'Error al cerrar planilla',
     tournamentClosed: 'El torneo ya cerró. No es posible crear nuevas planillas.',
+    tabGrupos: '⚽ Grupos',
+    tabEliminatoria: '⚡ Eliminatoria',
+  },
+  eliminatoria: {
+    title: '⚡ Fase Eliminatoria',
+    noMatches: 'No hay partidos en esta ronda todavía',
+    round: (j: number): string => {
+      const names: Record<number, string> = {
+        1: 'Octavos de Final',
+        2: 'Cuartos de Final',
+        3: 'Semifinales',
+        4: 'Tercer Puesto',
+        5: 'Final',
+      }
+      return names[j] ?? `Ronda ${j}`
+    },
+    matchCount: (n: number, open: number) =>
+      open > 0 ? `${n} partidos · ${open} abiertos` : `${n} partidos`,
+    selectPlanilla: 'Elegí una planilla para apostar',
   },
   ranking: {
     title: '🏆 Ranking', global: 'Global', player: 'Jugador',

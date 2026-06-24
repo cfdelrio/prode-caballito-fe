@@ -100,6 +100,25 @@ export const pt: T = {
     planillaLocked: 'Planilha fechada ✓',
     errorLock: 'Erro ao fechar planilha',
     tournamentClosed: 'O torneio já encerrou. Não é possível criar novas planilhas.',
+    tabGrupos: '⚽ Grupos',
+    tabEliminatoria: '⚡ Eliminatória',
+  },
+  eliminatoria: {
+    title: '⚡ Fase Eliminatória',
+    noMatches: 'Não há partidas nesta rodada ainda',
+    round: (j: number): string => {
+      const names: Record<number, string> = {
+        1: 'Oitavas de Final',
+        2: 'Quartas de Final',
+        3: 'Semifinais',
+        4: 'Terceiro Lugar',
+        5: 'Final',
+      }
+      return names[j] ?? `Rodada ${j}`
+    },
+    matchCount: (n: number, open: number) =>
+      open > 0 ? `${n} partidas · ${open} abertas` : `${n} partidas`,
+    selectPlanilla: 'Escolhe uma planilha para apostar',
   },
   ranking: {
     title: '🏆 Classificação', global: 'Global', player: 'Jogador',
