@@ -1,10 +1,12 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import { api } from '@/api/client'
 import { useT } from '@/hooks/useT'
 import { MatchCard } from '@/components/match/MatchCard'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { SkMatchCard } from '@/components/ui/Skeleton'
 import type { Match, Bet, Tournament } from '@/types'
+import { BracketDesktop } from '@/components/bracket/BracketDesktop'
+import { BracketMobile } from '@/components/bracket/BracketMobile'
 
 interface Props {
   planillaId: string
@@ -18,6 +20,7 @@ export function EliminatoriaBracket({ planillaId, planillaLocked, tournament, no
   const [matches, setMatches] = useState<Match[]>([])
   const [bets, setBets] = useState<Record<string, Bet>>({})
   const [loading, setLoading] = useState(true)
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
 
   const loadBets = useCallback(async (pid: string) => {
     if (!pid) return
@@ -25,6 +28,12 @@ export function EliminatoriaBracket({ planillaId, planillaLocked, tournament, no
     const bMap: Record<string, Bet> = {}
     for (const b of (data.data || [])) bMap[b.match_id] = b
     setBets(bMap)
+  }, [])
+
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', handler)
+    return () => window.removeEventListener('resize', handler)
   }, [])
 
   useEffect(() => {
@@ -42,18 +51,6 @@ export function EliminatoriaBracket({ planillaId, planillaLocked, tournament, no
   const handleBetSaved = (bet: Bet) => setBets(prev => ({ ...prev, [bet.match_id]: bet }))
   const handleBetDeleted = (matchId: string) => {
     setBets(prev => { const n = { ...prev }; delete n[matchId]; return n })
-  }
-
-  // Group matches by jornada, sort chronologically within each round
-  const rounds: [number, Match[]][] = []
-  const byJornada = new Map<number, Match[]>()
-  for (const m of matches) {
-    const j = m.jornada ?? 0
-    if (!byJornada.has(j)) byJornada.set(j, [])
-    byJornada.get(j)!.push(m)
-  }
-  for (const [j, ms] of [...byJornada.entries()].sort(([a], [b]) => a - b)) {
-    rounds.push([j, ms.sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())])
   }
 
   if (loading) {
@@ -76,44 +73,26 @@ export function EliminatoriaBracket({ planillaId, planillaLocked, tournament, no
     )
   }
 
-  return (
-    <div className="space-y-8">
-      {rounds.map(([jornada, roundMatches]) => {
-        const openCount = roundMatches.filter(m => new Date(m.time_cutoff).getTime() > now).length
-        return (
-          <div key={jornada}>
-            {/* Round header */}
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#001A4B]/20 to-[#001A4B]/40" />
-              <div className="text-center">
-                <p className="text-xs font-black uppercase tracking-widest text-[#001A4B]">
-                  {t.eliminatoria.round(jornada)}
-                </p>
-                <p className="text-[10px] text-gray-400 mt-0.5">
-                  {t.eliminatoria.matchCount(roundMatches.length, openCount)}
-                </p>
-              </div>
-              <div className="h-px flex-1 bg-gradient-to-l from-transparent via-[#001A4B]/20 to-[#001A4B]/40" />
-            </div>
-
-            {/* Match cards */}
-            <div className="space-y-3">
-              {roundMatches.map(m => (
-                <MatchCard
-                  key={m.id}
-                  match={m}
-                  bet={bets[m.id]}
-                  planillaId={planillaId}
-                  onBetSaved={handleBetSaved}
-                  onBetDeleted={handleBetDeleted}
-                  planillaLocked={planillaLocked}
-                  now={now}
-                />
-              ))}
-            </div>
-          </div>
-        )
-      })}
-    </div>
+  return isMobile ? (
+    <BracketMobile
+      matches={matches}
+      bets={bets}
+      planillaId={planillaId}
+      planillaLocked={planillaLocked}
+      now={now}
+      onBetSaved={handleBetSaved}
+      onBetDeleted={handleBetDeleted}
+    />
+  ) : (
+    <BracketDesktop
+      matches={matches}
+      bets={bets}
+      planillaId={planillaId}
+      planillaLocked={planillaLocked}
+      now={now}
+      onBetSaved={handleBetSaved}
+      onBetDeleted={handleBetDeleted}
+    />
   )
 }
+
