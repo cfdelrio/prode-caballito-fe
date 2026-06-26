@@ -295,14 +295,32 @@ export function Admin() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Jornada</label>
-              <select value={matchForm.jornada} onChange={(e) => setMatchForm({ ...matchForm, jornada: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]">
-                <option value="">—</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-              </select>
+              {(() => {
+                const selectedT = tournaments.find(t => t.id === matchForm.tournament_id)
+                const isElim = !!selectedT && !/grupo/i.test(selectedT.fase ?? '')
+                const knockoutRounds: [string, string][] = [
+                  ['1', '16avos (Elim. de 32)'],
+                  ['2', 'Octavos de Final'],
+                  ['3', 'Cuartos de Final'],
+                  ['4', 'Semifinales'],
+                  ['5', 'Tercer Puesto'],
+                  ['6', 'Final'],
+                ]
+                return (
+                  <>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      {isElim ? 'Ronda' : 'Jornada'}
+                    </label>
+                    <select value={matchForm.jornada} onChange={(e) => setMatchForm({ ...matchForm, jornada: e.target.value })}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0042A5]">
+                      <option value="">—</option>
+                      {isElim
+                        ? knockoutRounds.map(([v, label]) => <option key={v} value={v}>{`${v} · ${label}`}</option>)
+                        : [1, 2, 3].map(n => <option key={n} value={String(n)}>{n}</option>)}
+                    </select>
+                  </>
+                )
+              })()}
             </div>
           </div>
           <Button type="submit" fullWidth>

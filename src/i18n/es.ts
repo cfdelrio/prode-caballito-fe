@@ -106,11 +106,12 @@ export const es = {
     noMatches: 'No hay partidos en esta ronda todavía',
     round: (j: number): string => {
       const names: Record<number, string> = {
-        1: 'Octavos de Final',
-        2: 'Cuartos de Final',
-        3: 'Semifinales',
-        4: 'Tercer Puesto',
-        5: 'Final',
+        1: '16avos de Final',
+        2: 'Octavos de Final',
+        3: 'Cuartos de Final',
+        4: 'Semifinales',
+        5: 'Tercer Puesto',
+        6: 'Final',
       }
       return names[j] ?? `Ronda ${j}`
     },
