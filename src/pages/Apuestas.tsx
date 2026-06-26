@@ -36,7 +36,8 @@ function ApuestasSkeleton() {
     </div>
   )
 }
-import type { Match, Bet, Planilla } from '@/types'
+import { EliminatoriaBracket } from '@/pages/EliminatoriaBracket'
+import type { Match, Bet, Planilla, Tournament } from '@/types'
 
 export function Apuestas() {
   const { show } = useToastStore()
@@ -54,8 +55,11 @@ export function Apuestas() {
   const [now, setNow] = useState(Date.now())
   const [showHelp, setShowHelp] = useState(true)
   const [runTour, setRunTour] = useState(false)
+  const [tournaments, setTournaments] = useState<Tournament[]>([])
+  const [roundTab, setRoundTab] = useState<'grupos' | 'eliminatoria'>('grupos')
   const hasLive = matches.some(m => m.estado === 'live')
   const isTournamentClosed = matches.length > 0 && now > Math.min(...matches.map(m => new Date(m.time_cutoff).getTime()))
+  const eliminatoriaTournament = tournaments.find(t => t.is_active && !/grupo/i.test(t.fase ?? ''))
 
   useEffect(() => {
     loadInitial()
@@ -96,9 +100,10 @@ export function Apuestas() {
   const loadInitial = async () => {
     setLoading(true)
     try {
-      const [matchRes, planRes] = await Promise.all([
+      const [matchRes, planRes, tourRes] = await Promise.all([
         api.get('/matches?limit=200'),
         api.get('/planillas'),
+        api.get('/tournaments').catch(() => ({ data: { data: [] } })),
       ])
       setMatches(matchRes.data.data.matches)
       const pl: Planilla[] = planRes.data.data
@@ -106,6 +111,7 @@ export function Apuestas() {
       if (pl.length > 0) {
         setSelectedPlanilla(pl[0].id)
       }
+      setTournaments(tourRes.data.data || [])
     } catch {
       show(t.bets.errorLoadMatches, 'error')
     } finally {
@@ -234,6 +240,39 @@ export function Apuestas() {
           </ol>
         </div>
       )}
+
+      {/* Tabs Grupos / Eliminatoria — solo se muestran si hay torneo eliminatorio activo */}
+      {eliminatoriaTournament && (
+        <div className="flex rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
+          {(['grupos', 'eliminatoria'] as const).map(tab => (
+            <button
+              key={tab}
+              onClick={() => setRoundTab(tab)}
+              className={`flex-1 py-2.5 text-sm font-bold transition-colors ${
+                roundTab === tab
+                  ? 't-bg-primary t-text-on-primary'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              {tab === 'grupos' ? t.bets.tabGrupos : t.bets.tabEliminatoria}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Vista Eliminatoria */}
+      {roundTab === 'eliminatoria' && eliminatoriaTournament && (
+        <EliminatoriaBracket
+          planillaId={selectedPlanilla}
+          planillaLocked={selectedPlanillaObj?.locked ?? false}
+          tournament={eliminatoriaTournament}
+          now={now}
+        />
+      )}
+
+      {/* Vista Grupos (contenido existente — solo visible en tab grupos) */}
+      {roundTab === 'grupos' && (
+        <>
 
       {/* Selector de planilla + crear nueva */}
       <div className="flex gap-2 items-center" data-tour="planilla-selector">
@@ -413,6 +452,9 @@ export function Apuestas() {
           </Fragment>
         ))}
       </div>
+
+        </>
+      )}
 
       <OnboardingTour run={runTour} onFinish={() => setRunTour(false)} />
       <PushPromptModal delayMs={800} />
