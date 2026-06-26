@@ -108,11 +108,12 @@ export const pt: T = {
     noMatches: 'Não há partidas nesta rodada ainda',
     round: (j: number): string => {
       const names: Record<number, string> = {
-        1: 'Oitavas de Final',
-        2: 'Quartas de Final',
-        3: 'Semifinais',
-        4: 'Terceiro Lugar',
-        5: 'Final',
+        1: '16-avos de Final',
+        2: 'Oitavas de Final',
+        3: 'Quartas de Final',
+        4: 'Semifinais',
+        5: 'Terceiro Lugar',
+        6: 'Final',
       }
       return names[j] ?? `Rodada ${j}`
     },
