@@ -56,13 +56,18 @@ export function BracketMobile({ matches, bets, planillaId, planillaLocked, now, 
             <div className="space-y-3">
               {roundMatches.map((m, idx) => {
                 const bet = bets[m.id]
-                const { resultado_local: rl, resultado_visitante: rv } = m
+                const { resultado_local: rl, resultado_visitante: rv, penales_local: pl, penales_visitante: pv } = m
                 const hasResult = rl !== undefined && rv !== undefined
+                // El 90' decide; si hubo empate, los penales definen quién avanza
                 const winner = rl !== undefined && rv !== undefined
-                  ? rl > rv
-                    ? m.home_team
-                    : m.away_team
+                  ? rl !== rv
+                    ? (rl > rv ? m.home_team : m.away_team)
+                    : (pl !== undefined && pv !== undefined && pl !== pv
+                        ? (pl > pv ? m.home_team : m.away_team)
+                        : null)
                   : null
+                const penText = hasResult && rl === rv && pl !== undefined && pv !== undefined
+                  ? `pen ${pl}-${pv}` : null
 
                 return (
                   <Fragment key={m.id}>
@@ -97,7 +102,7 @@ export function BracketMobile({ matches, bets, planillaId, planillaLocked, now, 
                       <div className="flex items-center justify-center py-2">
                         <div className="text-center">
                           <p className="text-[10px] text-gray-400 font-medium">
-                            {winner}
+                            {winner}{penText ? ` (${penText})` : ''}
                           </p>
                           <p className="text-[8px] text-gray-300">↓ avanza</p>
                         </div>

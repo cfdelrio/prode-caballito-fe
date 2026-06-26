@@ -117,8 +117,17 @@ export function BracketDesktop({ matches, bets, planillaId, planillaLocked, now,
               {/* Match nodes */}
               <div className="space-y-4">
                 {nodes.map((node) => {
-                  const hasResult = node.match.resultado_local !== undefined && node.match.resultado_visitante !== undefined
+                  const { resultado_local: rl, resultado_visitante: rv, penales_local: pl, penales_visitante: pv } = node.match
+                  const hasResult = rl !== undefined && rv !== undefined
                   const hasPrediction = !!node.bet
+                  // Quién avanza: el 90' decide; en empate, los penales rompen el empate
+                  const advanceSide = rl !== undefined && rv !== undefined
+                    ? rl !== rv
+                      ? (rl > rv ? 'home' : 'away')
+                      : (pl !== undefined && pv !== undefined && pl !== pv ? (pl > pv ? 'home' : 'away') : null)
+                    : null
+                  const penText = hasResult && rl === rv && pl !== undefined && pv !== undefined
+                    ? `pen ${pl}-${pv}` : null
 
                   return (
                     <div
@@ -132,7 +141,7 @@ export function BracketDesktop({ matches, bets, planillaId, planillaLocked, now,
                         <div className="space-y-1.5">
                           {/* Home team */}
                           <div className="flex items-center justify-between gap-2">
-                            <span className="text-[11px] font-semibold text-gray-700 truncate flex-1">
+                            <span className={`text-[11px] truncate flex-1 ${advanceSide === 'home' ? 'font-black text-[#0042A5]' : 'font-semibold text-gray-700'}`}>
                               {node.match.home_team}
                             </span>
                             <div className="flex items-center gap-1">
@@ -151,7 +160,7 @@ export function BracketDesktop({ matches, bets, planillaId, planillaLocked, now,
 
                           {/* Away team */}
                           <div className="flex items-center justify-between gap-2">
-                            <span className="text-[11px] font-semibold text-gray-700 truncate flex-1">
+                            <span className={`text-[11px] truncate flex-1 ${advanceSide === 'away' ? 'font-black text-[#0042A5]' : 'font-semibold text-gray-700'}`}>
                               {node.match.away_team}
                             </span>
                             <div className="flex items-center gap-1">
@@ -168,6 +177,10 @@ export function BracketDesktop({ matches, bets, planillaId, planillaLocked, now,
                             </div>
                           </div>
                         </div>
+
+                        {penText && (
+                          <p className="mt-1 text-[9px] font-semibold text-amber-600 text-right">{penText}</p>
+                        )}
 
                         {/* Status badge */}
                         <div className="mt-2 flex items-center gap-1 text-[9px]">
