@@ -1,7 +1,6 @@
-import { useEffect, useState, useCallback, useMemo } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { api } from '@/api/client'
 import { useT } from '@/hooks/useT'
-import { MatchCard } from '@/components/match/MatchCard'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { SkMatchCard } from '@/components/ui/Skeleton'
 import type { Match, Bet, Tournament } from '@/types'
