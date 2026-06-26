@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useT } from '@/hooks/useT'
 import { MatchCard } from '@/components/match/MatchCard'
-import { teamFlag } from '@/utils/teamFlags'
 import type { Match, Bet } from '@/types'
 
 interface Props {
@@ -74,7 +73,6 @@ export function BracketDesktop({ matches, bets, planillaId, planillaLocked, now,
         {bracket.map((_, stageIdx) => {
           if (stageIdx >= bracket.length - 1) return null
           const currentStage = bracket[stageIdx]
-          const nextStage = bracket[stageIdx + 1]
           const paths = []
 
           for (let i = 0; i < currentStage[1].length; i += 2) {

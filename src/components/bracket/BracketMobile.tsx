@@ -56,9 +56,10 @@ export function BracketMobile({ matches, bets, planillaId, planillaLocked, now, 
             <div className="space-y-3">
               {roundMatches.map((m, idx) => {
                 const bet = bets[m.id]
-                const hasResult = m.resultado_local !== undefined && m.resultado_visitante !== undefined
-                const winner = hasResult
-                  ? m.resultado_local > m.resultado_visitante
+                const { resultado_local: rl, resultado_visitante: rv } = m
+                const hasResult = rl !== undefined && rv !== undefined
+                const winner = rl !== undefined && rv !== undefined
+                  ? rl > rv
                     ? m.home_team
                     : m.away_team
                   : null
