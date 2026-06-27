@@ -221,7 +221,7 @@ export function Matriz() {
       setFavorites(new Set(favRes.data.data || []))
       const tourList: Tournament[] = tourRes.data.data || []
       setTournaments(tourList)
-      const elim = tourList.find(t => /eliminatoria|knockout/i.test(t.fase ?? ''))
+      const elim = tourList.find(t => t.is_active && !/grupo/i.test(t.fase ?? ''))
       const elimId = elim?.id ?? ''
       elimTourIdRef.current = elimId
       const tid = selectedTournamentIdRef.current || (tourList.length > 0 ? tourList[0].id : '')
