@@ -352,7 +352,7 @@ export function Ranking() {
               <div className="grid grid-cols-[2rem_1fr_auto_auto_2rem] gap-2 px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-500 border-b">
                 <span>#</span>
                 <span>{t.ranking.player}</span>
-                <span className="text-center">{t.ranking.exact}</span>
+                <span className="text-center" title={t.ranking.fourPtsHint}>{t.ranking.fourPts}</span>
                 <span className="text-right">{t.ranking.pts}</span>
                 <span />
               </div>
@@ -436,7 +436,7 @@ export function Ranking() {
                         </p>
                       </div>
                     </div>
-                    <span className="text-xs text-center text-gray-600">{r.exactos_count}</span>
+                    <span className="text-xs text-center text-sky-600 font-semibold" title={t.ranking.fourPtsHint}>{r.aciertos_celeste}</span>
                     <span className="font-black t-text-primary text-right">{r.puntos_totales}</span>
                     {/* Botón favorito — no mostrar en fila propia */}
                     {!isMe ? (
