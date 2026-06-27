@@ -319,22 +319,36 @@ export function Matriz() {
   const baseRows: RankingEntry[] = ranking
 
   const tournamentPts = new Map<string, number>()
+  // Conteo de aciertos por nivel [4pts, 3pts, 2pts, 1pt] para el desempate.
+  const tournamentBreakers = new Map<string, [number, number, number, number]>()
   baseRows.forEach(r => {
     const playerBets = bets[r.planilla_id] || {}
-    const pts = finishedMatches.reduce((total, m) => {
+    let pts = 0, c4 = 0, c3 = 0, c2 = 0, c1 = 0
+    for (const m of finishedMatches) {
       const b = playerBets[m.id]
-      if (!b || m.resultado_local === undefined || m.resultado_visitante === undefined) return total
-      return total + calcularPuntaje(
+      if (!b || m.resultado_local === undefined || m.resultado_visitante === undefined) continue
+      const p = calcularPuntaje(
         { goles_local: b.home, goles_visitante: b.away },
         { resultado_local: m.resultado_local!, resultado_visitante: m.resultado_visitante! }
       ).puntos
-    }, 0)
+      pts += p
+      if (p === 4) c4++
+      else if (p === 3) c3++
+      else if (p === 2) c2++
+      else if (p === 1) c1++
+    }
     tournamentPts.set(r.planilla_id, pts)
+    tournamentBreakers.set(r.planilla_id, [c4, c3, c2, c1])
   })
 
-  const rows = [...baseRows].sort(
-    (a, b) => (tournamentPts.get(b.planilla_id) ?? 0) - (tournamentPts.get(a.planilla_id) ?? 0)
-  )
+  // Orden con desempate en cascada: pts → 4pts → 3pts → 2pts → 1pt (igual que el Ranking).
+  const rows = [...baseRows].sort((a, b) => {
+    const ptsDiff = (tournamentPts.get(b.planilla_id) ?? 0) - (tournamentPts.get(a.planilla_id) ?? 0)
+    if (ptsDiff !== 0) return ptsDiff
+    const [a4, a3, a2, a1] = tournamentBreakers.get(a.planilla_id) ?? [0, 0, 0, 0]
+    const [b4, b3, b2, b1] = tournamentBreakers.get(b.planilla_id) ?? [0, 0, 0, 0]
+    return (b4 - a4) || (b3 - a3) || (b2 - a2) || (b1 - a1)
+  })
 
   const searchSuggestions = searchQuery.trim()
     ? rows.filter(r =>
