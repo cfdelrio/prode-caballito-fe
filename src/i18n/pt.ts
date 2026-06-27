@@ -123,7 +123,7 @@ export const pt: T = {
   },
   ranking: {
     title: '🏆 Classificação', global: 'Global', player: 'Jogador',
-    exact: 'Exatos', fourPts: '4 pts', fourPtsHint: 'Acertos de 4 pts — primeiro critério de desempate', pts: 'Pts',
+    exact: 'Exatos', fourPts: 'x4', fourPtsHint: 'Acertos de 4 pts — primeiro critério de desempate', pts: 'Pts',
     noStarted: 'O torneio ainda não começou',
     noStartedDesc: 'A classificação será mostrada quando houver resultados',
     noResults: 'O torneio ainda não tem jogos terminados',
