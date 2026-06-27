@@ -61,6 +61,15 @@ export function Apuestas() {
   const isTournamentClosed = matches.length > 0 && now > Math.min(...matches.map(m => new Date(m.time_cutoff).getTime()))
   const eliminatoriaTournament = tournaments.find(t => t.is_active && !/grupo/i.test(t.fase ?? ''))
 
+  // Planillas filtradas por tab: grupos = no asociadas a eliminatoria; eliminatoria = asociadas al torneo eliminatorio
+  const planillasForTab = useMemo(() => {
+    if (!eliminatoriaTournament) return planillas
+    if (roundTab === 'eliminatoria') {
+      return planillas.filter(p => (p.tournament_ids ?? []).includes(eliminatoriaTournament.id))
+    }
+    return planillas.filter(p => !(p.tournament_ids ?? []).includes(eliminatoriaTournament.id))
+  }, [planillas, roundTab, eliminatoriaTournament])
+
   useEffect(() => {
     loadInitial()
   }, [])
@@ -77,6 +86,12 @@ export function Apuestas() {
   useEffect(() => {
     if (selectedPlanilla) loadBets(selectedPlanilla)
   }, [selectedPlanilla])
+
+  // Al cambiar de tab, auto-seleccionar la primera planilla del tab si la actual no pertenece a él
+  useEffect(() => {
+    const valid = planillasForTab.some(p => p.id === selectedPlanilla)
+    if (!valid) setSelectedPlanilla(planillasForTab[0]?.id ?? '')
+  }, [planillasForTab])
 
   // Tick now every 30s (for countdown chips)
   useEffect(() => {
@@ -131,14 +146,19 @@ export function Apuestas() {
   }
 
   const handleCreatePlanilla = async () => {
-    if (isTournamentClosed) {
+    if (roundTab === 'grupos' && isTournamentClosed) {
       show(t.bets.tournamentClosed, 'error')
       setShowNewPlanilla(false)
       return
     }
     setCreatingPlanilla(true)
     try {
-      const { data } = await api.post('/planillas')
+      const tournament_id = roundTab === 'eliminatoria'
+        ? eliminatoriaTournament?.id
+        : tournaments.find(t => t.is_active && /grupo/i.test(t.fase ?? ''))?.id
+      const { data } = tournament_id
+        ? await api.post('/planillas', { tournament_id })
+        : await api.post('/planillas')
       const created: Planilla = data.data
       setPlanillas(prev => [...prev, created])
       setSelectedPlanilla(created.id)
@@ -262,14 +282,14 @@ export function Apuestas() {
 
       {/* Selector de planilla + crear nueva (visible en ambas tabs) */}
       <div className="flex gap-2 items-center" data-tour="planilla-selector">
-        {planillas.length > 0 ? (
+        {planillasForTab.length > 0 ? (
           <div className="relative flex-1">
             <select
               value={selectedPlanilla}
               onChange={(e) => setSelectedPlanilla(e.target.value)}
               className="w-full appearance-none border border-gray-200 t-text-nav rounded-xl px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0042A5] pr-8 font-medium transition-all"
             >
-              {planillas.map((p) => (
+              {planillasForTab.map((p) => (
                 <option key={p.id} value={p.id}>{p.nombre_planilla}</option>
               ))}
             </select>
@@ -280,7 +300,7 @@ export function Apuestas() {
             {t.bets.noPlanillas}
           </div>
         )}
-        {!isTournamentClosed && (
+        {(roundTab === 'eliminatoria' ? !!eliminatoriaTournament : !isTournamentClosed) && (
           <button
             onClick={() => setShowNewPlanilla(true)}
             data-tour="new-planilla"

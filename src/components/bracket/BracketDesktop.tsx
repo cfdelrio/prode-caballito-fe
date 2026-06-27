@@ -118,15 +118,15 @@ export function BracketDesktop({ matches, bets, planillaId, planillaLocked, now,
               <div className="space-y-4">
                 {nodes.map((node) => {
                   const { resultado_local: rl, resultado_visitante: rv, penales_local: pl, penales_visitante: pv } = node.match
-                  const hasResult = rl !== undefined && rv !== undefined
+                  const hasResult = rl != null && rv != null
                   const hasPrediction = !!node.bet
                   // Quién avanza: el 90' decide; en empate, los penales rompen el empate
-                  const advanceSide = rl !== undefined && rv !== undefined
+                  const advanceSide = rl != null && rv != null
                     ? rl !== rv
                       ? (rl > rv ? 'home' : 'away')
-                      : (pl !== undefined && pv !== undefined && pl !== pv ? (pl > pv ? 'home' : 'away') : null)
+                      : (pl != null && pv != null && pl !== pv ? (pl > pv ? 'home' : 'away') : null)
                     : null
-                  const penText = hasResult && rl === rv && pl !== undefined && pv !== undefined
+                  const penText = hasResult && rl === rv && pl != null && pv != null
                     ? `pen ${pl}-${pv}` : null
 
                   return (
