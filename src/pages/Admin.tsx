@@ -145,9 +145,33 @@ export function Admin() {
     e.preventDefault()
     if (!resultMatch) return
     try {
+      const rl = parseInt(resultForm.resultado_local)
+      const rv = parseInt(resultForm.resultado_visitante)
+
+      // Validaciones de penales
+      if (resultForm.penales_local !== '' || resultForm.penales_visitante !== '') {
+        // Si se cargó al menos un penal, ambos deben estar presentes
+        if (resultForm.penales_local === '' || resultForm.penales_visitante === '') {
+          show('Error: si cargas penales, debes completar ambos', 'error')
+          return
+        }
+        // Los penales solo son válidos en empates
+        if (rl !== rv) {
+          show('Error: los penales solo se usan en empates (mismo marcador)', 'error')
+          return
+        }
+        // Los penales deben resolver el empate (ganador diferente)
+        const pl = parseInt(resultForm.penales_local)
+        const pv = parseInt(resultForm.penales_visitante)
+        if (pl === pv) {
+          show('Error: los penales deben tener un ganador (scores distintos)', 'error')
+          return
+        }
+      }
+
       const payload: Record<string, number> = {
-        resultado_local: parseInt(resultForm.resultado_local),
-        resultado_visitante: parseInt(resultForm.resultado_visitante),
+        resultado_local: rl,
+        resultado_visitante: rv,
       }
       // Penales: solo se envían si se cargaron ambos (definen quién avanza en empates)
       if (resultForm.penales_local !== '' && resultForm.penales_visitante !== '') {
