@@ -198,18 +198,18 @@ export function Matriz() {
     return () => window.removeEventListener('resize', sync)
   }, [loading, ranking.length])
 
-  const loadBetsForTournament = useCallback(async (tid: string, elimId: string) => {
+  const loadBetsForTournament = useCallback(async (tid: string, elimId: string, tourCount: number = tournaments.length) => {
     let url = '/bets/all-for-matrix'
     // Siempre filtrar si hay eliminatoria detectada, O si el tid es distinto al primero
     if (elimId) {
       url += tid === elimId ? `?tournament_id=${elimId}` : `?not_tournament_id=${elimId}`
-    } else if (tid && tournaments.length > 1) {
+    } else if (tid && tourCount > 1) {
       // Sin eliminatoria detectada pero hay múltiples torneos → filtrar por este torneo
       url += `?tournament_id=${tid}`
     }
     const bRes = await api.get(url)
     setBets(bRes.data.data)
-  }, [tournaments])
+  }, [])
 
   const loadRankingForTournament = useCallback(async (tid: string, elimId: string) => {
     let url = '/ranking?limit=200&include_unpaid=true'
@@ -241,7 +241,7 @@ export function Matriz() {
         selectedTournamentIdRef.current = tid
       }
       await Promise.all([
-        loadBetsForTournament(tid, elimId),
+        loadBetsForTournament(tid, elimId, tourList.length),
         loadRankingForTournament(tid, elimId)
       ])
     } finally {
@@ -572,7 +572,7 @@ export function Matriz() {
               setSelectedTournamentId(tour.id)
               selectedTournamentIdRef.current = tour.id
               Promise.all([
-                loadBetsForTournament(tour.id, elimTourIdRef.current),
+                loadBetsForTournament(tour.id, elimTourIdRef.current, tournaments.length),
                 loadRankingForTournament(tour.id, elimTourIdRef.current)
               ]).catch(() => show(t.matrix.errorLoad, 'error'))
             }}
