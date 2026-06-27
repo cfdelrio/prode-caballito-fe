@@ -198,18 +198,13 @@ export function Matriz() {
     return () => window.removeEventListener('resize', sync)
   }, [loading, ranking.length])
 
-<<<<<<< HEAD
-  const loadRankingForTournament = useCallback(async (tid: string) => {
-    const url = `/ranking?limit=200&include_unpaid=true${tid ? `&tournament_id=${tid}` : ''}`
-=======
   const loadRankingForTournament = useCallback(async (tid: string, elimId: string) => {
     let url = '/ranking?limit=200&include_unpaid=true'
     if (elimId) {
       url += tid === elimId ? `&tournament_id=${elimId}` : `&not_tournament_id=${elimId}`
     }
->>>>>>> 6414277 (fix(matriz): desempate 4→3→2→1 pts + planillas filtradas por torneo)
     const rRes = await api.get(url)
-    setRanking(rRes.data.data.ranking)
+    setRanking(rRes.data.data.ranking || [])
   }, [])
 
   const loadMatrizData = useCallback(async () => {
@@ -226,22 +221,15 @@ export function Matriz() {
       setFavorites(new Set(favRes.data.data || []))
       const tourList: Tournament[] = tourRes.data.data || []
       setTournaments(tourList)
-<<<<<<< HEAD
-=======
       const elim = tourList.find(t => /eliminatoria|knockout/i.test(t.fase ?? ''))
       const elimId = elim?.id ?? ''
       elimTourIdRef.current = elimId
->>>>>>> 6414277 (fix(matriz): desempate 4→3→2→1 pts + planillas filtradas por torneo)
       const tid = selectedTournamentIdRef.current || (tourList.length > 0 ? tourList[0].id : '')
       if (!selectedTournamentIdRef.current && tid) {
         setSelectedTournamentId(tid)
         selectedTournamentIdRef.current = tid
       }
-<<<<<<< HEAD
-      await loadRankingForTournament(tid)
-=======
       await loadRankingForTournament(tid, elimId)
->>>>>>> 6414277 (fix(matriz): desempate 4→3→2→1 pts + planillas filtradas por torneo)
     } finally {
       setRefreshing(false)
     }
@@ -569,11 +557,7 @@ export function Matriz() {
               onClick={() => {
               setSelectedTournamentId(tour.id)
               selectedTournamentIdRef.current = tour.id
-<<<<<<< HEAD
-              loadRankingForTournament(tour.id).catch(() => show(t.matrix.errorLoad, 'error'))
-=======
               loadRankingForTournament(tour.id, elimTourIdRef.current).catch(() => show(t.matrix.errorLoad, 'error'))
->>>>>>> 6414277 (fix(matriz): desempate 4→3→2→1 pts + planillas filtradas por torneo)
             }}
               className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
                 selectedTournamentId === tour.id
