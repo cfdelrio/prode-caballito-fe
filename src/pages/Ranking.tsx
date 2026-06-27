@@ -96,11 +96,19 @@ export function Ranking() {
 
   const [tournaments, setTournaments] = useState<Tournament[]>([])
   const [selectedTournamentId, setSelectedTournamentId] = useState<string>('')
+  const [eliminatoriaTournamentId, setEliminatoriaTournamentId] = useState<string>('')
   const selectedTournamentIdRef = useRef<string>('')
 
-  const loadRanking = useCallback(async (tid: string) => {
+  const loadRankingForTournament = useCallback(async (tourId: string, elimTourId: string) => {
     try {
-      const url = `/ranking?limit=500${tid ? `&tournament_id=${tid}` : ''}`
+      let url = '/ranking?limit=500'
+      if (elimTourId) {
+        url += tourId === elimTourId
+          ? `&tournament_id=${elimTourId}`
+          : `&not_tournament_id=${elimTourId}`
+      } else if (tourId) {
+        url += `&tournament_id=${tourId}`
+      }
       const res = await api.get(url)
       setRanking(res.data.data.ranking || [])
     } catch {
@@ -115,13 +123,16 @@ export function Ranking() {
     ]).then(([tourRes, fRes]) => {
       const tourList: Tournament[] = tourRes.status === 'fulfilled' ? (tourRes.value.data.data || []) : []
       setTournaments(tourList)
-      const tid = tourList.length > 0 ? tourList[0].id : ''
-      setSelectedTournamentId(tid)
-      selectedTournamentIdRef.current = tid
+      const elim = tourList.find(t => /eliminatoria|knockout/i.test(t.fase ?? ''))
+      const elimTourId = elim?.id ?? ''
+      setEliminatoriaTournamentId(elimTourId)
+      const firstTourId = tourList.length > 0 ? tourList[0].id : ''
+      setSelectedTournamentId(firstTourId)
+      selectedTournamentIdRef.current = firstTourId
       if (fRes.status === 'fulfilled') setFavorites(new Set(fRes.value.data.data || []))
-      loadRanking(tid).finally(() => setLoading(false))
+      loadRankingForTournament(firstTourId, elimTourId).finally(() => setLoading(false))
     }).catch(() => setLoading(false))
-  }, [loadRanking])
+  }, [loadRankingForTournament])
 
   useEffect(() => {
     setShared(false)
@@ -194,7 +205,7 @@ export function Ranking() {
               onClick={() => {
                 setSelectedTournamentId(tour.id)
                 selectedTournamentIdRef.current = tour.id
-                loadRanking(tour.id).catch(() => show(t.ranking.errorLoad, 'error'))
+                loadRankingForTournament(tour.id, eliminatoriaTournamentId).catch(() => show(t.ranking.errorLoad, 'error'))
               }}
               className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-all ${
                 selectedTournamentId === tour.id
