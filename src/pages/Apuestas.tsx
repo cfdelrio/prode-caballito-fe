@@ -156,7 +156,9 @@ export function Apuestas() {
       const tournament_id = roundTab === 'eliminatoria'
         ? eliminatoriaTournament?.id
         : tournaments.find(t => t.is_active && /grupo/i.test(t.fase ?? ''))?.id
-      const { data } = await api.post('/planillas', tournament_id ? { tournament_id } : {})
+      const { data } = tournament_id
+        ? await api.post('/planillas', { tournament_id })
+        : await api.post('/planillas')
       const created: Planilla = data.data
       setPlanillas(prev => [...prev, created])
       setSelectedPlanilla(created.id)

@@ -57,16 +57,16 @@ export function BracketMobile({ matches, bets, planillaId, planillaLocked, now, 
               {roundMatches.map((m, idx) => {
                 const bet = bets[m.id]
                 const { resultado_local: rl, resultado_visitante: rv, penales_local: pl, penales_visitante: pv } = m
-                const hasResult = rl !== undefined && rv !== undefined
+                const hasResult = rl != null && rv != null
                 // El 90' decide; si hubo empate, los penales definen quién avanza
-                const winner = rl !== undefined && rv !== undefined
+                const winner = rl != null && rv != null
                   ? rl !== rv
                     ? (rl > rv ? m.home_team : m.away_team)
-                    : (pl !== undefined && pv !== undefined && pl !== pv
+                    : (pl != null && pv != null && pl !== pv
                         ? (pl > pv ? m.home_team : m.away_team)
                         : null)
                   : null
-                const penText = hasResult && rl === rv && pl !== undefined && pv !== undefined
+                const penText = hasResult && rl === rv && pl != null && pv != null
                   ? `pen ${pl}-${pv}` : null
 
                 return (
