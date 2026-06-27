@@ -198,6 +198,15 @@ export function Matriz() {
     return () => window.removeEventListener('resize', sync)
   }, [loading, ranking.length])
 
+  const loadBetsForTournament = useCallback(async (tid: string, elimId: string) => {
+    let url = '/bets/all-for-matrix'
+    if (elimId) {
+      url += tid === elimId ? `?tournament_id=${elimId}` : `?not_tournament_id=${elimId}`
+    }
+    const bRes = await api.get(url)
+    setBets(bRes.data.data)
+  }, [])
+
   const loadRankingForTournament = useCallback(async (tid: string, elimId: string) => {
     let url = '/ranking?limit=200&include_unpaid=true'
     if (elimId) {
@@ -210,14 +219,12 @@ export function Matriz() {
   const loadMatrizData = useCallback(async () => {
     setRefreshing(true)
     try {
-      const [mRes, bRes, favRes, tourRes] = await Promise.all([
+      const [mRes, favRes, tourRes] = await Promise.all([
         api.get('/matches?limit=200'),
-        api.get('/bets/all-for-matrix'),
         api.get('/ranking/favorites').catch(() => ({ data: { data: [] } })),
         api.get('/tournaments').catch(() => ({ data: { data: [] } })),
       ])
       setMatches(mRes.data.data.matches)
-      setBets(bRes.data.data)
       setFavorites(new Set(favRes.data.data || []))
       const tourList: Tournament[] = tourRes.data.data || []
       setTournaments(tourList)
@@ -229,11 +236,14 @@ export function Matriz() {
         setSelectedTournamentId(tid)
         selectedTournamentIdRef.current = tid
       }
-      await loadRankingForTournament(tid, elimId)
+      await Promise.all([
+        loadBetsForTournament(tid, elimId),
+        loadRankingForTournament(tid, elimId)
+      ])
     } finally {
       setRefreshing(false)
     }
-  }, [loadRankingForTournament])
+  }, [loadBetsForTournament, loadRankingForTournament])
 
   useEffect(() => {
     loadMatrizData().catch(() => show(t.matrix.errorLoad, 'error')).finally(() => setLoading(false))
@@ -557,7 +567,10 @@ export function Matriz() {
               onClick={() => {
               setSelectedTournamentId(tour.id)
               selectedTournamentIdRef.current = tour.id
-              loadRankingForTournament(tour.id, elimTourIdRef.current).catch(() => show(t.matrix.errorLoad, 'error'))
+              Promise.all([
+                loadBetsForTournament(tour.id, elimTourIdRef.current),
+                loadRankingForTournament(tour.id, elimTourIdRef.current)
+              ]).catch(() => show(t.matrix.errorLoad, 'error'))
             }}
               className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
                 selectedTournamentId === tour.id
