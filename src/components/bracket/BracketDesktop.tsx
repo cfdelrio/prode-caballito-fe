@@ -124,9 +124,9 @@ export function BracketDesktop({ matches, bets, planillaId, planillaLocked, now,
                   const advanceSide = rl !== undefined && rv !== undefined
                     ? rl !== rv
                       ? (rl > rv ? 'home' : 'away')
-                      : (pl !== undefined && pv !== undefined && pl !== pv ? (pl > pv ? 'home' : 'away') : null)
+                      : (pl != null && pv != null && pl !== pv ? (pl > pv ? 'home' : 'away') : null)
                     : null
-                  const penText = hasResult && rl === rv && pl !== undefined && pv !== undefined
+                  const penText = hasResult && rl === rv && pl != null && pv != null
                     ? `pen ${pl}-${pv}` : null
 
                   return (

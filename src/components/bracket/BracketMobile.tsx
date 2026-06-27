@@ -62,11 +62,11 @@ export function BracketMobile({ matches, bets, planillaId, planillaLocked, now, 
                 const winner = rl !== undefined && rv !== undefined
                   ? rl !== rv
                     ? (rl > rv ? m.home_team : m.away_team)
-                    : (pl !== undefined && pv !== undefined && pl !== pv
+                    : (pl != null && pv != null && pl !== pv
                         ? (pl > pv ? m.home_team : m.away_team)
                         : null)
                   : null
-                const penText = hasResult && rl === rv && pl !== undefined && pv !== undefined
+                const penText = hasResult && rl === rv && pl != null && pv != null
                   ? `pen ${pl}-${pv}` : null
 
                 return (
