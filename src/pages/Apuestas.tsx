@@ -270,11 +270,7 @@ export function Apuestas() {
         />
       )}
 
-      {/* Vista Grupos (contenido existente — solo visible en tab grupos) */}
-      {roundTab === 'grupos' && (
-        <>
-
-      {/* Selector de planilla + crear nueva */}
+      {/* Selector de planilla + crear nueva (visible en ambas tabs) */}
       <div className="flex gap-2 items-center" data-tour="planilla-selector">
         {planillas.length > 0 ? (
           <div className="relative flex-1">
@@ -339,8 +335,11 @@ export function Apuestas() {
         </>
       )}
 
-      {/* Botón confirmar planilla */}
-      {selectedPlanillaObj && !selectedPlanillaObj.locked && (() => {
+      {/* Vista Grupos (contenido específico de la tab de grupos) */}
+      {roundTab === 'grupos' && (
+        <>
+          {/* Botón confirmar planilla */}
+          {selectedPlanillaObj && !selectedPlanillaObj.locked && (() => {
         const missing = pendingMatches.filter(m => !bets[m.id]).length
         const allDone = missing === 0 && pendingMatches.length > 0
         return (
