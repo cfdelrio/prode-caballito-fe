@@ -260,16 +260,6 @@ export function Apuestas() {
         </div>
       )}
 
-      {/* Vista Eliminatoria */}
-      {roundTab === 'eliminatoria' && eliminatoriaTournament && (
-        <EliminatoriaBracket
-          planillaId={selectedPlanilla}
-          planillaLocked={selectedPlanillaObj?.locked ?? false}
-          tournament={eliminatoriaTournament}
-          now={now}
-        />
-      )}
-
       {/* Selector de planilla + crear nueva (visible en ambas tabs) */}
       <div className="flex gap-2 items-center" data-tour="planilla-selector">
         {planillas.length > 0 ? (
@@ -333,6 +323,16 @@ export function Apuestas() {
             </div>
           </div>
         </>
+      )}
+
+      {/* Vista Eliminatoria */}
+      {roundTab === 'eliminatoria' && eliminatoriaTournament && (
+        <EliminatoriaBracket
+          planillaId={selectedPlanilla}
+          planillaLocked={selectedPlanillaObj?.locked ?? false}
+          tournament={eliminatoriaTournament}
+          now={now}
+        />
       )}
 
       {/* Vista Grupos (contenido específico de la tab de grupos) */}
