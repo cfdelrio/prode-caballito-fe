@@ -121,7 +121,7 @@ export const es = {
   },
   ranking: {
     title: '🏆 Ranking', global: 'Global', player: 'Jugador',
-    exact: 'Exactos', pts: 'Pts',
+    exact: 'Exactos', fourPts: '4 pts', fourPtsHint: 'Aciertos de 4 pts — primer criterio de desempate', pts: 'Pts',
     noStarted: 'El torneo aún no comenzó',
     noStartedDesc: 'El ranking se mostrará cuando haya resultados',
     noResults: 'El torneo aún no tiene partidos terminados',
