@@ -200,12 +200,16 @@ export function Matriz() {
 
   const loadBetsForTournament = useCallback(async (tid: string, elimId: string) => {
     let url = '/bets/all-for-matrix'
+    // Siempre filtrar si hay eliminatoria detectada, O si el tid es distinto al primero
     if (elimId) {
       url += tid === elimId ? `?tournament_id=${elimId}` : `?not_tournament_id=${elimId}`
+    } else if (tid && tournaments.length > 1) {
+      // Sin eliminatoria detectada pero hay múltiples torneos → filtrar por este torneo
+      url += `?tournament_id=${tid}`
     }
     const bRes = await api.get(url)
     setBets(bRes.data.data)
-  }, [])
+  }, [tournaments])
 
   const loadRankingForTournament = useCallback(async (tid: string, elimId: string) => {
     let url = '/ranking?limit=200&include_unpaid=true'
