@@ -142,7 +142,7 @@ export function Matriz() {
   const [refreshing, setRefreshing] = useState(false)
   const [tournaments, setTournaments] = useState<Tournament[]>([])
   const [selectedTournamentId, setSelectedTournamentId] = useState<string>('')
-  const selectedTourIdRef = useRef('')
+  const selectedTournamentIdRef = useRef<string>('')
   const elimTourIdRef = useRef('')
   const [activeCell, setActiveCell] = useState<ActiveCell | null>(null)
   const [filterColors, setFilterColors] = useState<Set<string>>(() => {
@@ -198,12 +198,10 @@ export function Matriz() {
     return () => window.removeEventListener('resize', sync)
   }, [loading, ranking.length])
 
-  const loadRankingForMatriz = useCallback(async (tourId: string, elimId: string) => {
+  const loadRankingForTournament = useCallback(async (tid: string, elimId: string) => {
     let url = '/ranking?limit=200&include_unpaid=true'
     if (elimId) {
-      url += tourId === elimId
-        ? `&tournament_id=${elimId}`
-        : `&not_tournament_id=${elimId}`
+      url += tid === elimId ? `&tournament_id=${elimId}` : `&not_tournament_id=${elimId}`
     }
     const rRes = await api.get(url)
     setRanking(rRes.data.data.ranking || [])
@@ -223,21 +221,19 @@ export function Matriz() {
       setFavorites(new Set(favRes.data.data || []))
       const tourList: Tournament[] = tourRes.data.data || []
       setTournaments(tourList)
-
       const elim = tourList.find(t => /eliminatoria|knockout/i.test(t.fase ?? ''))
       const elimId = elim?.id ?? ''
       elimTourIdRef.current = elimId
-
-      if (!selectedTourIdRef.current && tourList.length > 0) {
-        selectedTourIdRef.current = tourList[0].id
-        setSelectedTournamentId(tourList[0].id)
+      const tid = selectedTournamentIdRef.current || (tourList.length > 0 ? tourList[0].id : '')
+      if (!selectedTournamentIdRef.current && tid) {
+        setSelectedTournamentId(tid)
+        selectedTournamentIdRef.current = tid
       }
-
-      await loadRankingForMatriz(selectedTourIdRef.current || (tourList[0]?.id ?? ''), elimId)
+      await loadRankingForTournament(tid, elimId)
     } finally {
       setRefreshing(false)
     }
-  }, [loadRankingForMatriz])
+  }, [loadRankingForTournament])
 
   useEffect(() => {
     loadMatrizData().catch(() => show(t.matrix.errorLoad, 'error')).finally(() => setLoading(false))
@@ -571,10 +567,10 @@ export function Matriz() {
             <button
               key={tour.id}
               onClick={() => {
-                setSelectedTournamentId(tour.id)
-                selectedTourIdRef.current = tour.id
-                loadRankingForMatriz(tour.id, elimTourIdRef.current).catch(() => show(t.matrix.errorLoad, 'error'))
-              }}
+              setSelectedTournamentId(tour.id)
+              selectedTournamentIdRef.current = tour.id
+              loadRankingForTournament(tour.id, elimTourIdRef.current).catch(() => show(t.matrix.errorLoad, 'error'))
+            }}
               className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
                 selectedTournamentId === tour.id
                   ? 't-bg-primary t-text-on-primary'
