@@ -34,7 +34,10 @@ export function BracketMobile({ matches, bets, planillaId, planillaLocked, now, 
   return (
     <div className="space-y-8">
       {rounds.map(([jornada, roundMatches]) => {
-        const openCount = roundMatches.filter((m) => new Date(m.time_cutoff).getTime() > now).length
+        // La ronda entera cierra con su primer partido (MIN de los cutoffs).
+        const roundCutoff = Math.min(...roundMatches.map((m) => new Date(m.time_cutoff).getTime()))
+        const roundClosed = now > roundCutoff
+        const openCount = roundClosed ? 0 : roundMatches.length
 
         return (
           <div key={jornada}>
@@ -79,6 +82,7 @@ export function BracketMobile({ matches, bets, planillaId, planillaLocked, now, 
                         onBetSaved={onBetSaved}
                         onBetDeleted={onBetDeleted}
                         planillaLocked={planillaLocked}
+                        tournamentClosed={roundClosed}
                         now={now}
                       />
 

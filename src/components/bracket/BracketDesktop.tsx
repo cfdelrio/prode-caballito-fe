@@ -227,18 +227,26 @@ export function BracketDesktop({ matches, bets, planillaId, planillaLocked, now,
 
             {matches
               .filter((m) => m.id === selectedMatch)
-              .map((match) => (
-                <MatchCard
-                  key={match.id}
-                  match={match}
-                  bet={bets[match.id]}
-                  planillaId={planillaId}
-                  onBetSaved={onBetSaved}
-                  onBetDeleted={onBetDeleted}
-                  planillaLocked={planillaLocked}
-                  now={now}
-                />
-              ))}
+              .map((match) => {
+                // La ronda entera cierra con su primer partido (MIN de los cutoffs de la jornada).
+                const j = match.jornada ?? 0
+                const roundCutoff = Math.min(
+                  ...matches.filter((mm) => (mm.jornada ?? 0) === j).map((mm) => new Date(mm.time_cutoff).getTime())
+                )
+                return (
+                  <MatchCard
+                    key={match.id}
+                    match={match}
+                    bet={bets[match.id]}
+                    planillaId={planillaId}
+                    onBetSaved={onBetSaved}
+                    onBetDeleted={onBetDeleted}
+                    planillaLocked={planillaLocked}
+                    tournamentClosed={now > roundCutoff}
+                    now={now}
+                  />
+                )
+              })}
           </div>
         </>
       )}
