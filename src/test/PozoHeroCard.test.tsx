@@ -131,121 +131,84 @@ describe('PozoHeroCard', () => {
   const paidEntry = makeEntry({ precio_pagado: true })
   const unpaidEntry1 = makeEntry({ planilla_id: 'p2', precio_pagado: false })
   const unpaidEntry2 = makeEntry({ planilla_id: 'p3', precio_pagado: false })
-  const ranking = [paidEntry, unpaidEntry1, unpaidEntry2]
+  // Mundial: 1 de 2 pagaron (pozo $40.000) · 2° Prode: 0 de 1 (pozo $20.000)
+  const pozos = [
+    { name: 'Mundial 2026', ranking: [paidEntry, unpaidEntry1] },
+    { name: '2° Prode', ranking: [unpaidEntry2] },
+  ]
 
   it('renders "EL PREMIO CRECE" badge', () => {
-    render(<PozoHeroCard ranking={ranking} now={NOW} />)
+    render(<PozoHeroCard pozos={pozos} now={NOW} />)
     expect(screen.getByText(/EL PREMIO CRECE/i)).toBeInTheDocument()
   })
 
   it('renders "PRODE 2026" badge', () => {
-    render(<PozoHeroCard ranking={ranking} now={NOW} />)
+    render(<PozoHeroCard pozos={pozos} now={NOW} />)
     expect(screen.getByText(/PRODE 2026/i)).toBeInTheDocument()
   })
 
-  it('renders the main title', () => {
-    render(<PozoHeroCard ranking={ranking} now={NOW} />)
+  it('renders the "un pozo por torneo" title', () => {
+    render(<PozoHeroCard pozos={pozos} now={NOW} />)
     const heading = screen.getByRole('heading', { level: 1 })
-    expect(heading.textContent).toMatch(/EL PREMIO/i)
-    expect(heading.textContent).toMatch(/ESTA X EXPLOTAR/i)
+    expect(heading.textContent).toMatch(/CADA TORNEO/i)
+    expect(heading.textContent).toMatch(/SU PROPIO POZO/i)
   })
 
-  it('renders the main social proof line', () => {
-    render(<PozoHeroCard ranking={ranking} now={NOW} />)
-    expect(screen.getByText(/1 de 3 jugadores ya están adentro/i)).toBeInTheDocument()
+  it('explica que los premios van por separado', () => {
+    render(<PozoHeroCard pozos={pozos} now={NOW} />)
+    expect(screen.getByText(/se reparten por separado en cada torneo/i)).toBeInTheDocument()
   })
 
-  it('renders the prize potential line', () => {
-    render(<PozoHeroCard ranking={ranking} now={NOW} />)
-    expect(screen.getByText(/El premio potencial ya alcanza los/i)).toBeInTheDocument()
+  it('muestra un bloque por cada torneo con su nombre', () => {
+    render(<PozoHeroCard pozos={pozos} now={NOW} />)
+    expect(screen.getByText('Mundial 2026')).toBeInTheDocument()
+    expect(screen.getByText('2° Prode')).toBeInTheDocument()
   })
 
-  it('renders the remaining players line when not all paid', () => {
-    render(<PozoHeroCard ranking={ranking} now={NOW} />)
-    // 3 total - 1 paid = 2 remaining
-    expect(screen.getByText(/Todavía faltan 2 para completar el premio máximo/i)).toBeInTheDocument()
+  it('muestra el pozo de cada torneo por separado', () => {
+    render(<PozoHeroCard pozos={pozos} now={NOW} />)
+    // Mundial: 2 planillas × $20.000 = $40.000 · 2° Prode: 1 × $20.000 = $20.000
+    expect(screen.getByLabelText(/Pozo de Mundial 2026: \$40\.000/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/Pozo de 2° Prode: \$20\.000/i)).toBeInTheDocument()
   })
 
-  it('does not render remaining line when all players paid', () => {
-    const allPaid = [
-      makeEntry({ precio_pagado: true }),
-      makeEntry({ planilla_id: 'p2', precio_pagado: true }),
-    ]
-    render(<PozoHeroCard ranking={allPaid} now={NOW} />)
-    expect(screen.queryByText(/Todavía faltan/i)).not.toBeInTheDocument()
+  it('muestra cuántos pagaron por torneo', () => {
+    render(<PozoHeroCard pozos={pozos} now={NOW} />)
+    expect(screen.getByText(/1 de 2 pagaron/i)).toBeInTheDocument()
+    expect(screen.getByText(/0 de 1 pagaron/i)).toBeInTheDocument()
   })
 
-  it('shows correct paidPlayers count (1 of 3)', () => {
-    render(<PozoHeroCard ranking={ranking} now={NOW} />)
-    const label = screen.getByLabelText(/1 jugadores pagaron/i)
-    expect(label).toBeInTheDocument()
-  })
-
-  it('shows "de 3 jugadores" in the paid players block', () => {
-    render(<PozoHeroCard ranking={ranking} now={NOW} />)
-    // The exact small label inside bloque 1: "de 3 jugadores"
-    expect(screen.getAllByText(/de 3 jugadores/i).length).toBeGreaterThanOrEqual(1)
-  })
-
-  it('shows 33% paidPct', () => {
-    render(<PozoHeroCard ranking={ranking} now={NOW} />)
-    expect(screen.getByText('33%')).toBeInTheDocument()
-  })
-
-  it('renders progress bar with aria attributes', () => {
-    render(<PozoHeroCard ranking={ranking} now={NOW} />)
-    const bar = screen.getByRole('progressbar')
-    expect(bar).toHaveAttribute('aria-valuenow', '33')
-    expect(bar).toHaveAttribute('aria-valuemin', '0')
-    expect(bar).toHaveAttribute('aria-valuemax', '100')
-  })
-
-  it('shows formatted recaudado amount', () => {
-    render(<PozoHeroCard ranking={ranking} now={NOW} />)
-    const label = screen.getByLabelText(/Recaudado:/i)
-    expect(label).toBeInTheDocument()
-    // 1 paid * $20,000
-    expect(label.textContent).toMatch(/^\$/)
-  })
-
-  it('shows formatted pozoTotal amount', () => {
-    render(<PozoHeroCard ranking={ranking} now={NOW} />)
-    const label = screen.getByLabelText(/Pozo potencial:/i)
-    expect(label).toBeInTheDocument()
-    // 3 total * $20,000
-    expect(label.textContent).toMatch(/^\$/)
-  })
-
-  it('shows "si pagan los 3 anotados"', () => {
-    render(<PozoHeroCard ranking={ranking} now={NOW} />)
-    expect(screen.getByText(/si pagan los 3 anotados/i)).toBeInTheDocument()
+  it('renderiza una barra de progreso por torneo', () => {
+    render(<PozoHeroCard pozos={pozos} now={NOW} />)
+    const bars = screen.getAllByRole('progressbar')
+    expect(bars.length).toBe(2)
+    // Mundial 1/2 = 50%
+    expect(bars[0]).toHaveAttribute('aria-valuenow', '50')
   })
 
   it('renders the date', () => {
-    render(<PozoHeroCard ranking={ranking} now={NOW} />)
-    // date shown in footer: "jueves, 4 jun 2026"
+    render(<PozoHeroCard pozos={pozos} now={NOW} />)
     const dateEl = document.querySelector('p.text-white\\/25')
     expect(dateEl?.textContent).toMatch(/2026/i)
   })
 
-  it('renders correctly with empty ranking (zero state)', () => {
-    render(<PozoHeroCard ranking={[]} now={NOW} />)
-    expect(screen.getByText(/EL PREMIO CRECE/i)).toBeInTheDocument()
-    expect(screen.getByText(/0 de 0 jugadores ya están adentro/i)).toBeInTheDocument()
-    expect(screen.getByText('0%')).toBeInTheDocument()
+  it('omite torneos sin jugadores y muestra zero-state si no hay ninguno', () => {
+    render(<PozoHeroCard pozos={[{ name: 'Mundial 2026', ranking: [] }]} now={NOW} />)
+    expect(screen.queryByText('Mundial 2026')).not.toBeInTheDocument()
+    expect(screen.getByText(/no hay jugadores anotados/i)).toBeInTheDocument()
   })
 
-  it('shows 100% when all players paid', () => {
+  it('muestra 100% cuando todos pagaron en el torneo', () => {
     const allPaid = [
       makeEntry({ precio_pagado: true }),
       makeEntry({ planilla_id: 'p2', precio_pagado: true }),
     ]
-    render(<PozoHeroCard ranking={allPaid} now={NOW} />)
-    expect(screen.getByText('100%')).toBeInTheDocument()
+    render(<PozoHeroCard pozos={[{ name: 'Mundial 2026', ranking: allPaid }]} now={NOW} />)
+    expect(screen.getByText(/100% adentro/i)).toBeInTheDocument()
   })
 
-  it('shows "de planilla" price info in Recaudado block', () => {
-    render(<PozoHeroCard ranking={ranking} now={NOW} />)
+  it('muestra el precio por planilla', () => {
+    render(<PozoHeroCard pozos={pozos} now={NOW} />)
     expect(screen.getByText(/c\/planilla/i)).toBeInTheDocument()
   })
 })
