@@ -349,7 +349,10 @@ export function Apuestas() {
       {roundTab === 'eliminatoria' && eliminatoriaTournament && (
         <EliminatoriaBracket
           planillaId={selectedPlanilla}
-          planillaLocked={selectedPlanillaObj?.locked ?? false}
+          // El "cierre" de planilla es un concepto de grupos; en eliminatoria
+          // se apuesta ronda a ronda y solo manda el cutoff por partido (igual
+          // que el backend, que ignora `locked` en esta fase).
+          planillaLocked={false}
           tournament={eliminatoriaTournament}
           now={now}
         />
