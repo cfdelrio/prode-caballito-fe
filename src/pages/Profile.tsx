@@ -25,6 +25,7 @@ const COUNTRY_CODES = [
   { code: '+34', flag: '🇪🇸', name: 'España' },
   { code: '+212', flag: '🇲🇦', name: 'Marruecos' },
   { code: '+1', flag: '🇺🇸', name: 'EE.UU.' },
+  { code: '+61', flag: '🇦🇺', name: 'Australia' },
 ]
 
 // Redimensiona y comprime una imagen usando Canvas. Devuelve base64 sin el prefijo data:...
