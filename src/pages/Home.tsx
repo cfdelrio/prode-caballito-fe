@@ -16,7 +16,7 @@ import { LeaderHome } from '@/pages/LeaderHome'
 import { POINT_COLORS } from '@/utils/scoring'
 import { PollWidget } from '@/components/PollWidget'
 import { useGamification } from '@/hooks/useGamification'
-import { PozoHeroCard } from '@/components/PozoHeroCard'
+import { PozoHeroCard, type PozoTorneo } from '@/components/PozoHeroCard'
 import { IncompleteProdeHero } from '@/components/IncompleteProdeHero'
 import type { Match, Bet, Planilla, RankingEntry } from '@/types'
 
@@ -362,6 +362,7 @@ export function Home() {
   const [bets, setBets] = useState<Record<string, Bet>>({})
   const [planilla, setPlanilla] = useState<Planilla | null>(null)
   const [ranking, setRanking] = useState<RankingEntry[]>([])
+  const [pozos, setPozos] = useState<PozoTorneo[]>([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState(false)
   const [now, setNow] = useState(new Date())
@@ -379,6 +380,31 @@ export function Home() {
   }, [])
 
   useEffect(() => { loadData() }, [])
+
+  // Pozos por torneo (premio por planilla × torneo, separado). Una sola carga:
+  // el pozo cambia poco (solo cuando alguien paga), no hace falta en el polling.
+  useEffect(() => {
+    const loadPozos = async () => {
+      try {
+        const tourRes = await api.get('/tournaments').catch(() => ({ data: { data: [] } }))
+        const tours: { id: string; name: string; fase?: string; is_active?: boolean }[] = tourRes.data.data || []
+        const elim = tours.find(t => t.is_active && !/grupo/i.test(t.fase ?? ''))
+        if (!elim) return  // sin eliminatoria → cae al pozo global en el render
+        const grupos = tours.find(t => t.id !== elim.id && t.is_active) ?? tours.find(t => t.id !== elim.id)
+        const [grupRes, elimRes] = await Promise.all([
+          api.get(`/ranking?not_tournament_id=${elim.id}&include_unpaid=true&limit=500`),
+          api.get(`/ranking?tournament_id=${elim.id}&include_unpaid=true&limit=500`),
+        ])
+        const next: PozoTorneo[] = []
+        if (grupos) next.push({ name: grupos.name, ranking: grupRes.data.data.ranking || [] })
+        next.push({ name: elim.name, ranking: elimRes.data.data.ranking || [] })
+        setPozos(next)
+      } catch {
+        /* noop: el render usa el pozo global como fallback */
+      }
+    }
+    loadPozos()
+  }, [])
 
   usePolling(() => loadData(true), 30_000)
 
@@ -531,7 +557,7 @@ export function Home() {
 
         {/* Hero — 3 variantes según estado de pago y pronósticos */}
         {heroVariant === 'pozo' ? (
-          <PozoHeroCard ranking={ranking} now={now} />
+          <PozoHeroCard pozos={pozos.length ? pozos : [{ name: 'PRODE 2026', ranking }]} now={now} />
         ) : heroVariant === 'incomplete' ? (
           <IncompleteProdeHero totalUnbet={totalUnbet} urgentUnbet={urgentUnbet} now={now} userName={user?.nombre} />
         ) : (

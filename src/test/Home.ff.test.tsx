@@ -103,27 +103,28 @@ describe('Home — PozoHeroCard (precio_pagado: false)', () => {
     })
   })
 
-  it('muestra métricas de jugadores que pagaron', async () => {
+  it('muestra el título "un pozo por torneo"', async () => {
     await setupApi(false)
     renderHome()
     await waitFor(() => {
-      expect(screen.getByText(/¿Cuántos ya pagaron\?/i)).toBeInTheDocument()
+      const heading = screen.getByRole('heading', { level: 1 })
+      expect(heading.textContent).toMatch(/CADA TORNEO/i)
     })
   })
 
-  it('muestra métricas de recaudado', async () => {
+  it('aclara que los premios van por separado por torneo', async () => {
     await setupApi(false)
     renderHome()
     await waitFor(() => {
-      expect(screen.getByText(/¿Cuánto recaudado\?/i)).toBeInTheDocument()
+      expect(screen.getByText(/se reparten por separado en cada torneo/i)).toBeInTheDocument()
     })
   })
 
-  it('muestra métricas del pozo potencial', async () => {
+  it('muestra el precio por planilla del pozo', async () => {
     await setupApi(false)
     renderHome()
     await waitFor(() => {
-      expect(screen.getByText(/Pozo si todos pagan/i)).toBeInTheDocument()
+      expect(screen.getByText(/c\/planilla/i)).toBeInTheDocument()
     })
   })
 
