@@ -260,11 +260,20 @@ describe('Apuestas — callbacks de MatchCard en lista principal', () => {
 
     await waitFor(() => expect(screen.getByTestId('delete-m1')).toBeInTheDocument(), { timeout: 3000 })
 
-    const callsBefore = (api.get as ReturnType<typeof vi.fn>).mock.calls.length
+    // En CI (más lento) una llamada inicial puede registrarse tarde y falsear
+    // la línea base; esperar a que el conteo de api.get se estabilice primero.
+    const getCount = () => (api.get as ReturnType<typeof vi.fn>).mock.calls.length
+    let prev = -1
+    for (let i = 0; i < 40 && getCount() !== prev; i++) {
+      prev = getCount()
+      await new Promise((r) => setTimeout(r, 25))
+    }
+
+    const callsBefore = getCount()
     await user.click(screen.getByTestId('delete-m1'))
 
     // No debe disparar GET extra (es solo mutación de estado local)
-    expect((api.get as ReturnType<typeof vi.fn>).mock.calls.length).toBe(callsBefore)
+    expect(getCount()).toBe(callsBefore)
   })
 })
 
