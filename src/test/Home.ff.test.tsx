@@ -173,12 +173,12 @@ describe('Home — IncompleteProdeHero (precio_pagado: true, partidos sin aposta
 // ─── Hero clásico — pagó y tiene todo pronosticado ────────────────────────────
 
 describe('Home — Hero clásico (precio_pagado: true, sin partidos pendientes)', () => {
-  it('muestra el hero clásico con "EL MUNDIAL"', async () => {
+  it('muestra el hero clásico de la eliminatoria', async () => {
     await setupApi(true, [])
     renderHome()
     await waitFor(() => {
       const heading = screen.getByRole('heading', { level: 1 })
-      expect(heading.textContent).toMatch(/EL MUNDIAL/i)
+      expect(heading.textContent).toMatch(/MATA-MATA/i)
     })
   })
 

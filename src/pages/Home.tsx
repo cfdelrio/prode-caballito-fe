@@ -554,7 +554,7 @@ export function Home() {
                 style={{ background: 'rgba(255,223,0,0.12)', border: '1px solid rgba(255,223,0,0.35)', borderRadius: 99, padding: '5px 14px' }}
               >
                 <span style={{ fontSize: 11, fontWeight: 700, color: '#FFDF00', letterSpacing: '0.06em' }}>
-                  ✨ MUNDIAL 2026
+                  ⚡ 2° PRODE · ELIMINATORIA
                 </span>
               </div>
 
@@ -562,9 +562,13 @@ export function Home() {
                 className="font-black text-white leading-none mb-2"
                 style={{ fontSize: 'clamp(28px, 6vw, 44px)', fontFamily: "'Arial Black', Arial, sans-serif", lineHeight: 0.95 }}
               >
-                EL MUNDIAL<br />SE JUEGA ACÁ<br />
-                <em style={{ color: '#FFDF00', fontStyle: 'italic' }}>TAMBIÉN</em>
+                ARRANCA EL<br />MATA-MATA<br />
+                <em style={{ color: '#FFDF00', fontStyle: 'italic' }}>NO AFLOJÉS</em>
               </h1>
+
+              <p className="text-white/70 text-sm font-semibold mb-1 leading-snug">
+                Se juega por rondas: cargá toda la ronda <span style={{ color: '#FFDF00' }}>antes</span> de que arranque el primer partido.
+              </p>
 
               <p className="text-white/50 text-xs mt-2 mb-2">
                 {getGreeting(now)}, {user?.nombre?.split(' ')[0] || 'jugador'}
@@ -603,7 +607,7 @@ export function Home() {
                     className="inline-flex items-center gap-2 font-black text-sm px-5 py-3 rounded-xl w-fit transition-all hover:brightness-110 active:scale-95 hover:scale-105"
                     style={{ background: '#FFDF00', color: '#001A4B', boxShadow: '0 4px 20px rgba(255,223,0,0.5)' }}
                   >
-                    ⚽ {totalUnbet > 0 ? `Completar mi prode (${totalUnbet})` : 'Jugar ahora'}
+                    ⚡ {totalUnbet > 0 ? `Completar mi prode (${totalUnbet})` : 'Jugar la eliminatoria'}
                   </Link>
                 )}
 
