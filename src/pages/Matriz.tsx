@@ -235,7 +235,8 @@ export function Matriz() {
       const elim = tourList.find(t => t.is_active && !/grupo/i.test(t.fase ?? ''))
       const elimId = elim?.id ?? ''
       elimTourIdRef.current = elimId
-      const tid = selectedTournamentIdRef.current || (tourList.length > 0 ? tourList[0].id : '')
+      // Por default mostrar el torneo de eliminatoria (2° Prode) si existe.
+      const tid = selectedTournamentIdRef.current || elimId || (tourList.length > 0 ? tourList[0].id : '')
       if (!selectedTournamentIdRef.current && tid) {
         setSelectedTournamentId(tid)
         selectedTournamentIdRef.current = tid

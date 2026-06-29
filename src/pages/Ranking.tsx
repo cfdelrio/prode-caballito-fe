@@ -123,14 +123,15 @@ export function Ranking() {
     ]).then(([tourRes, fRes]) => {
       const tourList: Tournament[] = tourRes.status === 'fulfilled' ? (tourRes.value.data.data || []) : []
       setTournaments(tourList)
-      const elim = tourList.find(t => /eliminatoria|knockout/i.test(t.fase ?? ''))
+      const elim = tourList.find(t => t.is_active && !/grupo/i.test(t.fase ?? ''))
       const elimTourId = elim?.id ?? ''
       setEliminatoriaTournamentId(elimTourId)
-      const firstTourId = tourList.length > 0 ? tourList[0].id : ''
-      setSelectedTournamentId(firstTourId)
-      selectedTournamentIdRef.current = firstTourId
+      // Por default mostrar el torneo de eliminatoria (2° Prode) si existe.
+      const defaultTid = elimTourId || (tourList.length > 0 ? tourList[0].id : '')
+      setSelectedTournamentId(defaultTid)
+      selectedTournamentIdRef.current = defaultTid
       if (fRes.status === 'fulfilled') setFavorites(new Set(fRes.value.data.data || []))
-      loadRankingForTournament(firstTourId, elimTourId).finally(() => setLoading(false))
+      loadRankingForTournament(defaultTid, elimTourId).finally(() => setLoading(false))
     }).catch(() => setLoading(false))
   }, [loadRankingForTournament])
 
