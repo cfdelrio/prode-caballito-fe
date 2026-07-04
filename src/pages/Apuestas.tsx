@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, Fragment } from 'react'
+import { useEffect, useState, useMemo, useRef, Fragment } from 'react'
 import { usePolling } from '@/hooks/usePolling'
 import { api } from '@/api/client'
 import { useT } from '@/hooks/useT'
@@ -73,6 +73,16 @@ export function Apuestas() {
   useEffect(() => {
     loadInitial()
   }, [])
+
+  // Al entrar, arrancar en la tab Eliminatoria si hay un torneo activo (la ronda
+  // en curso). Una sola vez: si el usuario cambia a Grupos después, se respeta.
+  const defaultTabAppliedRef = useRef(false)
+  useEffect(() => {
+    if (!defaultTabAppliedRef.current && eliminatoriaTournament) {
+      defaultTabAppliedRef.current = true
+      setRoundTab('eliminatoria')
+    }
+  }, [eliminatoriaTournament])
 
   // Arrancar el tour de bienvenida la primera vez que entran a Pronósticos.
   // Esperamos a que el contenido haya cargado (loading=false) para que los targets existan.
