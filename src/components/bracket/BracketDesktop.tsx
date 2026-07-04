@@ -48,58 +48,11 @@ export function BracketDesktop({ matches, bets, planillaId, planillaLocked, now,
 
   if (bracket.length === 0) return null
 
-  const nodeHeight = 100
-  const nodeGap = 16
-  const columnGap = 120
-  const svgHeight = 2000
-  const svgWidth = 600
-
   return (
     <div className="space-y-6">
-      {/* SVG connecting lines */}
-      <svg
-        width="100%"
-        height={svgHeight}
-        viewBox={`0 0 ${svgWidth} ${svgHeight}`}
-        className="absolute inset-0 pointer-events-none hidden lg:block"
-        preserveAspectRatio="none"
-      >
-        <defs>
-          <linearGradient id="connectorGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#0042A5" stopOpacity="0.1" />
-            <stop offset="100%" stopColor="#0042A5" stopOpacity="0.3" />
-          </linearGradient>
-        </defs>
-        {bracket.map((_, stageIdx) => {
-          if (stageIdx >= bracket.length - 1) return null
-          const currentStage = bracket[stageIdx]
-          const paths = []
-
-          for (let i = 0; i < currentStage[1].length; i += 2) {
-            const x1 = 80 + stageIdx * columnGap
-            const y1 = 60 + (i / 2) * (nodeHeight * 2 + nodeGap * 2)
-            const x2 = x1 + columnGap
-            const y2 = 60 + (Math.floor(i / 2)) * (nodeHeight + nodeGap)
-
-            // Bézier curve
-            const cpx1 = x1 + columnGap / 3
-            const cpx2 = x2 - columnGap / 3
-            paths.push(
-              <path
-                key={`path-${stageIdx}-${i}`}
-                d={`M ${x1} ${y1 + nodeHeight / 2} C ${cpx1} ${y1 + nodeHeight / 2} ${cpx2} ${y2 + nodeHeight / 2} ${x2} ${y2 + nodeHeight / 2}`}
-                fill="none"
-                stroke="url(#connectorGradient)"
-                strokeWidth="2"
-                strokeDasharray="4 2"
-              />
-            )
-          }
-          return paths
-        })}
-      </svg>
-
-      {/* Bracket grid */}
+      {/* Bracket grid — columnas por ronda. Las líneas de conexión se quitaron:
+          los cruces se cargan con equipos fijos (sin source_match_id), así que
+          no hay estructura de llave real para dibujar, y el SVG salía descoordinado. */}
       <div className="relative overflow-x-auto">
         <div className="flex gap-12 p-4 min-w-min">
           {bracket.map(([jornada, nodes]) => (
